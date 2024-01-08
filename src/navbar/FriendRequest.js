@@ -3,51 +3,14 @@ import React, { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import { useSelector } from 'react-redux';
-import io from 'socket.io-client';
 import './abc.css';
 
 const FriendRequest = () => {
     const [photoURL, setPhotoURL] = useState(null);
     const [username, setUsername] = useState('');
     const [receiverId, setReceiverId] = useState('');
-    const [socket, setSocket] = useState(null);
-    const [socketId, setSocketId] = useState('');
     const [friendRequests, setFriendRequests] = useState([]);
-
     const uuid = useSelector((state) => state.profileuuid.uuid);
-
-    useEffect(() => {
-        // Connect to the Socket.IO server
-        const socketInstance = io('http://localhost:8080');
-
-        // Listen for the connect event
-        socketInstance.on('connect', () => {
-            console.log('Socket connected:', socketInstance.id);
-            setSocketId(socketInstance.id);
-        });
-
-        // Listen for friend request events from the server
-        socketInstance.on('friendRequest', (receivedFriendRequest) => {
-            console.log('Friend request received:', receivedFriendRequest);
-
-            // Update the state with the received friend request
-            setFriendRequests((prevFriendRequests) => [...prevFriendRequests, receivedFriendRequest]);
-        });
-
-        // Listen for any errors or debugging information from the server
-        socketInstance.on('serverMessage', (message) => {
-            console.log('Server message:', message);
-        });
-
-        // Store the socket instance in the state
-        setSocket(socketInstance);
-
-        // Cleanup the socket connection on component unmount
-        return () => {
-            console.log('Socket disconnected');
-            socketInstance.disconnect();
-        };
-    }, []);
 
     useEffect(() => {
         // Fetch user profile data when the UUID changes
@@ -69,14 +32,76 @@ const FriendRequest = () => {
             });
     }, [uuid]);
 
+    useEffect(() => {
+        // Fetch friend requests for the receiver's UUID
+        fetch(`http://localhost:8080/friendRequests/${receiverId}`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setFriendRequests(data); // Assuming the response is an array of friend requests
+            })
+            .catch((error) => {
+                console.error('Error fetching friend requests:', error.message);
+                // Handle error or update UI accordingly
+            });
+    }, [receiverId]); //
+
     const handleSendRequest = () => {
         console.log(`Friend request sent to ${username}`);
 
-        // Emit a friend request event to the server
-        socket.emit('sendFriendRequest', { senderId: uuid, receiverId });
+        // Make a POST request to the friend request API endpoint
+        fetch('http://localhost:8080/friendRequests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                senderId: uuid,
+                receiverId: receiverId,
+            }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Friend request failed');
+                }
+                return response.json();
+            })
+            .then((friendRequest) => {
+                console.log('Friend request sent successfully:', friendRequest);
+                // You can update the UI or take other actions if needed
+            })
+            .catch((error) => {
+                console.error('Error sending friend request:', error.message);
+                // Handle error or update UI accordingly
+            });
+    };
 
-        // You can update the UI or take other actions immediately (optimistically)
-        // since the server will also send a real-time update
+    const handleAcceptRequest = () => {
+        console.log(`Friend request accepted for receiverId: ${receiverId}`);
+
+        // Make a PUT request to accept friend request
+        fetch(`http://localhost:8080/friendRequests/${receiverId}/accept`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Failed to accept friend request');
+                }
+                return response.json();
+            })
+            .then((acceptedFriendRequest) => {
+                console.log('Friend request accepted successfully:', acceptedFriendRequest);
+                // You can update the UI or take other actions if needed
+            })
+            .catch((error) => {
+                console.error('Error accepting friend request:', error.message);
+                // Handle error or update UI accordingly
+            });
     };
 
     return (
@@ -87,10 +112,14 @@ const FriendRequest = () => {
                 <Button className="send-request-button" onClick={handleSendRequest}>
                     Send Request
                 </Button>
-                <div>Socket ID: {socketId}</div>
 
                 {friendRequests.map((request) => (
-                    <div key={request.id}>Friend Request from {request.senderId}</div>
+                    <div key={request.id}>
+                        Friend Request from {request.senderId}
+                        <Button onClick={handleAcceptRequest}>
+                            Accept Request
+                        </Button>
+                    </div>
                 ))}
             </div>
         </>
