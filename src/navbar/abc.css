@@ -1,0 +1,24 @@
+/* UserProfile.css */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.avatar-wrapper {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.username {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.send-request-button {
+    background-color: #4caf50;
+    color: #fff;
+}

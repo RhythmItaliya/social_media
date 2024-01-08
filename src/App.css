@@ -1,0 +1,67 @@
+:root {
+  --background-dark: #000000;
+  --font-color-dark: #FFFFFF;
+  --border-color-dark: #333333;
+  --icon-color-dark: #CCCCCC;
+  --input-color-dark: #444444;
+  --box-shadow-dark: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  --background-light: #FFFFFF;
+  --font-color-light: #000000;
+  --border-color-light: #E0E0E0;
+  --icon-color-light: #666666;
+  --input-color-light: #F5F5F5;
+  --box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  background-color: var(--background-light);
+  color: var(--font-color-light);
+}
+
+/* Dark Mode Styles */
+.dark-mode {
+  background-color: var(--background-dark);
+  color: var(--font-color-dark);
+}
+
+/* Define other styles using the custom properties */
+
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

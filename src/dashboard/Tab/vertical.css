@@ -1,0 +1,78 @@
+:root {
+  --background-color-light: #ffffff;
+  --background-color-dark: rgb(0, 0, 0);
+
+  --text-color-light: rgb(0, 0, 0);
+  --text-color-dark: #ffffff;
+
+  --border-color-light: #333333;
+  --border-color-dark: #CCCCCC;
+}
+
+/* Common styles for both light and dark modes */
+.full-screen,
+.full-screen-setting {
+  height: 100vh;
+  width: 100%;
+  color: var(--text-color-dark);
+  background-color: var(--background-color-light);
+}
+
+
+.verticalSidebar {
+  height: 100vh;
+  border-right: 1px solid var(--border-color-light);
+  color: var(--text-color-light);
+  background: var(--background-color-light);
+}
+
+.horizontalSidebar {
+  border-top: 1px solid var(--border-color-light);
+  color: var(--text-color-light);
+  background: var(--background-color-light);
+}
+
+.custom-tab {
+  color: var(--text-color-light) !important;
+}
+
+
+.custom-tab.Mui-selected {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Responsive styles */
+@media (max-width: 991.98px) {
+  .full-screen {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media screen and (min-width: 991.99px) and (max-width: 1024px) {
+  .full-screen {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* Dark mode specific styles */
+body.dark-mode {
+  --text-color-light: var(--text-color-dark) !important;
+  --background-color-light: var(--background-color-dark) !important;
+  --border-color-light: var(--border-color-dark) !important;
+}
+
+/* Styles for components in dark mode */
+.profile {
+  height: 100vh;
+  width: 100%;
+  color: var(--text-color-light) !important;
+  background-color: var(--background-color-light) !important;
+  border: 1px solid var(--border-color-light) !important;
+}
+
+.ant-modal-body {
+  justify-content: center;
+  display: flex;
+}
