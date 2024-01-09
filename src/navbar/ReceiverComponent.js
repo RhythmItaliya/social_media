@@ -1,77 +1,99 @@
 import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
 import { useSelector } from 'react-redux';
 
 const ReceiverComponent = () => {
     const receiverUUID = useSelector((state) => state.profileuuid.uuid);
     const [receiverData, setReceiverData] = useState(null);
-    const [userPhotoUrl, setUserPhotoUrl] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [friendRequestAccepted, setFriendRequestAccepted] = useState(false);
 
-    useEffect(() => {
-        // Fetch friend requests
-        fetch(`http://localhost:8080/friendRequests/${receiverUUID}`, {
-            method: 'GET',
-            credentials: 'include',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                // Process friend request data
-                const processedData = data.map((friendRequest) => {
-                    const { uuid, sender, receiver } = friendRequest;
-                    return {
-                        uuid,
-                        sender: sender.uuid,
-                        receiver: receiver.uuid,
-                    };
-                });
-
-                // Take the first processed data
-                const firstProcessedData = processedData[0];
-                if (firstProcessedData) {
-                    setReceiverData(firstProcessedData.receiver);
-                    setLoading(false); // Set loading to false after data is fetched
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-                setLoading(false); // Set loading to false in case of error
-            });
-    }, [receiverUUID]);
+    const [firstProcessedData, setFirstProcessedData] = useState(null);
 
     useEffect(() => {
         const fetchReceiverData = async () => {
             try {
-                if (!receiverData) {
-                    // Receiver data is not available yet, you may want to handle this case
-                    return;
-                }
-
-                // Fetch receiver data using the processed receiver UUID
-                const response = await fetch(`http://localhost:8080/api/user/profile/receiver/${receiverData}`, {
+                const response = await fetch(`http://localhost:8080/friendRequests/${receiverUUID}`, {
                     method: 'GET',
                     credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                 });
 
                 if (!response.ok) {
-                    console.error('Request failed');
-                    throw new Error('Request failed');
+                    console.error('Friend Requests Request failed');
+                    throw new Error('Friend Requests Request failed');
                 }
 
                 const data = await response.json();
-                setReceiverData(data);
+                const firstProcessedData = data[0];
+                setFirstProcessedData(firstProcessedData);
 
-                setUserPhotoUrl(data.completeImageUrl);
+                if (firstProcessedData) {
+                    const receiverResponse = await fetch(`http://localhost:8080/api/user/profile/receiver/${firstProcessedData.receiver.uuid}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!receiverResponse.ok) {
+                        console.error('Receiver Data Request failed');
+                        throw new Error('Receiver Data Request failed');
+                    }
+
+                    const receiverData = await receiverResponse.json();
+                    setReceiverData(receiverData);
+                }
+
+                setLoading(false);
             } catch (error) {
                 console.error(error);
+                setLoading(false);
             }
         };
 
         fetchReceiverData();
-    }, [receiverData]);
+    }, [receiverUUID]);
+
+    const handleAcceptFriendRequest = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/friendRequests/${receiverUUID}/accept`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Accept Friend Request Request failed');
+                throw new Error('Accept Friend Request Request failed');
+            }
+
+            setFriendRequestAccepted(true);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleRejectFriendRequest = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/delete/friend/request/${firstProcessedData.uuid}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                console.error('Reject Friend Request Request failed');
+                throw new Error('Reject Friend Request Request failed');
+            }
+
+            setFriendRequestAccepted(false);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div>
@@ -79,8 +101,18 @@ const ReceiverComponent = () => {
             {loading && <p>Loading...</p>}
             {!loading && receiverData && (
                 <div>
-                    {userPhotoUrl && <Avatar alt="Receiver Photo" src={userPhotoUrl} />}
+                    {receiverData.completeImageUrl && <Avatar alt="Receiver Photo" src={receiverData.completeImageUrl} />}
                     <p>{receiverData.firstName} {receiverData.lastName}</p>
+                    {!friendRequestAccepted && (
+                        <div>
+                            <Button variant="contained" color="primary" onClick={handleAcceptFriendRequest}>
+                                Accept Friend Request
+                            </Button>
+                            <Button variant="contained" color="secondary" onClick={handleRejectFriendRequest}>
+                                Reject Friend Request
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
