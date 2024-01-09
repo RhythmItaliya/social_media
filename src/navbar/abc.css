@@ -1,24 +1,42 @@
-/* UserProfile.css */
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+/* Merger.css */
+:root {
+    --background-dark: #000000;
+    --font-color-dark: #FFFFFF;
+    --border-color-dark: #333333;
+    --icon-color-dark: #CCCCCC;
+    --input-color-dark: #444444;
+    --box-shadow-dark: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+    --background-light: #FFFFFF;
+    --font-color-light: #000000;
+    --border-color-light: #E0E0E0;
+    --icon-color-light: #666666;
+    --input-color-light: #F5F5F5;
+    --box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.avatar-wrapper {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 10px;
+.fade-enter {
+    opacity: 0;
+    transform: translateY(-20px); /* Adjust as needed */
 }
 
-.username {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms ease-in, transform 300ms ease-in; /* Adjust as needed */
 }
 
-.send-request-button {
-    background-color: #4caf50;
-    color: #fff;
+.fade-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transform: translateY(-20px); /* Adjust as needed */
+    transition: opacity 300ms ease-out, transform 300ms ease-out; /* Adjust as needed */
+}
+
+.darklightmode{
+    
 }

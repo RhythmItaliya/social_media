@@ -1,15 +1,44 @@
+// ReceiverComponent.js
+
 import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import { Done, Close } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
+import { CSSTransition } from 'react-transition-group';
+import StyledIconButton from '@material-ui/core/IconButton';
+import { useDarkMode } from '../theme/Darkmode';
+
+import './abc.css';
+
+const lightModeColors = {
+    backgroundColor: '#ffffff',
+    iconColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
+    focusColor: 'rgb(0,0,0)',
+    border: '#CCCCCC',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+};
+
+const darkModeColors = {
+    backgroundColor: 'rgb(0,0,0)',
+    iconColor: '#ffffff',
+    textColor: '#ffffff',
+    focusColor: '#ffffff',
+    border: '#333333',
+    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+};
 
 const ReceiverComponent = () => {
     const receiverUUID = useSelector((state) => state.profileuuid.uuid);
     const [receiverData, setReceiverData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [friendRequestAccepted, setFriendRequestAccepted] = useState(false);
-
     const [firstProcessedData, setFirstProcessedData] = useState(null);
+    const [isHidden, setIsHidden] = useState(false);
+
+    const { isDarkMode } = useDarkMode();
+
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
         const fetchReceiverData = async () => {
@@ -25,11 +54,12 @@ const ReceiverComponent = () => {
                 }
 
                 const data = await response.json();
+                console.log(data);
                 const firstProcessedData = data[0];
                 setFirstProcessedData(firstProcessedData);
 
                 if (firstProcessedData) {
-                    const receiverResponse = await fetch(`http://localhost:8080/api/user/profile/receiver/${firstProcessedData.receiver.uuid}`, {
+                    const receiverResponse = await fetch(`http://localhost:8080/api/user/profile/receiver/${firstProcessedData.sender.uuid}`, {
                         method: 'GET',
                         credentials: 'include',
                         headers: {
@@ -72,6 +102,7 @@ const ReceiverComponent = () => {
             }
 
             setFriendRequestAccepted(true);
+            setIsHidden(true);
         } catch (error) {
             console.error(error);
         }
@@ -90,32 +121,52 @@ const ReceiverComponent = () => {
             }
 
             setFriendRequestAccepted(false);
+            setIsHidden(true);
         } catch (error) {
             console.error(error);
         }
     };
 
     return (
-        <div>
-            <h2>Pending Friend Requests</h2>
-            {loading && <p>Loading...</p>}
-            {!loading && receiverData && (
-                <div>
-                    {receiverData.completeImageUrl && <Avatar alt="Receiver Photo" src={receiverData.completeImageUrl} />}
-                    <p>{receiverData.firstName} {receiverData.lastName}</p>
-                    {!friendRequestAccepted && (
-                        <div>
-                            <Button variant="contained" color="primary" onClick={handleAcceptFriendRequest}>
-                                Accept Friend Request
-                            </Button>
-                            <Button variant="contained" color="secondary" onClick={handleRejectFriendRequest}>
-                                Reject Friend Request
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
+        <CSSTransition
+            in={!isHidden}
+            timeout={500}
+            classNames="fade"
+            unmountOnExit
+        >
+            <div className='' style={{ border: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}` }}>
+                {loading && <p>Loading...</p>}
+                {!loading && receiverData && (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {receiverData.completeImageUrl && <Avatar alt="Receiver Photo" src={receiverData.completeImageUrl} />}
+
+                        <p style={{ color: colors.textColor }} className='m-4'>
+                            {receiverData.firstName} {receiverData.lastName}
+                            <br />
+                            <span style={{ margin: '0', color: '#707070', fontSize: '12px' }}>
+                                asdfghj
+                            </span>
+                        </p>
+
+                        {!friendRequestAccepted && (
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <StyledIconButton
+                                    color="inherit" style={{ color: colors.iconColor }}
+                                    onClick={handleAcceptFriendRequest}>
+                                    <Done fontSize="small" />
+                                </StyledIconButton>
+
+                                <StyledIconButton
+                                    color="inherit" style={{ color: colors.iconColor }}
+                                    onClick={handleRejectFriendRequest}>
+                                    <Close fontSize="small" />
+                                </StyledIconButton>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </CSSTransition >
     );
 };
 

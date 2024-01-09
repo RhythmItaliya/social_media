@@ -5,13 +5,11 @@ import { useSelector } from 'react-redux';
 
 const SenderComponent = () => {
     const uuid = useSelector((state) => state.profileuuid.uuid);
-    const [photoURL, setPhotoURL] = useState('');
-    const [username, setUsername] = useState('');
-    const [receiverId, setReceiverId] = useState('');
+    const [userProfiles, setUserProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch user profile data
+        // Fetch user profiles
         fetch(`http://localhost:8080/api/userProfiles/${uuid}`, {
             method: 'GET',
             credentials: 'include',
@@ -19,23 +17,19 @@ const SenderComponent = () => {
             .then((response) => response.json())
             .then((data) => {
                 if (data.userProfiles && data.userProfiles.length > 0) {
-                    const firstUserProfile = data.userProfiles[0];
-                    setPhotoURL(firstUserProfile.photoURL);
-                    setUsername(firstUserProfile.username);
-                    setReceiverId(firstUserProfile.uuid);
-                    setLoading(false); // Set loading to false after data is fetched
+                    setUserProfiles(data.userProfiles);
                 }
             })
             .catch((error) => {
                 console.error(error);
-                setLoading(false); // Set loading to false in case of error
+            })
+            .finally(() => {
+                setLoading(false); // Set loading to false after data is fetched or in case of error
             });
     }, [uuid]);
 
-    const sendFriendRequest = async () => {
+    const sendFriendRequest = async (receiverId) => {
         try {
-            setLoading(true); // Set loading to true before making the request
-
             // Make a POST request to your backend endpoint to send the friend request
             const response = await fetch('http://localhost:8080/friendRequests', {
                 method: 'POST',
@@ -57,22 +51,26 @@ const SenderComponent = () => {
             }
         } catch (error) {
             console.error('Error sending friend request:', error);
-        } finally {
-            setLoading(false); // Set loading to false after the request is complete (whether success or failure)
         }
     };
 
     return (
         <div className="profile-container bg-black">
-            {loading && <p>Loading...</p>}
-            {!loading && (
-                <>
-                    <Avatar className="avatar-wrapper" alt="User Avatar" src={`http://static.profile.local/${photoURL}`} />
-                    <div className="username p-2 bg-black">{username}</div>
-                    <Button className="send-request-button" onClick={sendFriendRequest}>
-                        Send Request
-                    </Button>
-                </>
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                userProfiles.map((profile) => (
+                    <div key={profile.uuid} className="profile-item">
+                        <Avatar className="avatar-wrapper" alt="User Avatar" src={`http://static.profile.local/${profile.photoURL}`} />
+                        <div className="username p-2 bg-black">{profile.username}</div>
+                        <Button
+                            className="send-request-button"
+                            onClick={() => sendFriendRequest(profile.uuid)}
+                        >
+                            Send Request
+                        </Button>
+                    </div>
+                ))
             )}
         </div>
     );
