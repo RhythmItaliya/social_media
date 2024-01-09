@@ -5,7 +5,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import QuiltedImageList from './Gallery';  // Replace with the correct path
 import { Grid, useMediaQuery, useTheme } from '@mui/material';
 import './Merger.css';  // Import your CSS file for custom styles
-import FriendRequest from './FriendRequest';
+import SenderComponent from './SenderComponent';
+import ReceiverComponent from './ReceiverComponent';
 
 function Merger() {
     const [openImagesModal, setOpenImagesModal] = useState(false);
@@ -48,7 +49,8 @@ function Merger() {
 
                     {/* FriendRequest takes up the other 50% of the screen width */}
                     <Grid item xs={12} sm={6} className='mx-auto justify-content-center d-flex'>
-                        <FriendRequest />
+                        <SenderComponent />
+                        <ReceiverComponent />
                     </Grid>
                 </div>
             )}
@@ -62,7 +64,8 @@ function Merger() {
             {/* Modal for View All Friend Requests */}
             <Dialog open={openFriendRequestsModal} onClose={handleCloseFriendRequestsModal}>
                 <DialogTitle>View All Friend Requests</DialogTitle>
-                <FriendRequest />
+                <SenderComponent />
+                <ReceiverComponent />
             </Dialog>
         </div>
     );

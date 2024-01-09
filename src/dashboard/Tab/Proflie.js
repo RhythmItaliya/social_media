@@ -1,96 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBCardText, MDBCardBody, MDBCardImage, MDBBtn, MDBTypography } from 'mdb-react-ui-kit';
 import '../Tab/vertical.css';
-import CryptoJS from 'crypto-js';
 import { BiPencil } from 'react-icons/bi';
 import { Modal } from 'antd';
 import Editprofile from './Editprofile';
-import { useDispatch, useSelector } from 'react-redux';
-import { setProfileUuid, setUserPhoto, setUserUuid } from '../../actions/authActions';
-import { useCookies } from 'react-cookie';
+import { useSelector } from 'react-redux';
 
 export default function Profile() {
     const [userData, setUserData] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isProfileimg, setProfileimg] = useState({ userPhotoUrl: '' });
-    const [cookies] = useCookies(['token']);
+
     const defaultImageUrl = 'https://robohash.org/yourtext.png';
-    const dispatch = useDispatch();
+
+    //user uuid
+    const uuid = useSelector(state => state.useruuid.uuid);
+
+    // userPhotoUrl
+    const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
 
     useEffect(() => {
-        const encryptedUuid = cookies.token;
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/users/${uuid}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-        if (encryptedUuid) {
-            const decryptedBytes = CryptoJS.AES.decrypt(encryptedUuid, 'ASDCFVBNLKMNBSDFVBNJNBCV');
-            const uuid = decryptedBytes.toString(CryptoJS.enc.Utf8);
-            dispatch(setUserUuid(uuid));
-            fetchUserData(uuid);
-        }
-    }, [dispatch, cookies.token]);
-
-    const uuid2 = useSelector(state => state.profileuuid.uuid);
-
-    const fetchUserData = (uuid) => {
-        fetch(`http://localhost:8080/users/${uuid}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
                 if (!response.ok) {
                     console.error('Request failed');
                     throw new Error('Request failed');
                 }
-                return response.json();
-            })
-            .then(data => {
+
+                const data = await response.json();
                 setUserData({
                     firstName: data.userProfile.firstName,
                     lastName: data.userProfile.lastName,
                     location: data.userProfile.location,
                 });
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-                dispatch(setProfileUuid(data.userProfile.uuid));
-            })
-            .catch(e => {
-                console.log(e);
-            });
-    };
-
-
-    const featchuserPhoto = () => {
-        fetch(`http://localhost:8080/profile/profilePhoto/${uuid2}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Request failed');
-                    throw new Error('Request failed');
-                }
-                return response.json();
-            })
-            .then(data => {
-
-                setProfileimg({
-                    userPhotoUrl: data.completeImageUrl,
-                });
-
-                dispatch(setUserPhoto(data.completeImageUrl));
-            })
-            .catch(e => {
-                console.error(e);
-            });
-    };
-
-    useEffect(() => {
-        featchuserPhoto();
-    }, [uuid2]);
+        fetchUserData();
+    }, [uuid]);
 
     const handlePencilClick = () => {
         setIsModalOpen(true);
@@ -124,7 +80,7 @@ export default function Profile() {
 
                                     <div className="position-relative">
                                         <MDBCardImage
-                                            src={isProfileimg.userPhotoUrl || defaultImageUrl}
+                                            src={userPhotoUrl || defaultImageUrl}
                                             alt="Default Profile Photo"
                                             className="mt-4 mb-2 img-thumbnail img-fluid"
                                             style={{ width: '150px', height: '150px', objectFit: 'cover' }}
