@@ -30,14 +30,10 @@ const darkModeColors = {
 
 const ReceiverComponent = () => {
     const receiverUUID = useSelector((state) => state.profileuuid.uuid);
-    const [receiverData, setReceiverData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [friendRequestAccepted, setFriendRequestAccepted] = useState(false);
-    const [firstProcessedData, setFirstProcessedData] = useState(null);
-    const [isHidden, setIsHidden] = useState(false);
-
+    const [receiverData, setReceiverData] = useState([]);
+    const [friendRequestVisibility, setFriendRequestVisibility] = useState({});
     const { isDarkMode } = useDarkMode();
-
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
@@ -54,41 +50,48 @@ const ReceiverComponent = () => {
                 }
 
                 const data = await response.json();
-                console.log(data);
-                const firstProcessedData = data[0];
-                setFirstProcessedData(firstProcessedData);
 
-                if (firstProcessedData) {
-                    const receiverResponse = await fetch(`http://localhost:8080/api/user/profile/receiver/${firstProcessedData.sender.uuid}`, {
-                        method: 'GET',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
+                // Accumulate friend request data into an array
+                const processedData = data.map((friendRequestInfo, index) => {
+                    const friendRequestUuid = friendRequestInfo.friendRequest.uuid;
+                    const senderUuid = friendRequestInfo.friendRequest.sender.uuid;
+                    const receiverUuid = friendRequestInfo.friendRequest.receiver.uuid;
+                    const firstName = friendRequestInfo.senderProfile.firstName;
+                    const lastName = friendRequestInfo.senderProfile.lastName;
+                    const imageUrl = friendRequestInfo.senderProfile.completeImageUrl;
 
-                    if (!receiverResponse.ok) {
-                        console.error('Receiver Data Request failed');
-                        throw new Error('Receiver Data Request failed');
-                    }
+                    return {
+                        friendRequestUuid,
+                        senderUuid,
+                        receiverUuid,
+                        firstName,
+                        lastName,
+                        imageUrl,
+                    };
+                });
 
-                    const receiverData = await receiverResponse.json();
-                    setReceiverData(receiverData);
-                }
+                // Initialize visibility state for each friend request
+                const initialVisibility = processedData.reduce((acc, data) => {
+                    acc[data.friendRequestUuid] = false;
+                    return acc;
+                }, {});
+                setFriendRequestVisibility(initialVisibility);
+
+                // Set the processed data once outside the loop
+                setReceiverData(processedData);
 
                 setLoading(false);
             } catch (error) {
                 console.error(error);
-                setLoading(false);
             }
         };
 
         fetchReceiverData();
     }, [receiverUUID]);
 
-    const handleAcceptFriendRequest = async () => {
+    const handleAcceptFriendRequest = async (friendRequestUuid) => {
         try {
-            const response = await fetch(`http://localhost:8080/friendRequests/${receiverUUID}/accept`, {
+            const response = await fetch(`http://localhost:8080/friendRequests/${friendRequestUuid}/accept`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: {
@@ -101,16 +104,19 @@ const ReceiverComponent = () => {
                 throw new Error('Accept Friend Request Request failed');
             }
 
-            setFriendRequestAccepted(true);
-            setIsHidden(true);
+            // Set visibility to true only for the accepted friend request
+            setFriendRequestVisibility((prevVisibility) => ({
+                ...prevVisibility,
+                [friendRequestUuid]: true,
+            }));
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleRejectFriendRequest = async () => {
+    const handleRejectFriendRequest = async (friendRequestUuid) => {
         try {
-            const response = await fetch(`http://localhost:8080/delete/friend/request/${firstProcessedData.uuid}`, {
+            const response = await fetch(`http://localhost:8080/delete/friend/request/${friendRequestUuid}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
@@ -120,53 +126,61 @@ const ReceiverComponent = () => {
                 throw new Error('Reject Friend Request Request failed');
             }
 
-            setFriendRequestAccepted(false);
-            setIsHidden(true);
+            // Set visibility to true only for the rejected friend request
+            setFriendRequestVisibility((prevVisibility) => ({
+                ...prevVisibility,
+                [friendRequestUuid]: true,
+            }));
         } catch (error) {
             console.error(error);
         }
     };
 
     return (
-        <CSSTransition
-            in={!isHidden}
-            timeout={500}
-            classNames="fade"
-            unmountOnExit
-        >
-            <div className='' style={{ border: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}` }}>
-                {loading && <p>Loading...</p>}
-                {!loading && receiverData && (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {receiverData.completeImageUrl && <Avatar alt="Receiver Photo" src={receiverData.completeImageUrl} />}
-
-                        <p style={{ color: colors.textColor }} className='m-4'>
-                            {receiverData.firstName} {receiverData.lastName}
-                            <br />
-                            <span style={{ margin: '0', color: '#707070', fontSize: '12px' }}>
-                                asdfghj
-                            </span>
-                        </p>
-
-                        {!friendRequestAccepted && (
+        <div>
+            {loading && <p>Loading...</p>}
+            {!loading && receiverData.length > 0 && (
+                receiverData.map((data, index) => (
+                    <CSSTransition
+                        key={index}
+                        in={!friendRequestVisibility[data.friendRequestUuid]}
+                        timeout={500}
+                        classNames="fade"
+                        unmountOnExit
+                    >
+                        <div>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <StyledIconButton
-                                    color="inherit" style={{ color: colors.iconColor }}
-                                    onClick={handleAcceptFriendRequest}>
-                                    <Done fontSize="small" />
-                                </StyledIconButton>
+                                {data.imageUrl && <Avatar alt="Receiver Photo" src={data.imageUrl} />}
 
-                                <StyledIconButton
-                                    color="inherit" style={{ color: colors.iconColor }}
-                                    onClick={handleRejectFriendRequest}>
-                                    <Close fontSize="small" />
-                                </StyledIconButton>
+                                <p style={{ color: colors.textColor }} className='m-4'>
+                                    {data.firstName} {data.lastName}
+                                    <br />
+                                    <span style={{ margin: '0', color: '#707070', fontSize: '12px' }}>
+                                        asdfghj
+                                    </span>
+                                </p>
+
+                                {!friendRequestVisibility[data.friendRequestUuid] && (
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <StyledIconButton
+                                            color="inherit" style={{ color: colors.iconColor }}
+                                            onClick={() => handleAcceptFriendRequest(data.friendRequestUuid)}>
+                                            <Done fontSize="small" />
+                                        </StyledIconButton>
+
+                                        <StyledIconButton
+                                            color="inherit" style={{ color: colors.iconColor }}
+                                            onClick={() => handleRejectFriendRequest(data.friendRequestUuid)}>
+                                            <Close fontSize="small" />
+                                        </StyledIconButton>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                )}
-            </div>
-        </CSSTransition >
+                        </div>
+                    </CSSTransition>
+                ))
+            )}
+        </div>
     );
 };
 
