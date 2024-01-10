@@ -31,12 +31,12 @@ const darkModeColors = {
     spinnerColor: '#ffffff',
 };
 
+
 const ReceiverComponent = () => {
     const receiverUUID = useSelector((state) => state.profileuuid.uuid);
     const [loading, setLoading] = useState(true);
     const [receiverData, setReceiverData] = useState([]);
     const [friendRequestVisibility, setFriendRequestVisibility] = useState({});
-
     const [renderIndex, setRenderIndex] = useState(0);
 
     const { isDarkMode } = useDarkMode();
@@ -50,13 +50,19 @@ const ReceiverComponent = () => {
                     credentials: 'include',
                 });
 
+
+                if (response.status === 404) {
+                    // Handle 404 error (Result not found)
+                    setLoading(false);
+                    return;
+                }
+
                 if (!response.ok) {
                     console.error('Friend Requests Request failed');
                     throw new Error('Friend Requests Request failed');
                 }
 
                 const data = await response.json();
-
 
                 // Simulate a minimum loading time of 1000 milliseconds (adjust as needed)
                 setTimeout(() => {
@@ -86,6 +92,13 @@ const ReceiverComponent = () => {
                     }, {});
                     setFriendRequestVisibility(initialVisibility);
 
+                    if (processedData.length === 0) {
+                        // No friend requests found, handle this case if needed
+                        console.log('No friend requests found.');
+                        setLoading(false);
+                        return;
+                    }
+
                     // Set the processed data once outside the loop
                     setReceiverData(processedData);
                     setLoading(false);
@@ -106,8 +119,6 @@ const ReceiverComponent = () => {
 
         return () => clearTimeout(timer);
     }, [renderIndex]);
-
-
 
     const handleAcceptFriendRequest = async (friendRequestUuid) => {
         try {
@@ -158,11 +169,16 @@ const ReceiverComponent = () => {
 
     return (
         <div className='p-3'>
-            <p style={{ color: colors.textColor }} >Friend Request</p>
+            <p style={{ color: colors.textColor }}>Friend Request</p>
             {loading && (
                 <div className="loading-spinner">
                     <ScaleLoader color={colors.spinnerColor} loading={loading} height={15} />
                 </div>
+            )}
+            {!loading && receiverData.length === 0 && (
+                <p style={{ color: colors.textColor }}>
+                    {receiverData.length === 0 ? 'No friend requests found.' : 'Result not found.'}
+                </p>
             )}
             {!loading && receiverData.length > 0 && (
                 receiverData.slice(0, renderIndex).map((data, index) => (
