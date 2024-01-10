@@ -19,13 +19,14 @@ import { Grid } from '@mui/material';
 import Merger from '../../navbar/Merger';
 import Profilebar from '../../navbar/ProfileBar';
 import Layout from '../../theme/Layout';
-import { DarkModeProvider } from '../../theme/Darkmode';
+import { DarkModeProvider, useDarkMode } from '../../theme/Darkmode';
 
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
+import SenderComponent from '../../navbar/SenderComponent';
 
 
 function TabPanel(props) {
@@ -66,8 +67,29 @@ function a11yProps(index) {
     };
 }
 
+const lightModeColors = {
+    backgroundColor: '#ffffff',
+    iconColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
+    focusColor: 'rgb(0,0,0)',
+    border: '#CCCCCC',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+    spinnerColor: 'rgb(0,0,0)',
+};
+
+const darkModeColors = {
+    backgroundColor: 'rgb(0,0,0)',
+    iconColor: '#ffffff',
+    textColor: '#ffffff',
+    focusColor: '#ffffff',
+    border: '#333333',
+    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+    spinnerColor: '#ffffff',
+};
+
 export default function VerticalTabs() {
     const [value, setValue] = React.useState(0);
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -94,7 +116,7 @@ export default function VerticalTabs() {
                             borderColor: 'divider',
                             marginTop: '100%',
                             transform: 'translateY(100%)',
-                        
+
                         }}
                     >
                         <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
@@ -128,9 +150,20 @@ export default function VerticalTabs() {
                 {/* Use full width on all devices */}
                 <TabPanel value={value} index={0}>
                     <Profilebar />
-                    <div className='col-lg-12 mx-auto justify-content-center d-flex'>
-                        <Post />
+                    <div className="grid-container">
+                        <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
+                            <Post />
+
+                        </Grid>
+
+                        <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
+                            <div>
+                                <SenderComponent />
+                            </div>
+                        </Grid>
                     </div>
+
+
                 </TabPanel>
                 <TabPanel value={value} index={1}>
                     <Profile />

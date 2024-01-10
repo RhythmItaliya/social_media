@@ -7,6 +7,27 @@ import { Grid, useMediaQuery, useTheme } from '@mui/material';
 import './Merger.css';  // Import your CSS file for custom styles
 import SenderComponent from './SenderComponent';
 import ReceiverComponent from './ReceiverComponent';
+import { useDarkMode } from '../theme/Darkmode';
+
+const lightModeColors = {
+    backgroundColor: '#ffffff',
+    iconColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
+    focusColor: 'rgb(0,0,0)',
+    border: '#CCCCCC',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+    spinnerColor: 'rgb(0,0,0)',
+};
+
+const darkModeColors = {
+    backgroundColor: 'rgb(0,0,0)',
+    iconColor: '#ffffff',
+    textColor: '#ffffff',
+    focusColor: '#ffffff',
+    border: '#333333',
+    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+    spinnerColor: '#ffffff',
+};
 
 function Merger() {
     const [openImagesModal, setOpenImagesModal] = useState(false);
@@ -14,6 +35,9 @@ function Merger() {
 
     const theme = useTheme();
     const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
+
+    const { isDarkMode } = useDarkMode();
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     const handleViewAllImages = () => {
         setOpenImagesModal(true);
@@ -39,21 +63,26 @@ function Merger() {
                 <button onClick={handleViewAllImages}>View All Images</button>
             </div>
 
-            {/* Grid container for larger screens */}
             {isLargeScreen && (
                 <div className="grid-container">
                     {/* QuiltedImageList takes up 50% of the screen width */}
-                    <Grid item xs={12} sm={6} className='mx-auto justify-content-center d-flex'>
+                    <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
                         <QuiltedImageList />
                     </Grid>
 
-                    {/* FriendRequest takes up the other 50% of the screen width */}
-                    <Grid item xs={12} sm={6} className='mx-auto justify-content-center d-flex'>
-                        <SenderComponent />
-                        <ReceiverComponent />
+                    {/* SenderComponent takes up 25% of the screen width */}
+                    <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
+                        <div
+                            style={{
+                                border: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}`,
+                            }}
+                        >
+                            <ReceiverComponent />
+                        </div>
                     </Grid>
                 </div>
             )}
+
 
             {/* Modal for View All Images */}
             <Dialog open={openImagesModal} onClose={handleCloseImagesModal}>
@@ -67,7 +96,7 @@ function Merger() {
                 <SenderComponent />
                 <ReceiverComponent />
             </Dialog>
-        </div>
+        </div >
     );
 }
 

@@ -37,6 +37,8 @@
     transition: opacity 300ms ease-out, transform 300ms ease-out; /* Adjust as needed */
 }
 
-.darklightmode{
-    
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
