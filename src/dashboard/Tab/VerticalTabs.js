@@ -27,6 +27,10 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 import SenderComponent from '../../navbar/SenderComponent';
+import CreatePost from './CreatePost';
+import { CreateSharp } from '@mui/icons-material';
+import ChatComponent from '../../Chat.js/UserChatList';
+import Chat from '../../Chat.js/Chat';
 
 
 function TabPanel(props) {
@@ -123,6 +127,8 @@ export default function VerticalTabs() {
                         <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
                         <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
+                        <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
+
 
                         {/* <Logout /> */}
                         {/* <Layout /> */}
@@ -143,12 +149,14 @@ export default function VerticalTabs() {
                         <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
                         <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
+                        <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
 
                     </Tabs>
                 </Box>
 
                 {/* Use full width on all devices */}
                 <TabPanel value={value} index={0}>
+
                     <Profilebar />
                     <div className="grid-container">
                         <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
@@ -161,20 +169,28 @@ export default function VerticalTabs() {
                                 <SenderComponent />
                             </div>
                         </Grid>
+
                     </div>
-
-
                 </TabPanel>
+
                 <TabPanel value={value} index={1}>
                     <Profile />
                 </TabPanel>
+
                 <TabPanel value={value} index={2}>
                     <SearchAppBar />
                     <Merger />
                 </TabPanel>
+
                 <TabPanel value={value} index={3}>
                     {/* Your content for the "Account" tab */}
                 </TabPanel>
+
+                <TabPanel value={value} index={4}>
+                    {/* <CreatePost /> */}
+                    <Chat />
+                </TabPanel>
+
             </Box>
         </DarkModeProvider>
     );
