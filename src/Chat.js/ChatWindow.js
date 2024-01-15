@@ -1,3 +1,4 @@
+//ChatWindow.js
 import React, { useEffect, useState } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { useSelector } from 'react-redux';
@@ -63,23 +64,30 @@ const ChatWindow = ({ selectedUser }) => {
   };
 
   return (
+
+
     <div style={{ flex: 1, padding: '20px', backgroundColor: colors.backgroundColor }}>
       <div style={{ height: '300px', overflowY: 'auto', border: `1px solid ${colors.border}`, padding: '10px' }}>
+
         {messages.map((message, index) => (
-          <div
-            key={index}
-            style={{
-              marginBottom: '8px',
-              color: colors.textColor,
-              textAlign: message.senderUuid === senderUuid ? 'right' : 'left',
-            }}
-          >
-            <span style={{ fontWeight: 'bold', color: message.senderUuid === senderUuid ? '#4CAF50' : '#2196F3' }}>
-              {message.senderUuid === senderUuid ? 'You:' : selectedUser.firstName + ':'}
-            </span>
-            {message.content}
-          </div>
+          // Check if the current message is not the same as the previous one
+          (index === 0 || messages[index - 1].content !== message.content) && (
+            <div
+              key={index}
+              style={{
+                marginBottom: '8px',
+                color: colors.textColor,
+                textAlign: message.senderUuid === senderUuid ? 'right' : 'left',
+              }}
+            >
+              <span style={{ fontWeight: 'bold', color: message.senderUuid === senderUuid ? '#4CAF50' : '#2196F3' }}>
+                {message.senderUuid === senderUuid}
+              </span>
+              {message.content}
+            </div>
+          )
         ))}
+
       </div>
       <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <div style={{ marginBottom: '10px', color: colors.textColor }}>
@@ -99,6 +107,7 @@ const ChatWindow = ({ selectedUser }) => {
         </button>
       </div>
     </div>
+    
   );
 };
 
