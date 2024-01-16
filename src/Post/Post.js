@@ -20,7 +20,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
 
-import Logo from '../../assets/Millie.png'
+import Logo from '../assets/Millie.png'
 // import Logo from '../../assets/orkut-logo.png'
 // import Logo from '../../assets/girl-user-icon-simple-vector-18149176.jpg'
 

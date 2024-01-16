@@ -7,6 +7,7 @@ import authReducerLogout from './logoutReducer';
 import userPhotoReducer from './userPhotoReducer';
 import useruuidReducer from './useruuidReducer';
 import profileuuidReducer from './profileuuidReducer';
+import imageReducer from './imageReducer';
 
 const rootReducer = combineReducers({
     login: authReducerLogin,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     useruuid: useruuidReducer,
     profileuuid: profileuuidReducer,
     userPhoto: userPhotoReducer,
+    post: imageReducer,
 });
 
 export default rootReducer;

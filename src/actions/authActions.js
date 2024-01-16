@@ -33,3 +33,11 @@ export const setUserPhoto = (photoUrl) => ({
     type: types.SET_USER_PHOTO,
     payload: photoUrl,
 });
+
+
+export const setBase64Data = (base64Data) => {
+    return {
+        type: types.SET_BASE64_DATA,
+        payload: base64Data,
+    };
+};

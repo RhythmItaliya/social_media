@@ -5,21 +5,16 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import '../Tab/vertical.css';
-import Logout from "../../others/Logout";
 import Profile from './Proflie';
-import Settings from './Settings';
-import Profilephoto from './ProfilePhoto';
-import Post from './Post';
 
-import Logo from '../../assets/Millie.png'
+
 import SearchAppBar from '../../navbar/Searchbar';
-import TitlebarImageList from '../../navbar/Gallery';
-import QuiltedImageList from '../../navbar/Gallery';
+
 import { Grid } from '@mui/material';
 import Merger from '../../navbar/Merger';
 import Profilebar from '../../navbar/ProfileBar';
-import Layout from '../../theme/Layout';
-import { DarkModeProvider, useDarkMode } from '../../theme/Darkmode';
+
+import { DarkModeProvider } from '../../theme/Darkmode';
 
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -27,10 +22,11 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 import SenderComponent from '../../navbar/SenderComponent';
-import CreatePost from './CreatePost';
+
 import { CreateSharp } from '@mui/icons-material';
-import ChatComponent from '../../Chat.js/UserChatList';
 import Chat from '../../Chat.js/Chat';
+import Post from '../../Post/Post'
+import CreatePost from '../../Post/CreatePost';
 
 
 function TabPanel(props) {
@@ -128,6 +124,7 @@ export default function VerticalTabs() {
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
                         <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
                         <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
+                        <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
 
 
                         {/* <Logout /> */}
@@ -150,6 +147,7 @@ export default function VerticalTabs() {
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
                         <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
                         <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
+                        <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
 
                     </Tabs>
                 </Box>
@@ -187,8 +185,11 @@ export default function VerticalTabs() {
                 </TabPanel>
 
                 <TabPanel value={value} index={4}>
-                    {/* <CreatePost /> */}
                     <Chat />
+                </TabPanel>
+
+                <TabPanel value={value} index={5}>
+                    <CreatePost />
                 </TabPanel>
 
             </Box>

@@ -19,3 +19,4 @@ export const USER_SET_UUID = 'USER_SET_UUID';
 export const PROFILE_SET_UUID = 'PROFILE_SET_UUID';
 export const SET_USER_PHOTO = 'SET_USER_PHOTO';
 
+export const SET_BASE64_DATA = 'SET_BASE64_DATA';
