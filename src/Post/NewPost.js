@@ -110,7 +110,8 @@ const NewPost = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '500px' }}>
+        <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '650px'}}>
             {selectedImage ? (
                 <div>
                     <div style={{ width: '499.5px', height: '500px', overflow: 'hidden', backgroundColor: colors.backgroundColor, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: colors.boxShadow }}>

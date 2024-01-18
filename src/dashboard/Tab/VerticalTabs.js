@@ -27,6 +27,8 @@ import { CreateSharp } from '@mui/icons-material';
 import Chat from '../../Chat.js/Chat';
 import Post from '../../Post/Post'
 import CreatePost from '../../Post/CreatePost';
+import ProfileSet from '../Profile/ProfileSet';
+
 
 
 function TabPanel(props) {
@@ -159,7 +161,6 @@ export default function VerticalTabs() {
                     <div className="grid-container">
                         <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
                             <Post />
-
                         </Grid>
 
                         <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
@@ -172,7 +173,8 @@ export default function VerticalTabs() {
                 </TabPanel>
 
                 <TabPanel value={value} index={1}>
-                    <Profile />
+                    {/* <Profile /> */}
+                    <ProfileSet />
                 </TabPanel>
 
                 <TabPanel value={value} index={2}>
@@ -181,7 +183,7 @@ export default function VerticalTabs() {
                 </TabPanel>
 
                 <TabPanel value={value} index={3}>
-                    {/* Your content for the "Account" tab */}
+                    {/* <ProfileSet /> */}
                 </TabPanel>
 
                 <TabPanel value={value} index={4}>
@@ -189,9 +191,10 @@ export default function VerticalTabs() {
                 </TabPanel>
 
                 <TabPanel value={value} index={5}>
-                    <CreatePost />
+                    <div className='d-flex align-items-center justify-content-center overflow-scroll' style={{ height: '100vh' }}>
+                        <CreatePost />
+                    </div>
                 </TabPanel>
-
             </Box>
         </DarkModeProvider>
     );

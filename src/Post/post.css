@@ -1,0 +1,16 @@
+/* Merger.css */
+:root {
+    --background-dark: #000000;
+    --font-color-dark: #FFFFFF;
+    --border-color-dark: #333333;
+    --icon-color-dark: #CCCCCC;
+    --input-color-dark: #444444;
+    --box-shadow-dark: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+    --background-light: #FFFFFF;
+    --font-color-light: #000000;
+    --border-color-light: #E0E0E0;
+    --icon-color-light: #666666;
+    --input-color-light: #F5F5F5;
+    --box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

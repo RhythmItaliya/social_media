@@ -32,12 +32,13 @@ const CreatePost = () => {
 
   return (
     <Grid container spacing={2} justifyContent="center" alignItems="center">
-      <Grid item xs={12} lg={6}>
+      <Grid item lg={6}>
         <div
+          className='justify-content-center d-flex align-content-center'
           style={{
             width: '550px',
+            height: '650px',
             margin: 'auto',
-            height: '550px',
             border: `1px solid ${colors.border}`,
             backgroundColor: colors.backgroundColor,
             position: 'relative',
@@ -48,7 +49,7 @@ const CreatePost = () => {
         </div>
       </Grid>
 
-      <Grid item xs={12} lg={6}>
+      <Grid item lg={6}>
         <PostFrom />
       </Grid>
     </Grid>
