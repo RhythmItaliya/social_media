@@ -9,33 +9,32 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Dialog, DialogContent } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDarkMode } from '../theme/Darkmode';
-
-
 import { useDispatch } from 'react-redux';
 import { setBase64Data } from '../actions/authActions';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
-    searchBarColor: '#ffffff',
     iconColor: 'rgb(0,0,0)',
-    placeholderColor: 'rgb(0,0,0)',
-    inputTextColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
     focusColor: 'rgb(0,0,0)',
     border: '#CCCCCC',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+    spinnerColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
+    valueTextColor: 'rgb(0,0,0)',
 };
 
 const darkModeColors = {
-    backgroundColor: '#ffffff',
-    searchBarColor: 'rgb(0,0,0)',
+    backgroundColor: 'rgb(0,0,0)',
     iconColor: '#ffffff',
-    placeholderColor: '#ffffff',
-    inputTextColor: 'rgb(0,0,0)',
+    textColor: '#ffffff',
     focusColor: '#ffffff',
     border: '#333333',
     boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+    spinnerColor: '#ffffff',
+    labelColor: '#CCC',
+    valueTextColor: '#ffffff'
 };
-
 
 const NewPost = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -43,7 +42,7 @@ const NewPost = () => {
     const [scale, setScale] = useState(1);
     const [openModal, setOpenModal] = useState(false);
     const [croppedImageUrl, setCroppedImageUrl] = useState(null);
-    const [loading, setLoading] = useState(false); // New loading state
+    const [loading, setLoading] = useState(false);
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
@@ -100,7 +99,7 @@ const NewPost = () => {
 
             // Check aspect ratio
             if (img.width > img.height) {
-                return '#ffffff'; // Landscape image, set background to white
+                return '#ffffff';
             } else {
                 return '#ffffff'; // Portrait image, set background to white (you can change this if needed)
             }
@@ -111,10 +110,11 @@ const NewPost = () => {
 
     return (
         <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '650px'}}>
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '650px'
+        }}>
             {selectedImage ? (
                 <div>
-                    <div style={{ width: '499.5px', height: '500px', overflow: 'hidden', backgroundColor: colors.backgroundColor, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: colors.boxShadow }}>
+                    <div style={{ width: '500px', height: '500px', overflow: 'hidden', backgroundColor: colors.backgroundColor, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: colors.boxShadow }}>
                         <AvatarEditor
                             ref={(ref) => setEditor(ref)}
                             image={selectedImage}

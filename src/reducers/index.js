@@ -8,6 +8,7 @@ import userPhotoReducer from './userPhotoReducer';
 import useruuidReducer from './useruuidReducer';
 import profileuuidReducer from './profileuuidReducer';
 import imageReducer from './imageReducer';
+import profileReducer from './profileReducer';
 
 const rootReducer = combineReducers({
     login: authReducerLogin,
@@ -17,6 +18,10 @@ const rootReducer = combineReducers({
     profileuuid: profileuuidReducer,
     userPhoto: userPhotoReducer,
     post: imageReducer,
+    postData: profileReducer,
+
 });
 
 export default rootReducer;
+
+

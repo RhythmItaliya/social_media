@@ -41,3 +41,8 @@ export const setBase64Data = (base64Data) => {
         payload: base64Data,
     };
 };
+
+export const setUserProfilePosts = (posts) => ({
+    type: types.SET_USER_PROFILE_POSTS,
+    payload: posts,
+});

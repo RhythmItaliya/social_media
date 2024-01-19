@@ -159,9 +159,10 @@ export default function VerticalTabs() {
 
                     <Profilebar />
                     <div className="grid-container">
-                        <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
+                        <Grid item xs={12} lg={6} className='mx-auto justify-content-center d-flex'>
                             <Post />
                         </Grid>
+
 
                         <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
                             <div>

@@ -8,7 +8,7 @@ import SendIcon from '@mui/icons-material/Send';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { Chip } from '@material-ui/core';
+import { Chip, TextareaAutosize } from '@material-ui/core';
 
 import { useDarkMode } from '../theme/Darkmode';
 import './post.css';
@@ -21,7 +21,7 @@ const lightModeColors = {
     border: '#CCCCCC',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
     spinnerColor: 'rgb(0,0,0)',
-    labelColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
     valueTextColor: 'rgb(0,0,0)',
 };
 
@@ -37,13 +37,16 @@ const darkModeColors = {
     valueTextColor: '#ffffff'
 };
 
+
 const PostForm = () => {
     const profileUUID = useSelector(state => state.profileuuid.uuid);
+
     const postBase64 = useSelector(state => state.post.base64Data);
 
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+    const [caption, setCaption] = useState('');
     const [postText, setPostText] = useState('');
     const [location, setLocation] = useState({ lat: null, lng: null });
     const [city, setCity] = useState('');
@@ -117,13 +120,14 @@ const PostForm = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userProfileUuid: profileUUID,
+                    userProfileId: profileUUID,
                     postText,
-                    location,
-                    hashtags,
+                    // isPhoto,
+                    caption,
+                    location: JSON.stringify([location.lat, location.lng]),
+                    isVisibility: isPublic ? '0' : '1',
                     data: postBase64,
-                    city,
-                    country,
+                    hashtags: JSON.stringify(hashtags),
                 }),
             });
 
@@ -143,13 +147,14 @@ const PostForm = () => {
             <form onSubmit={handleSubmit}>
 
                 <Grid className='mt-1' container spacing={2}>
+
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
                             label="Caption"
                             variant="standard"
-                            value={postText}
-                            onChange={(e) => setPostText(e.target.value)}
+                            value={caption}
+                            onChange={(e) => setCaption(e.target.value)}
                             InputProps={{
                                 style: {
                                     color: colors.textColor,
@@ -166,6 +171,31 @@ const PostForm = () => {
                             }}
                         />
                     </Grid>
+
+
+
+                    <Grid item xs={12}>
+                        <TextareaAutosize
+                            minRows={3}
+                            placeholder="Post Text"
+                            value={postText}
+                            onChange={(e) => setPostText(e.target.value)}
+                            style={{
+                                color: colors.textColor,
+                                backgroundColor: colors.backgroundColor,
+                                border: `1px solid ${colors.border}`,
+                                borderRadius: '4px',
+                                padding: '8px',
+                                width: '100%',
+                                marginTop: '8px',
+                                resize: 'none',
+                                '&:focus': {
+                                    borderColor: colors.focusColor,
+                                },
+                            }}
+                        />
+                    </Grid>
+
 
 
 
@@ -305,11 +335,11 @@ const PostForm = () => {
                                 style={{ color: colors.iconColor }}
                             >
                                 <span
-                                    style={{ 
+                                    style={{
                                         color: colors.labelColor,
-                                        fontSize:'16px',   
-                                        margin:'10px'                           
-                                     }}
+                                        fontSize: '16px',
+                                        margin: '10px'
+                                    }}
                                 >
                                     POST
                                 </span>
