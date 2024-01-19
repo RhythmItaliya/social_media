@@ -8,6 +8,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -96,22 +97,19 @@ export default function InstagramCard() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [expandedText, setExpandedText] = React.useState(false);
 
-  const [newUserProfile, setNewUserProfile] = React.useState({});
-  const dispatch = useDispatch();
-  const profileUUID = useSelector((state) => state.profileuuid.uuid);
-
+  const [mergedData, setMergedData] = React.useState([]);
 
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
 
+  const dispatch = useDispatch();
+  const profileUUID = useSelector((state) => state.profileuuid.uuid);
 
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
-
   useEffect(() => {
     const fetchPosts = async () => {
-
       try {
 
         setLoading(true);
@@ -124,11 +122,9 @@ export default function InstagramCard() {
         const data = await response.json();
 
         const updatedUserProfile = {
-          id: data.userProfile.id,
-          username: data.userProfile.username,
-          photoURL: data.userProfile.photoURL,
-          posts: data.posts.map((post) => ({
+          posts: data.friendsPosts.map((post) => ({
             id: post.id,
+            userProfileId: post.userProfileId,
             postText: post.postText,
             isPhoto: post.isPhoto,
             caption: post.caption,
@@ -142,12 +138,39 @@ export default function InstagramCard() {
               month: 'long',
               day: 'numeric',
             }),
+          }))
+        };
+
+        const updatedUserinfo = {
+          friends: data.friends.map((friend) => ({
+            id: friend.id,
+            username: friend.username,
+            photoURL: friend.photoURL,
           })),
         };
 
-        setNewUserProfile(updatedUserProfile);
+        setMergedData(updatedUserProfile.posts.map(post => {
+          const userInfo = updatedUserinfo.friends.find(friend => friend.id === post.userProfileId);
+
+          return {
+            id: post.id,
+            userProfileId: post.userProfileId,
+            postText: post.postText,
+            isPhoto: post.isPhoto,
+            caption: post.caption,
+            location: post.location,
+            isVisibility: post.isVisibility,
+            postUploadURLs: post.postUploadURLs,
+            hashtags: post.hashtags,
+            uuid: post.uuid,
+            createdAt: post.createdAt,
+            username: userInfo.username,
+            photoURL: userInfo.photoURL,
+          };
+        }));
 
         setLoading(false);
+
       } catch (error) {
         console.error('Error fetching posts:', error);
         // Set loading to false on error
@@ -161,8 +184,9 @@ export default function InstagramCard() {
   }, [profileUUID]);
 
   useEffect(() => {
-    dispatch(setUserProfilePosts(newUserProfile));
-  }, [newUserProfile, dispatch]);
+    dispatch(setUserProfilePosts(mergedData));
+  }, [mergedData, dispatch]);
+
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -221,7 +245,6 @@ export default function InstagramCard() {
   const id = open ? 'simple-popover' : undefined;
 
   return (
-
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
 
       {loading ? (
@@ -232,7 +255,7 @@ export default function InstagramCard() {
         <p>Error: {error}</p>
       ) : (
         <div>
-          {newUserProfile.posts && newUserProfile.posts.map((post) => (
+          {mergedData.map((post) => (
             <Card key={post.id} sx={{
               maxWidth: 420,
               marginBottom: 2,
@@ -241,25 +264,19 @@ export default function InstagramCard() {
               border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
             }}>
 
-              {/* ------------------------------------------------------------------------------------------------- */}
               <CardHeader
-
-                // AVTAR
                 avatar={
                   <Avatar
-                    src={`http://static.profile.local/${newUserProfile.photoURL}`}
+                    src={`http://static.profile.local/${post.photoURL}`}
                     alt="User Avatar"
                     sx={{
                       ...instagramStyles.roundedAvatar,
                       width: 40,
                       height: 40,
                       backgroundColor: colors.backgroundColor,
-
                     }}
                   />
                 }
-
-                // POST ACTION
                 action={
                   <IconButton
                     aria-label="settings"
@@ -269,21 +286,13 @@ export default function InstagramCard() {
                     }}
                     onClick={handleMoreVertClick}
                   >
-
                     <MoreVertIcon
                       sx={{ color: colors.iconColor }}
                     />
                   </IconButton>
                 }
-
-
-                // USERNAME
-                title={newUserProfile.username}
-
-                // DATE
+                title={post.username}
                 subheader={post.createdAt}
-
-
                 sx={{
                   color: colors.textColor,
                   borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
@@ -291,13 +300,8 @@ export default function InstagramCard() {
                     color: colors.labelColor,
                   },
                 }}
-
               />
 
-
-              {/* ------------------------------------------------------------------------------------------------- */}
-
-              {/* POST */}
               <CardMedia
                 component="img"
                 height="400"
