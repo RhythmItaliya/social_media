@@ -1,83 +1,79 @@
-// SenderComponent.js
-
 import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import StyledIconButton from '@material-ui/core/IconButton';
-import { PersonAdd } from '@mui/icons-material';
-import Paper from '@mui/material/Paper';
 import { useSelector } from 'react-redux';
 import { useDarkMode } from '../theme/Darkmode';
-import { css } from '@emotion/react';
 import { ScaleLoader } from 'react-spinners';
-
+import { PersonAdd, CheckCircleOutline as CheckCircleOutlineIcon } from '@mui/icons-material';
+import Grid from '@mui/material/Grid';
 import './abc.css';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
     iconColor: 'rgb(0,0,0)',
     textColor: 'rgb(0,0,0)',
-    focusColor: 'rgb(0,0,0)',
     border: '#CCCCCC',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
-    spinnerColor: '#000000', // Dark color for the spinner in light mode
+    spinnerColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
 };
 
 const darkModeColors = {
     backgroundColor: 'rgb(0,0,0)',
     iconColor: '#ffffff',
     textColor: '#ffffff',
-    focusColor: '#ffffff',
     border: '#333333',
-    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
-    spinnerColor: '#ffffff', // Light color for the spinner in dark mode
+    spinnerColor: '#ffffff',
+    labelColor: '#CCC',
+};
+
+const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
 };
 
 const SenderComponent = () => {
     const uuid = useSelector((state) => state.profileuuid.uuid);
     const [userProfiles, setUserProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [renderIndex, setRenderIndex] = useState(0);
-
+    const [friendRequestStatus, setFriendRequestStatus] = useState({});
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
-        // Simulate a minimum loading time of 1000 milliseconds (adjust as needed)
-        const timer = setTimeout(() => {
-            // Fetch user profiles
-            fetch(`http://localhost:8080/api/userProfiles/${uuid}`, {
-                method: 'GET',
-                credentials: 'include',
-            })
-                .then((response) => response.json())
-                .then((data) => {
+        const fetchUserProfiles = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/userProfiles/${uuid}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
                     if (data.userProfiles && data.userProfiles.length > 0) {
                         setUserProfiles(data.userProfiles);
                     }
-                })
-                .catch((error) => {
-                    console.error(error);
-                })
-                .finally(() => {
-                    setLoading(false); // Set loading to false after data is fetched or in case of error
-                });
+                } else {
+                    console.error('Failed to fetch user profiles');
+                }
+            } catch (error) {
+                console.error('Error fetching user profiles:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchUserProfiles();
         }, 1000);
 
         return () => clearTimeout(timer);
     }, [uuid]);
 
-    useEffect(() => {
-        // This effect controls the rendering of items one after another
-        const timer = setTimeout(() => {
-            setRenderIndex((prevIndex) => prevIndex + 1);
-        }, 700); // Adjust the delay between items as needed
-
-        return () => clearTimeout(timer);
-    }, [renderIndex]);
-
     const sendFriendRequest = async (receiverId) => {
         try {
-            // Make a POST request to your backend endpoint to send the friend request
             const response = await fetch('http://localhost:8080/friendRequests', {
                 method: 'POST',
                 headers: {
@@ -90,10 +86,12 @@ const SenderComponent = () => {
             });
 
             if (response.ok) {
-                // Friend request sent successfully, you can handle the UI accordingly
+                setFriendRequestStatus((prevStatus) => ({
+                    ...prevStatus,
+                    [receiverId]: true,
+                }));
                 console.log('Friend request sent successfully');
             } else {
-                // Handle error scenarios
                 console.error('Failed to send friend request');
             }
         } catch (error) {
@@ -101,65 +99,115 @@ const SenderComponent = () => {
         }
     };
 
+    const [selectedProfile, setSelectedProfile] = useState(null);
+    const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
+
+    const handleAvatarClick = (profile, event) => {
+        if (selectedProfile && selectedProfile.uuid === profile.uuid) {
+            setSelectedProfile(null);
+        } else {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setCardPosition({
+                top: rect.top + window.scrollY,
+                left: rect.left + window.scrollX,
+            });
+            setSelectedProfile(profile);
+        }
+    };
+
+    const handleClickOutsideCard = (event) => {
+        if (selectedProfile && !event.currentTarget.contains(event.target)) {
+            setSelectedProfile(null);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('click', handleClickOutsideCard);
+        return () => {
+            document.removeEventListener('click', handleClickOutsideCard);
+        };
+    }, [selectedProfile]);
+
     return (
-        <div className='p-3'>
-
-            <p style={{ color: colors.textColor }} >Suggested Friend</p>
-            {loading ? (
-                <div className="loading-spinner">
-                    <ScaleLoader color={colors.spinnerColor} loading={loading} height={15} />
-                </div>
-            ) : (
-                userProfiles.slice(0, renderIndex).map((profile) => (
-                    <Paper
-                        key={profile.uuid}
-                        elevation={3}
-                        className='d-flex mt-4 flex-column align-items-center p-2'
-                        style={{
-                            backgroundColor: isDarkMode
-                                ? darkModeColors.backgroundColor
-                                : lightModeColors.backgroundColor,
-                            color: isDarkMode
-                                ? darkModeColors.textColor
-                                : lightModeColors.textColor,
-                            borderBottom: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}`,
-
-                        }}
-                    >
-                        <Avatar
-                            className="avatar-wrapper mt-2"
-                            alt="User Avatar"
-                            src={`http://static.profile.local/${profile.photoURL}`}
-                        />
-
-                        <p
-                            className='m-2'
-                            style={{
-                                fontSize:'14px',
-                                color: isDarkMode
-                                    ? darkModeColors.textColor
-                                    : lightModeColors.textColor,
-                            }}
-                        >
-                            {profile.username}
-                        </p>
-
-                        <StyledIconButton
-                            color="inherit"
-                            className='m-0'
-                            style={{
-                                color: isDarkMode
-                                    ? darkModeColors.iconColor
-                                    : lightModeColors.iconColor,
-                            }}
-                            onClick={() => sendFriendRequest(profile.uuid)}
-                        >
-                            <PersonAdd fontSize="small" />
-                        </StyledIconButton>
-                    </Paper>
-    ))
+        <div className='rounded-2 mt-4' style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+            <p style={{
+                color: colors.textColor,
+                fontSize: '18px',
+                padding: '15px',
+                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+            }}>
+                Suggested Friends
+            </p>
+            <Grid
+                container spacing={2}
+                className="avatar-grid"
+                style={{
+                    padding: '10px',
+                    marginLeft: 0,
+                }}
+            >
+                {loading ? (
+                    <div className="loading-spinner justify-content-center d-flex align-content-center">
+                        <ScaleLoader color={colors.spinnerColor} loading={loading} height={15} />
+                    </div>
+                ) : (
+                    userProfiles.map((profile) => (
+                        <Grid item xs={4} key={profile.uuid}>
+                            <div
+                                className='avatar-container'
+                                onClick={(e) => handleAvatarClick(profile, e)}
+                            >
+                                <Avatar
+                                    className="avatar-wrapper"
+                                    alt="User Avatar"
+                                    src={`http://static.profile.local/${profile.photoURL}`}
+                                />
+                            </div>
+                        </Grid>
+                    ))
+                )}
+            </Grid>
+            {selectedProfile && (
+                <div
+                    className='selected-profile-details-overlay'
+                />
             )}
-        </div >
+            {selectedProfile && (
+                <div
+                    className='selected-profile-details-container rounded-2 p-3'
+                    style={{
+                        position: 'absolute',
+                        top: cardPosition.top,
+                        left: cardPosition.left,
+                        backgroundColor: colors.backgroundColor,
+                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
+                    }}
+                >
+                    <Avatar
+                        className="selected-avatar"
+                        alt="Selected User Avatar"
+                        src={`http://static.profile.local/${selectedProfile.photoURL}`}
+                        onClick={(e) => handleAvatarClick(selectedProfile, e)}
+
+                    />
+                    <div className='details'>
+                        <p style={{ color: colors.labelColor, marginTop: '12px' }}>{selectedProfile.username}</p>
+                        <StyledIconButton
+                            className='send-request-button'
+                            onClick={() => sendFriendRequest(selectedProfile.uuid)}
+                            disabled={friendRequestStatus[selectedProfile.uuid]}
+                            style={{ color: colors.iconColor, backgroundColor: "#F0F0F0" }}
+                        >
+                            {friendRequestStatus[selectedProfile.uuid] ? (
+                                <CheckCircleOutlineIcon fontSize="small" style={{ color: 'green' }} />
+                            ) : (
+                                <PersonAdd fontSize="small" />
+                            )}
+                        </StyledIconButton>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
