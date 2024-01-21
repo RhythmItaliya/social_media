@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Avatar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import SubSubOptionsComponent from './SubSubOptionsComponent';
 import { useSelector } from 'react-redux';
+import ProfilePhoto from '../dashboard/Profile/ProfilePhotoUpload';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -11,6 +12,7 @@ const hexToRgb = (hex) => {
   const b = bigint & 255;
   return `${r}, ${g}, ${b}`;
 };
+
 
 const SubOptionsComponent = ({ subOptions, colors }) => {
   const [selectedSubOption, setSelectedSubOption] = useState(null);
@@ -44,7 +46,7 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
 
       return (
         <TextField
-          className='w-75 mx-auto p-2'
+          className='w-75 mx-auto'
           variant="standard"
           label={`Set Your ${selectedSubOptionLabel}`}
           value={defaultValue}
@@ -70,20 +72,28 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
   };
 
   const renderAvatar = () => {
-    if (apiData && selectedSubOption !== null) {
-      const subOptionLabel = subOptions[selectedSubOption].option.toLowerCase();
-      if (subOptionLabel === 'avatar' && apiData.photoURL) {
-        return (
-          <img
+    const subOptionLabel = selectedSubOption !== null ? subOptions[selectedSubOption].option.toLowerCase() : '';
+
+    return (
+      <div
+        className='w-50 mx-auto d-flex justify-content-center align-content-center p-4'
+        style={{
+          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
+        }}
+      >
+        {subOptionLabel === 'avatar' && apiData && apiData.photoURL ? (
+          <Avatar
             src={apiData.photoURL}
             alt="Avatar"
-            style={{ width: '100px', height: '100px', borderRadius: '50%', border: `2px solid ${colors.border}` }}
+            style={{ width: '100px', height: '100px' }}
           />
-        );
-      }
-    }
-    return null;
+        ) : null}
+
+        <ProfilePhoto />
+      </div>
+    );
   };
+
 
 
 

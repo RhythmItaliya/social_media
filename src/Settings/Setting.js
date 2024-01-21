@@ -54,12 +54,12 @@ const hexToRgb = (hex) => {
 const dataMapping = {
   'Account Info': [
     { option: 'Username', subOptions: 'username' },
+    { option: 'Avatar', subOptions: 'avatar' },
     { option: 'Name', subOptions: 'firstName lastName' },
     { option: 'Gender', subOptions: 'gender' },
     { option: 'Bio', subOptions: 'bio' },
     { option: 'Location', subOptions: 'location' },
     { option: 'Birthdate', subOptions: 'birthDate' },
-    { option: 'Avatar', subOptions: 'avatar' },
   ],
   'Post Info': [
     { option: 'Post Option 1', subOptions: ['Post Sub Option 1-1', 'Post Sub Option 1-2', 'Post Sub Option 1-3'] },
