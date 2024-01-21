@@ -36,7 +36,7 @@ const EditProfile = () => {
         };
 
         fetchData();
-    }, [profileuuid, form]);
+    }, [profileuuid]);
 
 
     const onFinish = async (values) => {

@@ -8,6 +8,7 @@ import { Notifications, PersonAdd } from '@mui/icons-material';
 import { useDarkMode } from '../theme/Darkmode';
 import Logout from '../others/Logout';
 import Layout from '../theme/Layout';
+import { useSelector } from 'react-redux';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -58,9 +59,15 @@ export default function Profilebar() {
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+    // userPhotoUrl
+    const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
+
+    //username
+    const loginUserUsername = useSelector((state) => state.name.username);
+
     const user = {
-        avatar: 'url_to_user_avatar',
-        username: 'JohnDoe',
+        avatar: userPhotoUrl,
+        username: loginUserUsername,
     };
 
     return (

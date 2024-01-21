@@ -76,3 +76,31 @@ body.dark-mode {
   justify-content: center;
   display: flex;
 }
+
+.tab-content {
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+
+.sender-component {
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+
+.grid-container {
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+  /* Adjust properties as needed */
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected,
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+  color: var(--text-color-dark) !important;
+  background-color: var(--background-color-dark) !important;
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected,
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+  color: var(--text-color-light) !important;
+  background-color: var(--background-color-light) !important;
+}

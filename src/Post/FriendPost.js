@@ -90,7 +90,7 @@ const instagramStyles = {
   },
 };
 
-export default function InstagramCard() {
+export default function FriendPost() {
   const [expanded, setExpanded] = React.useState(false);
   const [comment, setComment] = React.useState('');
   const [comments, setComments] = React.useState([]);

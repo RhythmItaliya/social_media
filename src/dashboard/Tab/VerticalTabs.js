@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { } from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import '../Tab/vertical.css';
-import Profile from './Proflie';
-
 
 import SearchAppBar from '../../navbar/Searchbar';
 
@@ -23,12 +21,13 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 import SenderComponent from '../../navbar/SenderComponent';
 
-import { CreateSharp } from '@mui/icons-material';
+import { ChatBubble, CreateSharp, Settings } from '@mui/icons-material';
 import Chat from '../../Chat.js/Chat';
 import Post from '../../Post/Post'
 import CreatePost from '../../Post/CreatePost';
 import ProfileSet from '../Profile/ProfileSet';
-
+import FriendPost from '../../Post/FriendPost';
+import SettingsPage from '../../Settings/Setting';
 
 
 function TabPanel(props) {
@@ -69,33 +68,19 @@ function a11yProps(index) {
     };
 }
 
-const lightModeColors = {
-    backgroundColor: '#ffffff',
-    iconColor: 'rgb(0,0,0)',
-    textColor: 'rgb(0,0,0)',
-    focusColor: 'rgb(0,0,0)',
-    border: '#CCCCCC',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
-    spinnerColor: 'rgb(0,0,0)',
-};
-
-const darkModeColors = {
-    backgroundColor: 'rgb(0,0,0)',
-    iconColor: '#ffffff',
-    textColor: '#ffffff',
-    focusColor: '#ffffff',
-    border: '#333333',
-    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
-    spinnerColor: '#ffffff',
-};
-
 export default function VerticalTabs() {
     const [value, setValue] = React.useState(0);
-
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const [value2, setValue2] = React.useState(0);
+
+    const handleChange2 = (event2, newValue2) => {
+        setValue2(newValue2);
+    };
+
 
     return (
         <DarkModeProvider>
@@ -124,10 +109,9 @@ export default function VerticalTabs() {
                         <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
                         <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
-                        <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
-                        <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
+                        <Tab icon={<Settings />} {...a11yProps(3)} className="custom-tab" />
+                        <Tab icon={<ChatBubble />} {...a11yProps(4)} className="custom-tab" />
                         <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
-
 
                         {/* <Logout /> */}
                         {/* <Layout /> */}
@@ -147,31 +131,58 @@ export default function VerticalTabs() {
                         <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
                         <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
                         <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
-                        <Tab icon={<AccountBoxIcon />} {...a11yProps(3)} className="custom-tab" />
-                        <Tab icon={<CreateSharp />} {...a11yProps(4)} className="custom-tab" />
+                        <Tab icon={<Settings />} {...a11yProps(3)} className="custom-tab" />
+                        <Tab icon={<ChatBubble />} {...a11yProps(4)} className="custom-tab" />
                         <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
 
                     </Tabs>
                 </Box>
 
-                {/* Use full width on all devices */}
+                {/* Inside your render method or functional component */}
                 <TabPanel value={value} index={0}>
 
                     <Profilebar />
+
                     <div className="grid-container">
                         <Grid item xs={12} lg={6} className='mx-auto justify-content-center d-flex'>
-                            <Post />
-                        </Grid>
-
-
-                        <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
                             <div>
-                                <SenderComponent />
+                                <div className='justify-content-center align-content-center d-flex'>
+                                    <Tabs
+                                        value={value2}
+                                        onChange={handleChange2}
+                                    >
+                                        <Tab
+                                            label="Show Post"
+                                            style={{
+                                                fontSize: '12px',
+
+                                            }}
+                                        />
+                                        <Tab
+                                            label="Show Friend Post"
+                                            style={{
+                                                fontSize: '12px',
+
+                                            }}
+                                        />
+                                    </Tabs>
+                                </div>
+                                <div className="tab-content">
+                                    {value2 === 0 && <Post />}
+                                    {value2 === 1 && <FriendPost />}
+                                </div>
                             </div>
                         </Grid>
 
+                        <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
+                            <div className="sender-component">
+                                <SenderComponent />
+                            </div>
+                        </Grid>
                     </div>
+
                 </TabPanel>
+
 
                 <TabPanel value={value} index={1}>
                     {/* <Profile /> */}
@@ -184,7 +195,7 @@ export default function VerticalTabs() {
                 </TabPanel>
 
                 <TabPanel value={value} index={3}>
-                    {/* <ProfileSet /> */}
+                    <SettingsPage />
                 </TabPanel>
 
                 <TabPanel value={value} index={4}>

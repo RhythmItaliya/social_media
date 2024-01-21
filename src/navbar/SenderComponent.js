@@ -156,6 +156,9 @@ const SenderComponent = () => {
                             <div
                                 className='avatar-container'
                                 onClick={(e) => handleAvatarClick(profile, e)}
+                                style={{
+                                    cursor: 'pointer',
+                                }}
                             >
                                 <Avatar
                                     className="avatar-wrapper"
@@ -188,7 +191,9 @@ const SenderComponent = () => {
                         alt="Selected User Avatar"
                         src={`http://static.profile.local/${selectedProfile.photoURL}`}
                         onClick={(e) => handleAvatarClick(selectedProfile, e)}
-
+                        style={{
+                            cursor: 'pointer',
+                        }}
                     />
                     <div className='details'>
                         <p style={{ color: colors.labelColor, marginTop: '12px' }}>{selectedProfile.username}</p>

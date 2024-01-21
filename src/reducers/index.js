@@ -9,6 +9,7 @@ import useruuidReducer from './useruuidReducer';
 import profileuuidReducer from './profileuuidReducer';
 import imageReducer from './imageReducer';
 import profileReducer from './profileReducer';
+import usernameReducer from './usernameReducer';
 
 const rootReducer = combineReducers({
     login: authReducerLogin,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     userPhoto: userPhotoReducer,
     post: imageReducer,
     postData: profileReducer,
+    name: usernameReducer
 
 });
 

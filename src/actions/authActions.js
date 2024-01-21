@@ -46,3 +46,9 @@ export const setUserProfilePosts = (posts) => ({
     type: types.SET_USER_PROFILE_POSTS,
     payload: posts,
 });
+
+
+export const setUsername = (username) => ({
+    type: types.SET_USERNAME,
+    payload: username,
+});

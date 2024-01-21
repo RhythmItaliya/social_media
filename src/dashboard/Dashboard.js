@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import VerticalTabs from './Tab/VerticalTabs';
-import { setProfileUuid, setUserUuid, setUserPhoto } from '../actions/authActions';
+import { setProfileUuid, setUserUuid, setUserPhoto, setUsername } from '../actions/authActions';
 import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import CryptoJS from 'crypto-js';
+import Cookies from 'js-cookie';
 
 const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [cookies] = useCookies(['token']);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+    
+        const savedUsername = Cookies.get('username');
+        if (savedUsername) {
+   
+            dispatch(setUsername(savedUsername));
+        }
+    }, [dispatch]); // Added dispatch as a dependency
 
     useEffect(() => {
         const fetchData = async () => {

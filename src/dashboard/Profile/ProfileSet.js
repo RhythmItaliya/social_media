@@ -63,6 +63,9 @@ const ProfileSet = () => {
     // userPhotoUrl
     const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
 
+    //username
+    const loginUserUsername = useSelector((state) => state.name.username);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -141,7 +144,7 @@ const ProfileSet = () => {
 
                             {/* name */}
                             {userData && (
-                                <Typography style={{ color: colors.textColor, fontSize: "22px" }}>
+                                <Typography style={{ color: colors.textColor, fontSize: "18px" }}>
                                     {`${capitalizeFirstLetter(userData.firstName)} ${capitalizeFirstLetter(userData.lastName)}`}
                                 </Typography>
                             )}
@@ -150,7 +153,7 @@ const ProfileSet = () => {
                             <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                                 <AlternateEmailIcon style={{ color: colors.iconColor, fontSize: "16px" }} />
                                 <Typography style={{ fontSize: "14px", color: colors.labelColor }}>
-                                    username
+                                    {loginUserUsername}
                                 </Typography>
                             </div>
 
