@@ -16,9 +16,8 @@ import { ArrowForward, Update } from '@mui/icons-material';
 import SubSubOptionsComponent from './SubSubOptionsComponent';
 import { useSelector } from 'react-redux';
 import ProfilePhoto from '../dashboard/Profile/ProfilePhotoUpload';
-import DatePicker from 'react-datepicker';
-
-
+import DatePicker from 'react-datepicker'; // Importing react-datepicker
+import 'react-datepicker/dist/react-datepicker.css'; // Importing styles
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -168,39 +167,31 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
 
         return (
           <div className='p-2 w-75 mx-auto d-flex justify-content-center align-content-center'>
-            {/* <DatePicker
-            // label="Date of Birth"
-            // value={selectedDate}
-            // onChange={handleDateChange}
-            // open={isDatePickerOpen}
-            // onOpenChange={(status) => setDatePickerOpen(status)}
-            // renderInput={(params) => (
-            //   <TextField
-            //     {...params}
-            //     InputProps={{
-            //       style: {
-            //         color: colors.textColor,
-            //         borderBottom: `1px solid ${colors.border}`,
-            //         '&:focus': {
-            //           color: colors.focusColor,
-            //         },
-            //       },
-            //     }}
-            //     InputLabelProps={{
-            //       style: {
-            //         color: colors.labelColor,
-            //       },
-            //     }}
-            //   />
-            // )}
-            // /> */}
-
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              dateFormat="dd/MM/yyyy"
+              open={isDatePickerOpen}
+              onOpen={() => setDatePickerOpen(true)}
+              dateFormat="dd/MM/yyyy" // Set the desired date format
+              customInput={
+                <TextField
+                  InputProps={{
+                    style: {
+                      color: colors.textColor,
+                      borderBottom: `1px solid ${colors.border}`,
+                      '&:focus': {
+                        color: colors.focusColor,
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    style: {
+                      color: colors.labelColor,
+                    },
+                  }}
+                />
+              }
             />
-
             <IconButton
               style={{
                 color: colors.iconColor,
