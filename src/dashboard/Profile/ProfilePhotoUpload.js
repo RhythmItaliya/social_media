@@ -183,6 +183,16 @@ const ProfilePhoto = () => {
                     >
                         Save
                     </Button>
+
+                    <Button
+                        type="default"
+                        icon={<PlusOutlined />}
+                        onClick={handleClear}
+                        disabled={uploading}
+                        style={{ marginTop: 16, marginRight: 8 }}
+                    >
+                        Clear
+                    </Button>
                 </>
             )}
 
