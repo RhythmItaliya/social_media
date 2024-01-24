@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { styled } from '@mui/system';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -13,12 +12,10 @@ import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
 import TextField from '@mui/material/TextField';
 import Collapse from '@mui/material/Collapse';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 import Logo from '../assets/Millie.png';
 
@@ -29,7 +26,7 @@ import { useDarkMode } from '../theme/Darkmode';
 import { Link } from 'react-router-dom';
 
 
-import Comment from './Comment'; // Import the Comment component
+import Comment from './Comment';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -56,7 +53,7 @@ const darkModeColors = {
   labelColor: '#CCC',
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
-  hashtagColor: '#8A2BE2', // Ch
+  hashtagColor: '#8A2BE2',
 };
 
 const hexToRgb = (hex) => {
@@ -68,16 +65,7 @@ const hexToRgb = (hex) => {
 };
 
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
+
 
 const instagramStyles = {
   roundedAvatar: {
@@ -92,17 +80,31 @@ const instagramStyles = {
 };
 
 export default function InstagramCard() {
-  const [expandedPosts, setExpandedPosts] = React.useState({});
-  const [comment, setComment] = React.useState('');
-  const [comments, setComments] = React.useState('');
-  const [postComments, setPostComments] = React.useState({});
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [expandedText, setExpandedText] = React.useState(false);
+
   const [newUserProfile, setNewUserProfile] = React.useState({});
+
+  const [expandedPosts, setExpandedPosts] = React.useState({});
+  const [expandedText, setExpandedText] = React.useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const [comment, setComment] = React.useState('');
+  const [commentCounts, setCommentCounts] = React.useState({});
+  const [postComments, setPostComments] = React.useState({});
+
+  const [likeCounts, setLikeCounts] = React.useState({});
+  const [likedPosts, setLikedPosts] = React.useState([]);
+
+  const [shareCounts, setShareCounts] = React.useState({});
+
   const dispatch = useDispatch();
   const profileUUID = useSelector((state) => state.profileuuid.uuid);
+
+
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
@@ -162,6 +164,36 @@ export default function InstagramCard() {
   }, [newUserProfile, dispatch]);
 
 
+
+  // Like click ------------------------------------
+
+  const handleLikeClick = (postId) => {
+    if (likedPosts.includes(postId)) {
+      setLikedPosts((prevLikedPosts) => prevLikedPosts.filter((id) => id !== postId));
+    } else {
+      setLikedPosts((prevLikedPosts) => [...prevLikedPosts, postId]);
+    }
+    const updatedLikeCounts = { ...likeCounts, [postId]: likedPosts.includes(postId) ? likeCounts[postId] - 1 : (likeCounts[postId] || 0) + 1 };
+    setLikeCounts(updatedLikeCounts);
+  };
+
+
+  // Share click ------------------------------------
+
+  const handleShareClick = (postId) => {
+    const updatedShareCounts = { ...shareCounts, [postId]: (shareCounts[postId] || 0) + 1 };
+    setShareCounts(updatedShareCounts);
+  };
+
+  // Show More click ------------------------------------
+
+  const handleShowMoreClick = (postId) => {
+    setExpandedText((prevExpanded) => ({
+      ...prevExpanded,
+      [postId]: !prevExpanded[postId],
+    }));
+  };
+
   // COMMENT HANDLING ------------------------------------
 
   const handleExpandClick = (postId) => {
@@ -184,6 +216,11 @@ export default function InstagramCard() {
     setPostComments((prevComments) => ({
       ...prevComments,
       [postId]: [...(prevComments[postId] || []), newComment],
+    }));
+
+    setCommentCounts((prevCounts) => ({
+      ...prevCounts,
+      [postId]: (prevCounts[postId] || 0) + 1,
     }));
 
     setComment('');
@@ -260,7 +297,6 @@ export default function InstagramCard() {
       [postId]: updatedComments,
     }));
   };
-
 
   // ------------------------------------
 
@@ -395,8 +431,8 @@ export default function InstagramCard() {
                 }}>
 
                 <div
-                  className={`truncate-text ${expandedText ? 'expanded' : ''}`}
-                  style={{ maxHeight: expandedText ? '100%' : '3em', overflow: 'hidden', position: 'relative' }}
+                  className={`truncate-text ${expandedText[post.id] ? 'expanded' : ''}`}
+                  style={{ maxHeight: expandedText[post.id] ? '100%' : '3em', overflow: 'hidden', position: 'relative' }}
                 >
                   <Typography variant="body2" className='p-1' sx={{ color: colors.labelColor, textAlign: 'start' }}>
                     {post.postText}
@@ -408,7 +444,7 @@ export default function InstagramCard() {
                   <Link
                     component="button"
                     variant="body2"
-                    onClick={() => setExpandedText(!expandedText)}
+                    onClick={() => handleShowMoreClick(post.id)}
                     className="show-more-link"
                     style={{
                       color: colors.linkColor,
@@ -422,26 +458,34 @@ export default function InstagramCard() {
                       textDecoration: 'none'
                     }}
                   >
-                    {expandedText ? 'Show Less' : 'Show More'}
+                    {expandedText[post.id] ? 'Show Less' : 'Show More'}
                   </Link>
                 )}
               </CardContent>
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
-
               {/* ICON */}
-              <CardActions disableSpacing className="justify-content-between d-flex">
-                <IconButton aria-label="add to favorites" sx={instagramStyles.instagramIcons}>
+              <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
+                <IconButton aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <FavoriteIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {likeCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
 
-                <IconButton aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <CommentIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {commentCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
 
-                <IconButton aria-label="share" sx={instagramStyles.instagramIcons}>
+                <IconButton className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <ShareIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {shareCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
               </CardActions>
 
