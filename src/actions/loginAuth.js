@@ -47,9 +47,9 @@ export const loginUser = (userData) => (dispatch) => {
                 document.cookie = `token=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
                 setTimeout(() => {
-                    // window.location.href = `/dashboard`;
-                    console.log('Redirecting to dashboard...');
-                    window.location.href = '/dashboard';
+                    // window.location.href = `/home`;
+                    console.log('Redirecting to home...');
+                    window.location.href = '/home';
 
                     message.success('Successfully Logged In');
                     dispatch(setGlobalLoading(false));

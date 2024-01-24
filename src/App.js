@@ -20,7 +20,7 @@ const App = () => {
       <GlobalLoading />
       <Routes>
 
-        {isAuthenticated ? (<Route path="/login" element={<Navigate to="/dashboard" replace />} />) : (<Route path="/login" element={<Login />} />)}
+        {isAuthenticated ? (<Route path="/login" element={<Navigate to="/home" replace />} />) : (<Route path="/login" element={<Login />} />)}
 
         <Route path="/register" element={<Register />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
@@ -28,9 +28,9 @@ const App = () => {
         <Route path="/verify/login/:token" element={<VerifyLogin />} />
         <Route path="/reset/password/:token" element={<ResetPassword />} />
 
-        <Route path="/dashboard" element={<ProtectedRoute condition={isAuthenticated}> <Dashboard /> </ProtectedRoute>} />
+        <Route path="/home" element={<ProtectedRoute condition={isAuthenticated}> <Dashboard /> </ProtectedRoute>} />
 
-        <Route path="*" element={isAuthenticated ? (<Navigate to="/dashboard" replace />) : (<Navigate to="/login" replace />)} />
+        <Route path="*" element={isAuthenticated ? (<Navigate to="/home" replace />) : (<Navigate to="/login" replace />)} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
 

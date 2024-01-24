@@ -5,29 +5,17 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import '../Tab/vertical.css';
-
-import SearchAppBar from '../../navbar/Searchbar';
-
-import { Grid } from '@mui/material';
-import Merger from '../../navbar/Merger';
-import Profilebar from '../../navbar/ProfileBar';
-
 import { DarkModeProvider } from '../../theme/Darkmode';
-
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-
-import SenderComponent from '../../navbar/SenderComponent';
-
 import { ChatBubble, CreateSharp, Settings } from '@mui/icons-material';
-import Chat from '../../Chat.js/Chat';
-import Post from '../../Post/Post'
+import Chat from '../../Chat/Chat';
 import CreatePost from '../../Post/CreatePost';
 import ProfileSet from '../Profile/ProfileSet';
-import FriendPost from '../../Post/FriendPost';
 import SettingsPage from '../../Settings/Setting';
+import Homemix from '../../mixComponet/Homemix';
+import Searchmix from '../../mixComponet/Searchmix';
 
 
 function TabPanel(props) {
@@ -75,12 +63,6 @@ export default function VerticalTabs() {
         setValue(newValue);
     };
 
-    const [value2, setValue2] = React.useState(0);
-
-    const handleChange2 = (event2, newValue2) => {
-        setValue2(newValue2);
-    };
-
 
     return (
         <DarkModeProvider>
@@ -113,8 +95,6 @@ export default function VerticalTabs() {
                         <Tab icon={<ChatBubble />} {...a11yProps(4)} className="custom-tab" />
                         <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
 
-                        {/* <Logout /> */}
-                        {/* <Layout /> */}
                     </Tabs>
                 </Box>
 
@@ -140,58 +120,16 @@ export default function VerticalTabs() {
 
                 {/* Inside your render method or functional component */}
                 <TabPanel value={value} index={0}>
-
-                    <Profilebar />
-
-                    <div className="grid-container">
-                        <Grid item xs={12} lg={6} className='mx-auto justify-content-center d-flex'>
-                            <div>
-                                <div className='justify-content-center align-content-center d-flex'>
-                                    <Tabs
-                                        value={value2}
-                                        onChange={handleChange2}
-                                    >
-                                        <Tab
-                                            label="Show Post"
-                                            style={{
-                                                fontSize: '12px',
-
-                                            }}
-                                        />
-                                        <Tab
-                                            label="Show Friend Post"
-                                            style={{
-                                                fontSize: '12px',
-
-                                            }}
-                                        />
-                                    </Tabs>
-                                </div>
-                                <div className="tab-content">
-                                    {value2 === 0 && <Post />}
-                                    {value2 === 1 && <FriendPost />}
-                                </div>
-                            </div>
-                        </Grid>
-
-                        <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
-                            <div className="sender-component">
-                                <SenderComponent />
-                            </div>
-                        </Grid>
-                    </div>
-
+                    <Homemix />
                 </TabPanel>
 
 
                 <TabPanel value={value} index={1}>
-                    {/* <Profile /> */}
                     <ProfileSet />
                 </TabPanel>
 
                 <TabPanel value={value} index={2}>
-                    <SearchAppBar />
-                    <Merger />
+                    <Searchmix />
                 </TabPanel>
 
                 <TabPanel value={value} index={3}>

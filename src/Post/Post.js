@@ -18,7 +18,7 @@ import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
-
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Logo from '../assets/Millie.png';
 
@@ -28,6 +28,8 @@ import { useEffect } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { Link } from 'react-router-dom';
 
+
+import Comment from './Comment'; // Import the Comment component
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -90,24 +92,19 @@ const instagramStyles = {
 };
 
 export default function InstagramCard() {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expandedPosts, setExpandedPosts] = React.useState({});
   const [comment, setComment] = React.useState('');
-  const [comments, setComments] = React.useState([]);
+  const [comments, setComments] = React.useState('');
+  const [postComments, setPostComments] = React.useState({});
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [expandedText, setExpandedText] = React.useState(false);
-
   const [newUserProfile, setNewUserProfile] = React.useState({});
   const dispatch = useDispatch();
   const profileUUID = useSelector((state) => state.profileuuid.uuid);
-
-
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
-
-
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
-
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -164,15 +161,17 @@ export default function InstagramCard() {
     dispatch(setUserProfilePosts(newUserProfile));
   }, [newUserProfile, dispatch]);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+
+  // COMMENT HANDLING ------------------------------------
+
+  const handleExpandClick = (postId) => {
+    setExpandedPosts((prevExpanded) => ({
+      ...prevExpanded,
+      [postId]: !prevExpanded[postId],
+    }));
   };
 
-  const handleCommentChange = (event) => {
-    setComment(event.target.value);
-  };
-
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = (postId) => {
     const newComment = {
       id: Date.now(),
       username: 'User123',
@@ -182,20 +181,55 @@ export default function InstagramCard() {
       replies: [],
     };
 
-    setComments([...comments, newComment]);
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: [...(prevComments[postId] || []), newComment],
+    }));
+
     setComment('');
   };
 
-  const handleLikeComment = (commentId) => {
-    const updatedComments = comments.map((comment) =>
+  const handleLikeComment = (postId, commentId) => {
+    const updatedComments = (postComments[postId] || []).map((comment) =>
       comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
     );
 
-    setComments(updatedComments);
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
   };
 
-  const handleLikeReply = (commentId, replyIndex) => {
-    const updatedComments = comments.map((comment) => {
+  const handleDeleteComment = (postId, commentId) => {
+    const updatedComments = (postComments[postId] || []).filter((comment) => comment.id !== commentId);
+
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
+  };
+
+  const handleReplySubmit = (postId, replyText, commentId) => {
+    const newReply = {
+      id: Date.now(),
+      username: 'User123',
+      avatar: Logo,
+      text: replyText,
+      likes: 0,
+    };
+
+    const updatedComments = (postComments[postId] || []).map((comment) =>
+      comment.id === commentId ? { ...comment, replies: [...comment.replies, newReply] } : comment
+    );
+
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
+  };
+
+  const handleLikeReply = (postId, commentId, replyIndex) => {
+    const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
         const updatedReplies = comment.replies.map((reply, index) =>
           index === replyIndex ? { ...reply, likes: reply.likes + 1 } : reply
@@ -206,8 +240,29 @@ export default function InstagramCard() {
       return comment;
     });
 
-    setComments(updatedComments);
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
   };
+
+  const handleDeleteReply = (postId, commentId, replyIndex) => {
+    const updatedComments = (postComments[postId] || []).map((comment) => {
+      if (comment.id === commentId) {
+        const updatedReplies = comment.replies.filter((_, index) => index !== replyIndex);
+        return { ...comment, replies: updatedReplies };
+      }
+      return comment;
+    });
+
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
+  };
+
+
+  // ------------------------------------
 
   const handleMoreVertClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -217,18 +272,16 @@ export default function InstagramCard() {
     setAnchorEl(null);
   };
 
+
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
   return (
 
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-
       {loading ? (
-        // Show loading indicator here
         <p>Loading...</p>
       ) : error ? (
-        // Show error message here
         <p>Error: {error}</p>
       ) : (
         <div>
@@ -380,44 +433,32 @@ export default function InstagramCard() {
               {/* ICON */}
               <CardActions disableSpacing className="justify-content-between d-flex">
                 <IconButton aria-label="add to favorites" sx={instagramStyles.instagramIcons}>
-                  <FavoriteIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+                  <FavoriteIcon sx={{ color: colors.iconColor }} />
                 </IconButton>
 
-                <IconButton aria-label="comment" onClick={handleExpandClick} sx={instagramStyles.instagramIcons}>
-                  <CommentIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+                <IconButton aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
+                  <CommentIcon sx={{ color: colors.iconColor }} />
                 </IconButton>
 
                 <IconButton aria-label="share" sx={instagramStyles.instagramIcons}>
-                  <ShareIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+                  <ShareIcon sx={{ color: colors.iconColor }} />
                 </IconButton>
-
               </CardActions>
-
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* COMMENT HANDALING */}
-              <Collapse in={expanded} timeout="auto" unmountOnExit
-                sx={{
-                  borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                }}
-              >
-                <CardContent >
+              <Collapse in={expandedPosts[post.id]} timeout="auto" unmountOnExit sx={{ borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+                <CardContent>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <TextField
                       label="Add a comment"
                       multiline
                       fullWidth
                       value={comment}
-                      onChange={handleCommentChange}
+                      onChange={(e) => setComment(e.target.value)}
                       variant="standard"
-                      size='small'
+                      size="small"
                       InputProps={{
                         style: {
                           color: colors.textColor,
@@ -433,90 +474,27 @@ export default function InstagramCard() {
                         },
                       }}
                     />
-                    <IconButton aria-label="submit comment" onClick={handleCommentSubmit}>
-                      <SendIcon
-                        sx={{ color: colors.iconColor }}
-                      />
+                    <IconButton aria-label="submit comment" onClick={() => handleCommentSubmit(post.id)}>
+                      <SendIcon sx={{ color: colors.iconColor }} />
                     </IconButton>
                   </div>
-
-                  {/* comment append */}
-                  {comments.map((comment, index) => (
-                    <div key={comment.id}>
-                      <CardHeader
-                        avatar={
-                          <Avatar
-                            src={comment.avatar}
-                            alt="User Avatar"
-                            sx={instagramStyles.roundedAvatar} />}
-
-                        title={comment.username}
-
-                        subheader={comment.text}
-
-                        action={
-                          <IconButton
-                            aria-label="like comment"
-                            onClick={() => handleLikeComment(comment.id)}
-                            sx={instagramStyles.instagramIcons}
-                          >
-
-                            <ThumbUpIcon
-                              sx={{
-                                color: colors.iconColor,
-                                fontSize: '16px'
-                              }}
-                            />
-
-                            <Typography variant="caption"
-                              sx={{
-                                color: colors.labelColor,
-                                fontSize: '12px',
-                                margin: '5px'
-                              }}
-                            >{comment.likes}
-                            </Typography>
-
-                          </IconButton>
-                        }
-
-                        sx={{
-                          color: colors.textColor,
-                          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                          '& .MuiCardHeader-subheader': {
-                            color: colors.labelColor,
-                          },
-                          justifyContent: 'center',
-                          alignContent: 'center',
-                          display: 'flex'
-                        }}
-                      />
-
-                      {comment.replies.map((reply, replyIndex) => (
-                        <CardHeader
-                          key={replyIndex}
-                          avatar={<Avatar src={reply.avatar} alt="User Avatar" sx={instagramStyles.roundedAvatar} />}
-                          title={reply.username}
-                          subheader={reply.text}
-                          action={
-                            <IconButton
-                              aria-label="like reply"
-                              onClick={() => handleLikeReply(comment.id, replyIndex)}
-                              sx={instagramStyles.instagramIcons}
-                            >
-                              <ThumbUpIcon />
-                              <Typography variant="caption">{reply.likes}</Typography>
-                            </IconButton>
-                          }
-                        />
-                      ))}
-                    </div>
+                  {(postComments[post.id] || []).map((comment) => (
+                    <Comment
+                      key={comment.id}
+                      comment={comment}
+                      handleLikeComment={(commentId) => handleLikeComment(post.id, commentId)}
+                      handleDeleteComment={(commentId) => handleDeleteComment(post.id, commentId)}
+                      handleReplySubmit={(replyText, commentId) => handleReplySubmit(post.id, replyText, commentId)}
+                      handleLikeReply={(commentId, replyIndex) => handleLikeReply(post.id, commentId, replyIndex)}
+                      handleDeleteReply={(commentId, replyIndex) => handleDeleteReply(post.id, commentId, replyIndex)}
+                      isUser123={comment.username === 'User123'}
+                    />
                   ))}
                 </CardContent>
               </Collapse>
 
               {/* POST SETTINGS */}
-              <Popover
+              < Popover
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
@@ -535,9 +513,10 @@ export default function InstagramCard() {
                 </Box>
               </Popover >
             </Card>
-          ))}
-        </div>
+          ))
+          }
+        </div >
       )}
-    </div>
+    </div >
   );
 }
