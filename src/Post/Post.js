@@ -17,7 +17,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
 
-import Logo from '../assets/Millie.png';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserProfilePosts } from '../actions/authActions';
@@ -64,9 +63,6 @@ const hexToRgb = (hex) => {
   return `${r}, ${g}, ${b}`;
 };
 
-
-
-
 const instagramStyles = {
   roundedAvatar: {
     borderRadius: '50%',
@@ -98,8 +94,15 @@ export default function InstagramCard() {
   const [shareCounts, setShareCounts] = React.useState({});
 
   const dispatch = useDispatch();
+
+  // Profile UUID
   const profileUUID = useSelector((state) => state.profileuuid.uuid);
 
+  // Logo
+  const setLogo = useSelector((state) => state.userPhoto.photoUrl);
+
+  // Username
+  const setUsername = useSelector((state) => state.name.username);
 
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -196,6 +199,7 @@ export default function InstagramCard() {
 
   // COMMENT HANDLING ------------------------------------
 
+  // Open Comment.....................................................................................
   const handleExpandClick = (postId) => {
     setExpandedPosts((prevExpanded) => ({
       ...prevExpanded,
@@ -203,11 +207,12 @@ export default function InstagramCard() {
     }));
   };
 
+  // Comment Submit.....................................................................................
   const handleCommentSubmit = (postId) => {
     const newComment = {
       id: Date.now(),
-      username: 'User123',
-      avatar: Logo,
+      username: setUsername,
+      avatar: setLogo,
       text: comment,
       likes: 0,
       replies: [],
@@ -226,10 +231,15 @@ export default function InstagramCard() {
     setComment('');
   };
 
+  // Comment like.....................................................................................
   const handleLikeComment = (postId, commentId) => {
-    const updatedComments = (postComments[postId] || []).map((comment) =>
-      comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
-    );
+    const updatedComments = (postComments[postId] || []).map((comment) => {
+      if (comment.id === commentId) {
+        const newLikes = comment.liked ? comment.likes - 1 : comment.likes + 1;
+        return { ...comment, likes: newLikes, liked: !comment.liked };
+      }
+      return comment;
+    });
 
     setPostComments((prevComments) => ({
       ...prevComments,
@@ -237,6 +247,7 @@ export default function InstagramCard() {
     }));
   };
 
+  // Delete Comment.....................................................................................
   const handleDeleteComment = (postId, commentId) => {
     const updatedComments = (postComments[postId] || []).filter((comment) => comment.id !== commentId);
 
@@ -246,11 +257,12 @@ export default function InstagramCard() {
     }));
   };
 
+  // Reply Submit .....................................................................................
   const handleReplySubmit = (postId, replyText, commentId) => {
     const newReply = {
       id: Date.now(),
-      username: 'User123',
-      avatar: Logo,
+      username: setUsername,
+      avatar: setLogo,
       text: replyText,
       likes: 0,
     };
@@ -265,12 +277,18 @@ export default function InstagramCard() {
     }));
   };
 
+  // Reply like.....................................................................................
   const handleLikeReply = (postId, commentId, replyIndex) => {
     const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
-        const updatedReplies = comment.replies.map((reply, index) =>
-          index === replyIndex ? { ...reply, likes: reply.likes + 1 } : reply
-        );
+        const updatedReplies = comment.replies.map((reply, index) => {
+          if (index === replyIndex) {
+            // Toggle like state
+            const newLikes = reply.liked ? 0 : 1;
+            return { ...reply, likes: newLikes, liked: !reply.liked };
+          }
+          return reply;
+        });
 
         return { ...comment, replies: updatedReplies };
       }
@@ -283,6 +301,7 @@ export default function InstagramCard() {
     }));
   };
 
+  // Reply Delete.....................................................................................
   const handleDeleteReply = (postId, commentId, replyIndex) => {
     const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
@@ -312,6 +331,8 @@ export default function InstagramCard() {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  {/* ------------------------------------------------------------------------------------------------- */ }
+
   return (
 
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
@@ -330,7 +351,6 @@ export default function InstagramCard() {
               border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
             }}>
 
-              {/* ------------------------------------------------------------------------------------------------- */}
               <CardHeader
 
                 // AVTAR
@@ -351,6 +371,7 @@ export default function InstagramCard() {
                 // POST ACTION
                 action={
                   <IconButton
+                    style={{ color: colors.iconColor }}
                     aria-label="settings"
                     sx={{
                       ...instagramStyles.roundedAvatar,
@@ -467,21 +488,21 @@ export default function InstagramCard() {
 
               {/* ICON */}
               <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
-                <IconButton aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton style={{ color: colors.iconColor }} aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <FavoriteIcon sx={{ color: colors.iconColor }} />
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {likeCounts[post.id] || 0}
                   </Typography>
                 </IconButton>
 
-                <IconButton className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <CommentIcon sx={{ color: colors.iconColor }} />
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {commentCounts[post.id] || 0}
                   </Typography>
                 </IconButton>
 
-                <IconButton className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <ShareIcon sx={{ color: colors.iconColor }} />
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {shareCounts[post.id] || 0}
@@ -518,8 +539,8 @@ export default function InstagramCard() {
                         },
                       }}
                     />
-                    <IconButton aria-label="submit comment" onClick={() => handleCommentSubmit(post.id)}>
-                      <SendIcon sx={{ color: colors.iconColor }} />
+                    <IconButton style={{ color: colors.iconColor }} aria-label="submit comment" onClick={() => handleCommentSubmit(post.id)}>
+                      <SendIcon sx={{ color: colors.iconColor, fontSize: '16px' }} />
                     </IconButton>
                   </div>
                   {(postComments[post.id] || []).map((comment) => (
@@ -531,7 +552,7 @@ export default function InstagramCard() {
                       handleReplySubmit={(replyText, commentId) => handleReplySubmit(post.id, replyText, commentId)}
                       handleLikeReply={(commentId, replyIndex) => handleLikeReply(post.id, commentId, replyIndex)}
                       handleDeleteReply={(commentId, replyIndex) => handleDeleteReply(post.id, commentId, replyIndex)}
-                      isUser123={comment.username === 'User123'}
+                      isUser123={comment.username === setUsername}
                     />
                   ))}
                 </CardContent>

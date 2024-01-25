@@ -9,6 +9,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import TextField from '@mui/material/TextField';
 import SendIcon from '@mui/icons-material/Send';
 import { useDarkMode } from '../theme/Darkmode';
+import styled from 'styled-components';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -46,6 +47,15 @@ const hexToRgb = (hex) => {
   return `${r}, ${g}, ${b}`;
 };
 
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  '&:focus': {
+    color: theme.isDarkMode ? darkModeColors.focusColor : lightModeColors.focusColor,
+  },
+  '&.MuiIconButton-root': {
+    color: theme.isDarkMode ? darkModeColors.iconColor : lightModeColors.iconColor,
+  },
+}));
+
 
 const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, handleReplySubmit, handleLikeReply, handleDeleteReply }) => {
   const [showReplies, setShowReplies] = useState(false);
@@ -76,22 +86,22 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
         subheader={<Typography style={{ color: colors.labelColor }}>{comment.text}</Typography>}
         action={
           <>
-            <IconButton aria-label="like comment" onClick={() => handleLikeComment(comment.id)}>
-              <ThumbUpIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
+            <StyledIconButton style={{ color: colors.iconColor }} aria-label="like comment" onClick={() => handleLikeComment(comment.id)}>
+              <ThumbUpIcon sx={{ fontSize: '14px' }} />
               <Typography variant="caption" sx={{ fontSize: '12px', margin: '5px', color: colors.labelColor }}>
                 {comment.likes}
               </Typography>
-            </IconButton>
+            </StyledIconButton>
 
             {isUser123 && (
-              <IconButton aria-label="delete comment" onClick={() => handleDeleteComment(comment.id)}>
-                <DeleteIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
-              </IconButton>
+              <StyledIconButton style={{ color: colors.iconColor }} aria-label="delete comment" onClick={() => handleDeleteComment(comment.id)}>
+                <DeleteIcon sx={{ fontSize: '14px' }} />
+              </StyledIconButton>
             )}
 
-            <IconButton aria-label="toggle replies" onClick={toggleReplies}>
-              <ReplyIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
-            </IconButton>
+            <StyledIconButton style={{ color: colors.iconColor }} aria-label="toggle replies" onClick={toggleReplies}>
+              <ReplyIcon sx={{ fontSize: '14px' }} />
+            </StyledIconButton>
           </>
         }
         sx={{
@@ -130,8 +140,8 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
                 },
               }}
             />
-            <IconButton aria-label="submit comment" onClick={handleReplySubmitInternal}>
-              <SendIcon sx={{ color: colors.iconColor }} />
+            <IconButton style={{ color: colors.iconColor }} aria-label="submit comment" onClick={handleReplySubmitInternal}>
+              <SendIcon sx={{ color: colors.iconColor, fontSize: '16px' }} />
             </IconButton>
           </div>
 
