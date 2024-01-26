@@ -93,6 +93,8 @@ export default function InstagramCard() {
 
   const [shareCounts, setShareCounts] = React.useState({});
 
+  const [likedComments, setLikedComments] = React.useState([]);
+
   const dispatch = useDispatch();
 
   // Profile UUID
@@ -200,51 +202,168 @@ export default function InstagramCard() {
   // COMMENT HANDLING ------------------------------------
 
   // Open Comment.....................................................................................
-  const handleExpandClick = (postId) => {
-    setExpandedPosts((prevExpanded) => ({
-      ...prevExpanded,
-      [postId]: !prevExpanded[postId],
-    }));
+  const handleExpandClick = async (postId) => {
+    try {
+      // Fetch comments for the post
+      const response = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const formattedComments = data.comments.map(comment => ({
+        id: comment.id,
+        commentText: comment.commentText,
+        commentReaction: comment.commentReaction,
+        reactionCount: comment.reactionCount,
+        user: {
+          username: comment.user.username,
+          photoURL: comment.user.photoURL,
+        },
+      }));
+
+      // Update local state with the formatted comments
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: formattedComments,
+      }));
+
+      // Toggle the expanded state
+      setExpandedPosts((prevExpanded) => ({
+        ...prevExpanded,
+        [postId]: !prevExpanded[postId],
+      }));
+
+
+      // Like comment 
+      const likedCommentsResponse = await fetch(`http://localhost:8080/find/api/user/liked-comments/${profileUUID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!likedCommentsResponse.ok) {
+        throw new Error(`HTTP error! Status: ${likedCommentsResponse.status}`);
+      }
+
+      const likedCommentsData = await likedCommentsResponse.json();
+
+      const formattedLikedComments = likedCommentsData.likedComments.map(likedComment => ({
+        id: likedComment.id,
+      }));
+
+      setLikedComments(formattedLikedComments);
+
+    } catch (error) {
+      console.error('Error fetching comments or user\'s liked comments:', error);
+    }
   };
+
 
   // Comment Submit.....................................................................................
-  const handleCommentSubmit = (postId) => {
-    const newComment = {
-      id: Date.now(),
-      username: setUsername,
-      avatar: setLogo,
-      text: comment,
-      likes: 0,
-      replies: [],
-    };
+  const handleCommentSubmit = async (postId) => {
+    try {
+      // Check if comment is not empty
+      if (!comment.trim()) {
+        return;
+      }
 
-    setPostComments((prevComments) => ({
-      ...prevComments,
-      [postId]: [...(prevComments[postId] || []), newComment],
-    }));
+      // Assuming you have user information in state
+      const newComment = {
+        id: Date.now(),
+        username: setUsername,
+        avatar: setLogo,
+        text: comment,
+        likes: 0,
+        replies: [],
+      };
 
-    setCommentCounts((prevCounts) => ({
-      ...prevCounts,
-      [postId]: (prevCounts[postId] || 0) + 1,
-    }));
+      // Update state with the new comment
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: [...(prevComments[postId] || []), newComment],
+      }));
 
-    setComment('');
+      // Update comment count
+      setCommentCounts((prevCounts) => ({
+        ...prevCounts,
+        [postId]: (prevCounts[postId] || 0) + 1,
+      }));
+
+      // Clear the comment input
+      setComment('');
+
+      // Make a POST request to the server to save the comment
+      const response = await fetch('http://localhost:8080/api/post/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileUUID: profileUUID,
+          postId,
+          commentText: comment,
+          commentReaction: '',
+          reactionCount: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      // Handle error as needed
+    }
   };
 
+
   // Comment like.....................................................................................
+
   const handleLikeComment = (postId, commentId) => {
     const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
         const newLikes = comment.liked ? comment.likes - 1 : comment.likes + 1;
+
+        // Update comment likes in local state
         return { ...comment, likes: newLikes, liked: !comment.liked };
       }
       return comment;
     });
 
+    // Update postComments state with the updated comments
     setPostComments((prevComments) => ({
       ...prevComments,
       [postId]: updatedComments,
     }));
+
+    // Make a POST request to the server to update the comment likes
+    fetch('http://localhost:8080/api/post/comment/like', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userProfileUUID: profileUUID,
+        commentId,
+      }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+      })
+      .catch(error => {
+        console.error('Error updating comment likes:', error);
+      });
   };
 
   // Delete Comment.....................................................................................
@@ -257,25 +376,35 @@ export default function InstagramCard() {
     }));
   };
 
+
   // Reply Submit .....................................................................................
   const handleReplySubmit = (postId, replyText, commentId) => {
+    // Assuming setUsername and setLogo are functions that set state variables
     const newReply = {
       id: Date.now(),
-      username: setUsername,
-      avatar: setLogo,
+      username: setUsername, // Invoke the function to get the value
+      avatar: setLogo, // Invoke the function to get the value
       text: replyText,
       likes: 0,
     };
 
-    const updatedComments = (postComments[postId] || []).map((comment) =>
-      comment.id === commentId ? { ...comment, replies: [...comment.replies, newReply] } : comment
-    );
+    const updatedComments = (postComments[postId] || []).map((comment) => {
+      if (comment.id === commentId) {
+        const updatedReplies = comment.replies || []; // Ensure replies is initialized as an array
+        return {
+          ...comment,
+          replies: [...updatedReplies, newReply],
+        };
+      }
+      return comment;
+    });
 
     setPostComments((prevComments) => ({
       ...prevComments,
       [postId]: updatedComments,
     }));
   };
+
 
   // Reply like.....................................................................................
   const handleLikeReply = (postId, commentId, replyIndex) => {
@@ -527,7 +656,7 @@ export default function InstagramCard() {
                       InputProps={{
                         style: {
                           color: colors.textColor,
-                          borderBottom: `1px solid ${colors.border}`,
+                          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
                           '&:focus': {
                             color: colors.focusColor,
                           },
@@ -543,6 +672,7 @@ export default function InstagramCard() {
                       <SendIcon sx={{ color: colors.iconColor, fontSize: '16px' }} />
                     </IconButton>
                   </div>
+
                   {(postComments[post.id] || []).map((comment) => (
                     <Comment
                       key={comment.id}
@@ -552,9 +682,10 @@ export default function InstagramCard() {
                       handleReplySubmit={(replyText, commentId) => handleReplySubmit(post.id, replyText, commentId)}
                       handleLikeReply={(commentId, replyIndex) => handleLikeReply(post.id, commentId, replyIndex)}
                       handleDeleteReply={(commentId, replyIndex) => handleDeleteReply(post.id, commentId, replyIndex)}
-                      isUser123={comment.username === setUsername}
+                      isLiked={likedComments.some(likedComment => likedComment.id === comment.id)} 
                     />
                   ))}
+
                 </CardContent>
               </Collapse>
 

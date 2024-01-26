@@ -57,7 +57,8 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 
-const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, handleReplySubmit, handleLikeReply, handleDeleteReply }) => {
+const Comment = ({ comment, handleLikeComment, handleDeleteComment, handleReplySubmit, handleLikeReply, handleDeleteReply, isLiked }) => {
+
   const [showReplies, setShowReplies] = useState(false);
   const [reply, setReply] = useState('');
 
@@ -81,23 +82,30 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
   return (
     <div key={comment.id}>
       <CardHeader
-        avatar={<Avatar src={comment.avatar} alt="User Avatar" sx={{ borderRadius: '50%', width: '30px', height: '30px' }} />}
-        title={comment.username}
-        subheader={<Typography style={{ color: colors.labelColor }}>{comment.text}</Typography>}
+        avatar={
+          <Avatar
+            src={comment.user ? `http://static.profile.local/${comment.user.photoURL}` : ''}
+            alt="User Avatar"
+            sx={{ borderRadius: '50%', width: '30px', height: '30px' }}
+          />
+        }
+        title={comment.user?.username}
+        subheader={<Typography style={{ color: colors.labelColor }}>{comment.commentText}</Typography>}
         action={
           <>
             <StyledIconButton style={{ color: colors.iconColor }} aria-label="like comment" onClick={() => handleLikeComment(comment.id)}>
-              <ThumbUpIcon sx={{ fontSize: '14px' }} />
+              <ThumbUpIcon sx={{
+                fontSize: '14px',
+                color: isLiked ? 'red' : colors.iconColor
+              }} />
               <Typography variant="caption" sx={{ fontSize: '12px', margin: '5px', color: colors.labelColor }}>
-                {comment.likes}
+                {comment.reactionCount}
               </Typography>
             </StyledIconButton>
 
-            {isUser123 && (
-              <StyledIconButton style={{ color: colors.iconColor }} aria-label="delete comment" onClick={() => handleDeleteComment(comment.id)}>
-                <DeleteIcon sx={{ fontSize: '14px' }} />
-              </StyledIconButton>
-            )}
+            <StyledIconButton style={{ color: colors.iconColor }} aria-label="delete comment" onClick={() => handleDeleteComment(comment.id)}>
+              <DeleteIcon sx={{ fontSize: '14px' }} />
+            </StyledIconButton>
 
             <StyledIconButton style={{ color: colors.iconColor }} aria-label="toggle replies" onClick={toggleReplies}>
               <ReplyIcon sx={{ fontSize: '14px' }} />
@@ -105,11 +113,11 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
           </>
         }
         sx={{
-          borderBottom: '1px solid rgba(0, 0, 0, 0.5)',
+          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
           justifyContent: 'center',
           alignContent: 'center',
           display: 'flex',
-          color: colors.textColor
+          color: colors.textColor,
         }}
       />
 
@@ -139,6 +147,9 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
                   color: colors.labelColor,
                 },
               }}
+              sx={{
+                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+              }}
             />
             <IconButton style={{ color: colors.iconColor }} aria-label="submit comment" onClick={handleReplySubmitInternal}>
               <SendIcon sx={{ color: colors.iconColor, fontSize: '16px' }} />
@@ -146,40 +157,39 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, isUser123, h
           </div>
 
           {/* Replies */}
-          {comment.replies.map((reply, replyIndex) => (
-            <CardHeader
-              key={replyIndex}
-              avatar={<Avatar src={reply.avatar} alt="User Avatar" sx={{ borderRadius: '50%', width: '30px', height: '30px' }} />}
-              title={reply.username}
-              subheader={<Typography style={{ color: colors.labelColor }}>{reply.text}</Typography>}
-              action={
-                <>
-                  <IconButton aria-label="like reply" onClick={() => handleLikeReply(comment.id, replyIndex)}>
-                    <ThumbUpIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
-                    <Typography sx={{ margin: '5px', fontSize: '12px', color: colors.labelColor }}>{reply.likes}</Typography>
-                  </IconButton>
+          {comment.replies &&
+            comment.replies.map((reply, replyIndex) => (
+              <CardHeader
+                key={replyIndex}
+                avatar={<Avatar src={reply.avatar} alt="User Avatar" sx={{ borderRadius: '50%', width: '30px', height: '30px' }} />}
+                title={reply.username}
+                subheader={<Typography style={{ color: colors.labelColor }}>{reply.text}</Typography>}
+                action={
+                  <>
+                    <IconButton aria-label="like reply" onClick={() => handleLikeReply(comment.id, replyIndex)}>
+                      <ThumbUpIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
+                      <Typography sx={{ margin: '5px', fontSize: '12px', color: colors.labelColor }}>{reply.likes}</Typography>
+                    </IconButton>
 
-                  {isUser123 && (
                     <IconButton aria-label="delete reply" onClick={() => handleDeleteReply(comment.id, replyIndex)}>
                       <DeleteIcon sx={{ fontSize: '14px', color: colors.iconColor }} />
                     </IconButton>
-                  )}
-                </>
-              }
-              sx={{
-                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-                justifyContent: 'center',
-                alignContent: 'center',
-                display: 'flex',
-                color: colors.textColor
-              }}
-              InputLabelProps={{
-                style: {
-                  color: colors.labelColor
-                },
-              }}
-            />
-          ))}
+                  </>
+                }
+                sx={{
+                  borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  display: 'flex',
+                  color: colors.textColor,
+                }}
+                InputLabelProps={{
+                  style: {
+                    color: colors.labelColor,
+                  },
+                }}
+              />
+            ))}
         </div>
       )}
     </div>
