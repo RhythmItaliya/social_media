@@ -53,6 +53,8 @@ const ProfileSet = () => {
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
     const [userData, setUserData] = useState(null);
+    const [postCount, setPostCount] = useState(0);
+    const [friendCount, setFriendPostCount] = useState(0);
 
     // defult imge
     const defaultImageUrl = 'https://robohash.org/yourtext.png';
@@ -60,12 +62,16 @@ const ProfileSet = () => {
     //user uuid
     const uuid = useSelector(state => state.useruuid.uuid);
 
+    // profileUU
+    const profileUUID = useSelector(state => state.profileuuid.uuid);
+
     // userPhotoUrl
     const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
 
     //username
     const loginUserUsername = useSelector((state) => state.name.username);
 
+    // USER PROFILE //
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -95,6 +101,62 @@ const ProfileSet = () => {
 
         fetchUserData();
     }, [uuid]);
+
+    // POST COUNT //
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Count the number of posts for the user
+                const postCountResponse = await fetch(`http://localhost:8080/api/userPostsCount/${profileUUID}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!postCountResponse.ok) {
+                    console.error('Failed to fetch post count');
+                    throw new Error('Failed to fetch post count');
+                }
+
+                const postData = await postCountResponse.json();
+                setPostCount(postData.postCount);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchUserData();
+    }, [profileUUID]);
+
+    // FRIENDSHIP COUNT //
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Count the number of posts for the user
+                const friendCountResponse = await fetch(`http://localhost:8080/api/friendships/count/${profileUUID}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!friendCountResponse.ok) {
+                    console.error('Failed to fetch post count');
+                    throw new Error('Failed to fetch post count');
+                }
+
+                const postfriendData = await friendCountResponse.json();
+                setFriendPostCount(postfriendData.friendshipCount);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchUserData();
+    }, [profileUUID]);
 
     // API PROFILE PHOTO 
 
@@ -170,11 +232,8 @@ const ProfileSet = () => {
                         </Grid>
 
                         <Grid item>
-
-
-
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
+                                <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount}</Typography>
                                 <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
                                     Post
                                 </Typography>
@@ -198,7 +257,7 @@ const ProfileSet = () => {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
+                        <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{friendCount}</Typography>
                         <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
                             Friend
                         </Typography>
@@ -250,7 +309,7 @@ const ProfileSet = () => {
 
 
             {/* post div */}
-            <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '20px', marginBottom: '20px' }}>
+            <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <Grid>
                     <PostProfile />
                 </Grid>

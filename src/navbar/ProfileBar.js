@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -54,7 +54,6 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function Profilebar() {
-    const theme = useTheme();
     const { isDarkMode } = useDarkMode();
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;

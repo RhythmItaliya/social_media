@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { styled } from '@mui/system';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -8,26 +7,24 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
 import TextField from '@mui/material/TextField';
 import Collapse from '@mui/material/Collapse';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
 
 
-import Logo from '../assets/Millie.png';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserProfilePosts } from '../actions/authActions';
 import { useEffect } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { Link } from 'react-router-dom';
+
+import Comment from './Comment';
 
 
 const lightModeColors = {
@@ -67,17 +64,6 @@ const hexToRgb = (hex) => {
 };
 
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
-
 const instagramStyles = {
   roundedAvatar: {
     borderRadius: '50%',
@@ -91,23 +77,46 @@ const instagramStyles = {
 };
 
 export default function FriendPost() {
-  const [expanded, setExpanded] = React.useState(false);
-  const [comment, setComment] = React.useState('');
-  const [comments, setComments] = React.useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [expandedText, setExpandedText] = React.useState(false);
 
   const [mergedData, setMergedData] = React.useState([]);
 
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [expandedPosts, setExpandedPosts] = React.useState({});
+  const [expandedText, setExpandedText] = React.useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const [comment, setComment] = React.useState('');
+  const [commentCounts, setCommentCounts] = React.useState({});
+  const [postComments, setPostComments] = React.useState({});
+
+  const [likeCounts, setLikeCounts] = React.useState({});
+  const [likedPosts, setLikedPosts] = React.useState([]);
+
+  const [shareCounts, setShareCounts] = React.useState({});
+
+  const [likedComments, setLikedComments] = React.useState([]);
 
   const dispatch = useDispatch();
+
+  // Profile UUID
   const profileUUID = useSelector((state) => state.profileuuid.uuid);
 
+  // Logo
+  const setLogo = useSelector((state) => state.userPhoto.photoUrl);
+
+  // Username
+  const setUsername = useSelector((state) => state.name.username);
+
+  // loading state
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [commentLoading, setCommentLoading] = React.useState(false);
+
+  // Dark mode
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+  // POST_FACTCH_FRIEND -------------------------------------------------
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -171,11 +180,13 @@ export default function FriendPost() {
 
         setLoading(false);
 
+        await Promise.all(updatedUserProfile.posts.map(async (post) => {
+          await fetchUserData(post.id);
+        }));
+
       } catch (error) {
-        console.error('Error fetching posts:', error);
-        // Set loading to false on error
+        console.log('Error fetching posts:', error);
         setLoading(false);
-        // Set error state to display an error message to the user
         setError(error.message);
       }
     };
@@ -188,50 +199,372 @@ export default function FriendPost() {
   }, [mergedData, dispatch]);
 
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+
+  // Like click ------------------------------------
+  const handleLikeClick = (postId) => {
+    if (likedPosts.includes(postId)) {
+      setLikedPosts((prevLikedPosts) => prevLikedPosts.filter((id) => id !== postId));
+    } else {
+      setLikedPosts((prevLikedPosts) => [...prevLikedPosts, postId]);
+    }
+    const updatedLikeCounts = { ...likeCounts, [postId]: likedPosts.includes(postId) ? likeCounts[postId] - 1 : (likeCounts[postId] || 0) + 1 };
+    setLikeCounts(updatedLikeCounts);
   };
 
-  const handleCommentChange = (event) => {
-    setComment(event.target.value);
+  // Share click ------------------------------------
+  const handleShareClick = (postId) => {
+    const updatedShareCounts = { ...shareCounts, [postId]: (shareCounts[postId] || 0) + 1 };
+    setShareCounts(updatedShareCounts);
   };
 
-  const handleCommentSubmit = () => {
-    const newComment = {
+  // Show More click ------------------------------------
+  const handleShowMoreClick = (postId) => {
+    setExpandedText((prevExpanded) => ({
+      ...prevExpanded,
+      [postId]: !prevExpanded[postId],
+    }));
+  };
+
+  // COMMENT HANDLING ------------------------------------
+
+  // Comment Count....................................................................................
+  const fetchUserData = async (postId) => {
+    try {
+      const commentCountResponse = await fetch(`http://localhost:8080/api/post/comments/count/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!commentCountResponse.ok) {
+        console.error('Failed to fetch post count');
+        throw new Error('Failed to fetch post count');
+      }
+
+      const commentData = await commentCountResponse.json();
+
+      setCommentCounts((prevCounts) => ({
+        ...prevCounts,
+        [postId]: commentData.commentCount,
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Open Comment.....................................................................................
+  const handleExpandClick = async (postId) => {
+    try {
+
+      setCommentLoading(true);
+
+      // Fetch comments for the post
+      const response = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const formattedComments = data.comments.map(comment => ({
+        id: comment.id,
+        commentText: comment.commentText,
+        commentReaction: comment.commentReaction,
+        reactionCount: comment.reactionCount,
+        user: {
+          username: comment.user.username,
+          photoURL: comment.user.photoURL,
+        },
+      }));
+
+      // Update local state with the formatted comments
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: formattedComments,
+      }));
+
+      // Toggle the expanded state
+      setExpandedPosts((prevExpanded) => ({
+        ...prevExpanded,
+        [postId]: !prevExpanded[postId],
+      }));
+
+
+      // Like comment 
+      const likedCommentsResponse = await fetch(`http://localhost:8080/find/api/user/liked-comments/${profileUUID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!likedCommentsResponse.ok) {
+        throw new Error(`HTTP error! Status: ${likedCommentsResponse.status}`);
+      }
+
+      const likedCommentsData = await likedCommentsResponse.json();
+
+      const formattedLikedComments = likedCommentsData.likedComments.map(likedComment => ({
+        id: likedComment.id,
+      }));
+
+      setLikedComments(formattedLikedComments);
+
+    } catch (error) {
+      console.error('Error fetching comments or user\'s liked comments:', error);
+
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+
+  // Comment Submit.....................................................................................
+  const handleCommentSubmit = async (postId) => {
+    try {
+      // Check if comment is not empty
+      if (!comment.trim()) {
+        return;
+      }
+
+      setCommentLoading(true);
+
+      // Make a POST request to the server to save the comment
+      const response = await fetch('http://localhost:8080/api/post/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileUUID: profileUUID,
+          postId,
+          commentText: comment,
+          commentReaction: '',
+          reactionCount: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // After successfully posting the comment, fetch the updated comments for the post
+      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!commentsResponse.ok) {
+        throw new Error(`HTTP error! Status: ${commentsResponse.status}`);
+      }
+
+      const commentsData = await commentsResponse.json();
+
+      const formattedComments = commentsData.comments.map(comment => ({
+        id: comment.id,
+        commentText: comment.commentText,
+        commentReaction: comment.commentReaction,
+        reactionCount: comment.reactionCount,
+        user: {
+          username: comment.user.username,
+          photoURL: comment.user.photoURL,
+        },
+      }));
+
+      // Update local state with the formatted comments
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: formattedComments,
+      }));
+
+      // Update comment count
+      setCommentCounts((prevCounts) => ({
+        ...prevCounts,
+        [postId]: formattedComments.length,
+      }));
+
+      // Clear the comment input
+      setComment('');
+
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+
+  // Comment like.....................................................................................
+  const handleLikeComment = async (postId, commentId) => {
+    try {
+
+      // Make a POST request to the server to update the comment likes
+      const likeResponse = await fetch('http://localhost:8080/api/post/comment/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileUUID: profileUUID,
+          commentId,
+        }),
+      });
+
+      if (!likeResponse.ok) {
+        throw new Error(`HTTP error! Status: ${likeResponse.status}`);
+      }
+
+      // After successfully updating the comment likes, fetch the updated comments for the post
+      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!commentsResponse.ok) {
+        throw new Error(`HTTP error! Status: ${commentsResponse.status}`);
+      }
+
+      const commentsData = await commentsResponse.json();
+
+      const formattedComments = commentsData.comments.map(comment => ({
+        id: comment.id,
+        commentText: comment.commentText,
+        commentReaction: comment.commentReaction,
+        reactionCount: comment.reactionCount,
+        user: {
+          username: comment.user.username,
+          photoURL: comment.user.photoURL,
+        },
+      }));
+
+      // Update local state with the formatted comments
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: formattedComments,
+      }));
+
+    } catch (error) {
+      console.error('Error updating comment likes:', error);
+    }
+  };
+
+
+  // Delete Comment.....................................................................................
+  const handleDeleteComment = async (postId, commentId) => {
+    try {
+
+      setCommentLoading(true);
+
+      // Make a DELETE request to the server to delete the comment
+      const response = await fetch(`http://localhost:8080/api/delete/comment/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // If the server confirms successful deletion, update the local state
+      const updatedComments = (postComments[postId] || []).filter((comment) => comment.id !== commentId);
+
+      setPostComments((prevComments) => ({
+        ...prevComments,
+        [postId]: updatedComments,
+      }));
+
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+
+  // Reply Submit .....................................................................................
+  const handleReplySubmit = (postId, replyText, commentId) => {
+    // Assuming setUsername and setLogo are functions that set state variables
+    const newReply = {
       id: Date.now(),
-      username: 'User123',
-      avatar: Logo,
-      text: comment,
+      username: setUsername, // Invoke the function to get the value
+      avatar: setLogo, // Invoke the function to get the value
+      text: replyText,
       likes: 0,
-      replies: [],
     };
 
-    setComments([...comments, newComment]);
-    setComment('');
-  };
-
-  const handleLikeComment = (commentId) => {
-    const updatedComments = comments.map((comment) =>
-      comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
-    );
-
-    setComments(updatedComments);
-  };
-
-  const handleLikeReply = (commentId, replyIndex) => {
-    const updatedComments = comments.map((comment) => {
+    const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
-        const updatedReplies = comment.replies.map((reply, index) =>
-          index === replyIndex ? { ...reply, likes: reply.likes + 1 } : reply
-        );
+        const updatedReplies = comment.replies || []; // Ensure replies is initialized as an array
+        return {
+          ...comment,
+          replies: [...updatedReplies, newReply],
+        };
+      }
+      return comment;
+    });
+
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
+  };
+
+
+  // Reply like.....................................................................................
+  const handleLikeReply = (postId, commentId, replyIndex) => {
+    const updatedComments = (postComments[postId] || []).map((comment) => {
+      if (comment.id === commentId) {
+        const updatedReplies = comment.replies.map((reply, index) => {
+          if (index === replyIndex) {
+            // Toggle like state
+            const newLikes = reply.liked ? 0 : 1;
+            return { ...reply, likes: newLikes, liked: !reply.liked };
+          }
+          return reply;
+        });
 
         return { ...comment, replies: updatedReplies };
       }
       return comment;
     });
 
-    setComments(updatedComments);
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
   };
+
+  // Reply Delete.....................................................................................
+  const handleDeleteReply = (postId, commentId, replyIndex) => {
+    const updatedComments = (postComments[postId] || []).map((comment) => {
+      if (comment.id === commentId) {
+        const updatedReplies = comment.replies.filter((_, index) => index !== replyIndex);
+        return { ...comment, replies: updatedReplies };
+      }
+      return comment;
+    });
+
+    setPostComments((prevComments) => ({
+      ...prevComments,
+      [postId]: updatedComments,
+    }));
+  };
+
+  // ------------------------------------
 
   const handleMoreVertClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -244,14 +577,13 @@ export default function FriendPost() {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  {/* ------------------------------------------------------------------------------------------------- */ }
+
   return (
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-
       {loading ? (
-        // Show loading indicator here
         <p>Loading...</p>
       ) : error ? (
-        // Show error message here
         <p>Error: {error}</p>
       ) : (
         <div>
@@ -264,11 +596,13 @@ export default function FriendPost() {
               border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
             }}>
 
+
               <CardHeader
                 avatar={
                   <Avatar
                     src={`http://static.profile.local/${post.photoURL}`}
                     alt="User Avatar"
+                    loading='lazy'
                     sx={{
                       ...instagramStyles.roundedAvatar,
                       width: 40,
@@ -277,6 +611,8 @@ export default function FriendPost() {
                     }}
                   />
                 }
+
+                // POST ACTION
                 action={
                   <IconButton
                     aria-label="settings"
@@ -291,8 +627,13 @@ export default function FriendPost() {
                     />
                   </IconButton>
                 }
+
+                // USWRNAME
                 title={post.username}
+
+                // DATE
                 subheader={post.createdAt}
+
                 sx={{
                   color: colors.textColor,
                   borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
@@ -302,10 +643,14 @@ export default function FriendPost() {
                 }}
               />
 
+              {/* ------------------------------------------------------------------------------------------------- */}
+
+              {/* POST */}
               <CardMedia
                 component="img"
                 height="400"
                 image={`http://static.post.local/${post.postUploadURLs}`}
+                loading='lazy'
                 alt="Post Image"
                 sx={{
                   background: '#fffff',
@@ -346,8 +691,8 @@ export default function FriendPost() {
                 }}>
 
                 <div
-                  className={`truncate-text ${expandedText ? 'expanded' : ''}`}
-                  style={{ maxHeight: expandedText ? '100%' : '3em', overflow: 'hidden', position: 'relative' }}
+                  className={`truncate-text ${expandedText[post.id] ? 'expanded' : ''}`}
+                  style={{ maxHeight: expandedText[post.id] ? '100%' : '3em', overflow: 'hidden', position: 'relative' }}
                 >
                   <Typography variant="body2" className='p-1' sx={{ color: colors.labelColor, textAlign: 'start' }}>
                     {post.postText}
@@ -359,7 +704,7 @@ export default function FriendPost() {
                   <Link
                     component="button"
                     variant="body2"
-                    onClick={() => setExpandedText(!expandedText)}
+                    onClick={() => handleShowMoreClick(post.id)}
                     className="show-more-link"
                     style={{
                       color: colors.linkColor,
@@ -373,7 +718,7 @@ export default function FriendPost() {
                       textDecoration: 'none'
                     }}
                   >
-                    {expandedText ? 'Show Less' : 'Show More'}
+                    {expandedText[post.id] ? 'Show Less' : 'Show More'}
                   </Link>
                 )}
               </CardContent>
@@ -382,50 +727,48 @@ export default function FriendPost() {
 
 
               {/* ICON */}
-              <CardActions disableSpacing className="justify-content-between d-flex">
-                <IconButton aria-label="add to favorites" sx={instagramStyles.instagramIcons}>
-                  <FavoriteIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+              <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
+                <IconButton style={{ color: colors.iconColor }} aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
+                  <FavoriteIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {likeCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
 
-                <IconButton aria-label="comment" onClick={handleExpandClick} sx={instagramStyles.instagramIcons}>
-                  <CommentIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
+                  <CommentIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {commentCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
 
-                <IconButton aria-label="share" sx={instagramStyles.instagramIcons}>
-                  <ShareIcon
-                    sx={{ color: colors.iconColor }}
-                  />
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
+                  <ShareIcon sx={{ color: colors.iconColor }} />
+                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                    {shareCounts[post.id] || 0}
+                  </Typography>
                 </IconButton>
-
               </CardActions>
 
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* COMMENT HANDALING */}
-              <Collapse in={expanded} timeout="auto" unmountOnExit
-                sx={{
-                  borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                }}
-              >
-                <CardContent >
+              <Collapse in={expandedPosts[post.id]} timeout="auto" unmountOnExit sx={{ borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+                <CardContent>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <TextField
                       label="Add a comment"
                       multiline
                       fullWidth
                       value={comment}
-                      onChange={handleCommentChange}
+                      onChange={(e) => setComment(e.target.value)}
                       variant="standard"
-                      size='small'
+                      size="small"
                       InputProps={{
                         style: {
                           color: colors.textColor,
-                          borderBottom: `1px solid ${colors.border}`,
+                          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
                           '&:focus': {
                             color: colors.focusColor,
                           },
@@ -437,85 +780,26 @@ export default function FriendPost() {
                         },
                       }}
                     />
-                    <IconButton aria-label="submit comment" onClick={handleCommentSubmit}>
-                      <SendIcon
-                        sx={{ color: colors.iconColor }}
-                      />
+                    <IconButton style={{ color: colors.iconColor }} aria-label="submit comment" onClick={() => handleCommentSubmit(post.id)}>
+                      <SendIcon sx={{ color: colors.iconColor, fontSize: '16px' }} />
                     </IconButton>
                   </div>
 
-                  {/* comment append */}
-                  {comments.map((comment, index) => (
-                    <div key={comment.id}>
-                      <CardHeader
-                        avatar={
-                          <Avatar
-                            src={comment.avatar}
-                            alt="User Avatar"
-                            sx={instagramStyles.roundedAvatar} />}
+                  {commentLoading && <p>Loading...</p>}
 
-                        title={comment.username}
-
-                        subheader={comment.text}
-
-                        action={
-                          <IconButton
-                            aria-label="like comment"
-                            onClick={() => handleLikeComment(comment.id)}
-                            sx={instagramStyles.instagramIcons}
-                          >
-
-                            <ThumbUpIcon
-                              sx={{
-                                color: colors.iconColor,
-                                fontSize: '16px'
-                              }}
-                            />
-
-                            <Typography variant="caption"
-                              sx={{
-                                color: colors.labelColor,
-                                fontSize: '12px',
-                                margin: '5px'
-                              }}
-                            >{comment.likes}
-                            </Typography>
-
-                          </IconButton>
-                        }
-
-                        sx={{
-                          color: colors.textColor,
-                          borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                          '& .MuiCardHeader-subheader': {
-                            color: colors.labelColor,
-                          },
-                          justifyContent: 'center',
-                          alignContent: 'center',
-                          display: 'flex'
-                        }}
-                      />
-
-                      {comment.replies.map((reply, replyIndex) => (
-                        <CardHeader
-                          key={replyIndex}
-                          avatar={<Avatar src={reply.avatar} alt="User Avatar" sx={instagramStyles.roundedAvatar} />}
-                          title={reply.username}
-                          subheader={reply.text}
-                          action={
-                            <IconButton
-                              aria-label="like reply"
-                              onClick={() => handleLikeReply(comment.id, replyIndex)}
-                              sx={instagramStyles.instagramIcons}
-                            >
-                              <ThumbUpIcon />
-                              <Typography variant="caption">{reply.likes}</Typography>
-                            </IconButton>
-                          }
-                        />
-                      ))}
-                    </div>
+                  {(postComments[post.id] || []).map((comment) => (
+                    <Comment
+                      key={comment.id}
+                      comment={comment}
+                      handleLikeComment={(commentId) => handleLikeComment(post.id, commentId)}
+                      handleDeleteComment={(commentId) => handleDeleteComment(post.id, commentId)}
+                      handleReplySubmit={(replyText, commentId) => handleReplySubmit(post.id, replyText, commentId)}
+                      handleLikeReply={(commentId, replyIndex) => handleLikeReply(post.id, commentId, replyIndex)}
+                      handleDeleteReply={(commentId, replyIndex) => handleDeleteReply(post.id, commentId, replyIndex)}
+                      isLiked={likedComments.some(likedComment => likedComment.id === comment.id)}
+                    />
                   ))}
+
                 </CardContent>
               </Collapse>
 
