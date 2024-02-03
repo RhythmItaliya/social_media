@@ -8,7 +8,7 @@ const Chat = () => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ width: '250px' }}>
+      <div style={{ width: '350px' }}>
         <UserChatList
           onSelectUser={(user) => {
             console.log(`Selected user: ${user.firstName} ${user.lastName}`);

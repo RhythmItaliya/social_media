@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { useSelector } from 'react-redux';
 import { joinRoom, leaveRoom, sendMessage } from './chatInfo';
+import { Avatar } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -12,6 +14,10 @@ const lightModeColors = {
   border: '#CCCCCC',
   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
   spinnerColor: 'rgb(0,0,0)',
+  labelColor: '#8e8e8e',
+  valueTextColor: 'rgb(0,0,0)',
+  linkColor: '#000',
+  hashtagColor: 'darkblue',
 };
 
 const darkModeColors = {
@@ -22,6 +28,18 @@ const darkModeColors = {
   border: '#333333',
   boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
   spinnerColor: '#ffffff',
+  labelColor: '#CCC',
+  valueTextColor: '#ffffff',
+  linkColor: '#CCC8',
+  hashtagColor: '#8A2BE2',
+};
+
+const hexToRgb = (hex) => {
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
 };
 
 const UserChatList = ({ onSelectUser }) => {
@@ -33,6 +51,17 @@ const UserChatList = ({ onSelectUser }) => {
   const [friendsList, setFriendsList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const [searchInput, setSearchInput] = useState('');
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+    return formattedTime;
+  };
+
+  // Find_friend
   useEffect(() => {
     async function fetchFriendsList() {
       try {
@@ -41,7 +70,23 @@ const UserChatList = ({ onSelectUser }) => {
 
         if (response.ok) {
           const fetchedFriendsList = data.friends;
-          setFriendsList(fetchedFriendsList);
+
+          // Fetch last message for each friend
+          const friendsWithLastMessage = await Promise.all(
+            fetchedFriendsList.map(async (friend) => {
+              const lastMessageResponse = await fetch(`http://localhost:8080/get-last-message/${friend.uuid}`);
+              const lastMessageData = await lastMessageResponse.json();
+              const lastMessage = lastMessageData.lastMessage;
+
+              return {
+                ...friend,
+                lastMessage,
+              };
+            })
+          );
+
+          setFriendsList(friendsWithLastMessage);
+          console.log(friendsWithLastMessage)
         } else {
           console.error('Error:', data.error);
         }
@@ -53,50 +98,132 @@ const UserChatList = ({ onSelectUser }) => {
     fetchFriendsList();
   }, [profileUuid]);
 
+
   const handleUserSelect = (user) => {
     console.log('Selected User:', user);
 
-    // Pass the selected user's profile to onSelectUser
     onSelectUser(user);
 
-    // Join the room with the selected user
     if (selectedUser) {
       leaveRoom(generateRoomId(profileUuid, selectedUser.uuid));
     }
 
-    // Generate a unique room ID based on the two user UUIDs
     const newRoomId = generateRoomId(profileUuid, user.uuid);
 
     joinRoom(profileUuid, user.uuid, (newMessages) => {
-      // You can use the newMessages as needed
+
       // setMessages(newMessages);
     });
 
     setSelectedUser(user);
   };
 
-  // Function to generate a unique room ID based on two user UUIDs
   const generateRoomId = (uuid1, uuid2) => {
     // Sort UUIDs to ensure consistent room ID regardless of order
     const sortedUUIDs = [uuid1, uuid2].sort();
     return `${sortedUUIDs[0]}-${sortedUUIDs[1]}`;
   };
 
+  // Filter friendsList based on searchInput
+  const filteredFriendsList = friendsList.filter((friend) => {
+    const fullName = `${friend.firstName} ${friend.lastName}`.toLowerCase();
+    return fullName.includes(searchInput.toLowerCase());
+  });
+
   return (
-    <div style={{ width: '250px', backgroundColor: colors.backgroundColor, padding: '20px' }}>
-      <h2 style={{ color: colors.textColor }}>User List</h2>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {friendsList.map((friend) => (
+    <div style={{
+      height: '100vh',
+      overflowY: 'auto',
+      width: '100%',
+      borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+    }}>
+      <div className='w-100'>
+        <h4 style={{ color: colors.textColor, padding: '10px' }}>Chats</h4>
+      </div>
+
+      <div>
+        <div style={{ padding: '10px' }}>
+          <div className="rounded-2 input-group">
+            <span className="input-group-text" style={{
+              justifyContent: "center",
+              alignContent: 'center',
+              display: "flex",
+              cursor: 'pointer',
+              backgroundColor: colors.backgroundColor,
+              border: `1px solid ${colors.border}`,
+              boxShadow: `0 2px 4px rgba(${hexToRgb(colors.boxShadow)}, 0.1) inset`,
+            }}>
+              <SearchIcon
+                sx={{
+                  color: colors.iconColor,
+                }} />
+            </span>
+            <input
+              placeholder="Search messages or users"
+              type="text"
+              className="form-control form-control"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              style={{
+                backgroundColor: colors.backgroundColor,
+                color: colors.textColor,
+                border: `1px solid ${colors.border}`,
+                boxShadow: `0 2px 4px rgba(${hexToRgb(colors.boxShadow)}, 0.1) inset`,
+                fontSize: '14px',
+                padding: '10px',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+
+      <ul className="p-3"
+        style={{
+          listStyleType: 'none',
+        }}>
+        {filteredFriendsList.map((friend) => (
           <li
             key={friend.uuid}
             style={{
               marginBottom: '10px',
               cursor: 'pointer',
-              color: selectedUser && selectedUser.uuid === friend.uuid ? 'blue' : colors.textColor,
+              backgroundColor: selectedUser && selectedUser.uuid === friend.uuid ? '#efefef' : colors.backgroundColor,
+              color: selectedUser && selectedUser.uuid === friend.uuid ? colors.textColor : colors.textColor,
+              padding: '2px',
+              borderRadius: '3px'
             }}
             onClick={() => handleUserSelect(friend)}
           >
-            {friend.firstName} {friend.lastName}
+            <div className='d-flex gap-3 m-1 p-1 rounded-2'>
+              <div className="d-flex justify-content-center align-content-center" style={{ flex: '20%' }}>
+                <Avatar
+                  src={friend.photoURL}
+                  alt={`${friend.firstName}'s Avatar`}
+                  style={{
+                    width: '42px',
+                    height: '42px'
+                  }}
+                />
+              </div>
+              <div style={{ flex: '80%' }}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="user-select-none" style={{ fontSize: "14px", color: colors.textColor, fontWeight: '500' }}>
+                    {friend.firstName.charAt(0).toUpperCase() + friend.firstName.slice(1)}{' '}
+                    {friend.lastName.charAt(0).toUpperCase() + friend.lastName.slice(1)}
+                  </span>
+                  <span className="user-select-none" style={{ fontSize: '10px' }}>
+                    {friend.lastMessage ? formatTimestamp(friend.lastMessage.timestamp) : ''}
+                  </span>
+                </div>
+                {friend.lastMessage && (
+                  <span className="user-select-none" style={{ fontSize: '12px', color: colors.labelColor }}>
+                    {''}
+                    {friend.lastMessage.message}
+                  </span>
+                )}
+              </div>
+            </div>
           </li>
         ))}
       </ul>
