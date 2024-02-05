@@ -1,11 +1,42 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import LoadingSpinner from "../others/LoadingSpinner";
+import { useDarkMode } from '../theme/Darkmode';
+
+
+// dark mode
+const lightModeColors = {
+    backgroundColor: '#ffffff',
+    iconColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
+    focusColor: 'rgb(0,0,0)',
+    border: '#CCCCCC',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+    spinnerColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
+    valueTextColor: 'rgb(0,0,0)',
+};
+
+const darkModeColors = {
+    backgroundColor: 'rgb(0,0,0)',
+    iconColor: '#ffffff',
+    textColor: '#ffffff',
+    focusColor: '#ffffff',
+    border: '#333333',
+    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+    spinnerColor: '#ffffff',
+    labelColor: '#CCC',
+    valueTextColor: '#ffffff'
+};
+
 
 const VerifyLogin = () => {
     const [isValid, setIsValid] = useState(null);
     const [loading, setLoading] = useState(true);
     const { token } = useParams();
+
+    const { isDarkMode } = useDarkMode();
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
         const checkLinkExpire = async () => {

@@ -15,15 +15,11 @@ export const loginUser = (userData) => (dispatch) => {
     })
         .then((response) => {
             if (response.status === 401) {
-                setTimeout(() => {
-                    message.error('Username and Password are incorrect...');
-                    dispatch(setGlobalLoading(false));
-                }, 1500);
+                message.error('Username and Password are incorrect...');
+                dispatch(setGlobalLoading(false));
             } else if (!response.ok) {
-                setTimeout(() => {
-                    message.error('Login failed due to a server error.');
-                    dispatch(setGlobalLoading(false));
-                }, 1500);
+                message.error('Login failed due to a server error.');
+                dispatch(setGlobalLoading(false));
             } else {
                 return response.json();
             }
@@ -46,15 +42,12 @@ export const loginUser = (userData) => (dispatch) => {
                 // Set the cookie with the encryptedUuid
                 document.cookie = `token=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                setTimeout(() => {
-                    // window.location.href = `/home`;
-                    console.log('Redirecting to home...');
-                    window.location.href = '/home';
+                // Redirect to home
+                window.location.href = '/home';
 
-                    message.success('Successfully Logged In');
-                    dispatch(setGlobalLoading(false));
-                    dispatch(loginSuccess(false));
-                }, 1500);
+                message.success('Successfully Logged In');
+                dispatch(setGlobalLoading(false));
+                dispatch(loginSuccess(false));
             }
         })
         .catch((error) => {

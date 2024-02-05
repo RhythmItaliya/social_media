@@ -1,3 +1,9 @@
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .card {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -10,16 +16,11 @@
     font-size: 20px;
 }
 
-.text-center a {
-    font-size: 14px;
-    color: #2d74da;
-}
-
 .text-center a:hover {
     text-decoration: underline;
 }
 
-  
+
 @media screen and (max-width: 320px) {}
 
 @media screen and (min-width: 321px) and (max-width: 480px) {}
@@ -29,3 +30,8 @@
 @media screen and (min-width: 768px) and (max-width: 991px) {}
 
 @media screen and (min-width: 992px) and (max-width: 1199px) {}
+
+
+input::placeholder {
+    color: #8e8e8e !important;
+}

@@ -52,7 +52,7 @@ const darkModeColors = {
   labelColor: '#CCC',
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
-  hashtagColor: '#8A2BE2', // Ch
+  hashtagColor: '#8A2BE2',
 };
 
 const hexToRgb = (hex) => {

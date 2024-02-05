@@ -12,6 +12,7 @@ import ResetPassword from './pages/Resetpassword';
 import { useCookies } from 'react-cookie';
 import NotFound from './others/NotFound';
 import ProfileRoute from './PublicCard/ProfileRoute';
+import { DarkModeProvider } from './theme/Darkmode';
 
 
 const App = () => {
@@ -21,31 +22,35 @@ const App = () => {
   return (
     <BrowserRouter>
       <GlobalLoading />
-      <Routes>
-        {isAuthenticated ? (
-          <Route path="/login" element={<Navigate to="/home" replace />} />
-        ) : (
-          <Route path="/login" element={<Login />} />
-        )}
+      <DarkModeProvider>
+        <Routes>
+          {isAuthenticated ? (
+            <Route path="/login" element={<Navigate to="/home" replace />} />
+          ) : (
+            <Route path="/login" element={<Login />} />
+          )}
 
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/verify/login/:token" element={<VerifyLogin />} />
-        <Route path="/reset/password/:token" element={<ResetPassword />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
 
-        <Route
-          path="/home"
-          element={<ProtectedRoute condition={isAuthenticated}><Dashboard /></ProtectedRoute>}
-        />
+          <Route path="/verify/login/:token" element={<VerifyLogin />} />
+          <Route path="/reset/password/:token" element={<ResetPassword />} />
 
-        <Route
-          path="/:username"
-          element={<ProfileRoute />}
-        />
+          <Route
+            path="/home"
+            element={<ProtectedRoute condition={isAuthenticated}><Dashboard /></ProtectedRoute>}
+          />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route
+            path="/:username"
+            element={<ProfileRoute />}
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </DarkModeProvider>
     </BrowserRouter>
   );
 };
