@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useDarkMode } from "../../theme/Darkmode";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { Container } from '@mui/material';
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
-import PostProfile from './PostProfile';
 
 import IconButton from "@mui/material/IconButton";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -14,8 +12,9 @@ import MessageIcon from "@mui/icons-material/Message";
 import { GiHeartKey } from 'react-icons/gi';
 import { GiBrokenSkull } from 'react-icons/gi';
 import Tooltip from "@mui/material/Tooltip";
-import { useSelector } from 'react-redux';
+import { useDarkMode } from '../theme/Darkmode';
 
+import PublicPost from './PublicPost';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -49,7 +48,7 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const ProfileSet = () => {
+const PublicCard = ({ uuid, profileUUID, username, photoURL }) => {
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
     const [userData, setUserData] = useState(null);
@@ -58,10 +57,7 @@ const ProfileSet = () => {
     const [userBio, setUserBio] = useState('');
 
     const defaultImageUrl = 'https://robohash.org/yourtext.png';
-    const uuid = useSelector(state => state.useruuid.uuid);
-    const profileUUID = useSelector(state => state.profileuuid.uuid);
-    const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
-    const loginUserUsername = useSelector((state) => state.name.username);
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -174,7 +170,7 @@ const ProfileSet = () => {
                     <Grid container alignItems="center" spacing={3}>
                         <Grid item>
                             <Avatar
-                                src={userPhotoUrl || defaultImageUrl}
+                                src={`http://static.profile.local/${photoURL || defaultImageUrl}`}
                                 alt="Profile Avatar"
                                 style={{ width: '100px', height: '100px' }}
                             />
@@ -190,7 +186,7 @@ const ProfileSet = () => {
                             <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                                 <AlternateEmailIcon style={{ color: colors.iconColor, fontSize: "16px" }} />
                                 <Typography style={{ fontSize: "14px", color: colors.labelColor }}>
-                                    {loginUserUsername}
+                                    {username}
                                 </Typography>
                             </div>
 
@@ -285,11 +281,12 @@ const ProfileSet = () => {
             {/* post div */}
             <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Grid>
-                    <PostProfile />
+                    <PublicPost profileUUID={profileUUID} />
                 </Grid>
             </div>
         </Container>
     );
 }
 
-export default ProfileSet;
+
+export default PublicCard;

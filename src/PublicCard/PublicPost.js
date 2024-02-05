@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import { Dialog, DialogContent, Typography, Link } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { useDarkMode } from '../../theme/Darkmode';
+import { useDarkMode } from '../theme/Darkmode';
 
 
 const lightModeColors = {
@@ -42,8 +41,10 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-function PostProfile() {
-    const profileUUID = useSelector(state => state.profileuuid.uuid);
+function PublicPost({ profileUUID }) {
+
+    console.log('Public Post', profileUUID);
+
     const [posts, setPosts] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -135,4 +136,4 @@ function PostProfile() {
     );
 }
 
-export default PostProfile;
+export default PublicPost;
