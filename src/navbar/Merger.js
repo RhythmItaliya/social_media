@@ -67,7 +67,7 @@ function Merger() {
                 <div className="grid-container">
                     {/* QuiltedImageList takes up 50% of the screen width */}
                     <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
-                        <QuiltedImageList />
+                        {/* <QuiltedImageList /> */}
                     </Grid>
 
                     {/* SenderComponent takes up 25% of the screen width */}

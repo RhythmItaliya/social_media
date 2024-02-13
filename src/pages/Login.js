@@ -77,7 +77,7 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
             <Form className="login-form justify-content-center align-items-center d-flex vh-100" onFinish={onFinish}
                 style={{ backgroundColor: colors.backgroundColor, color: colors.textColor }}>
                 <div className="container">
-                    <div className="row justify-content-center mt-5">
+                    <div className="row justify-content-center">
                         <div className="col-12 col-md-8 col-lg-6 col-xl-4">
                             <div className='m-2 ' style={{ boxShadow: 'none', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
                                 <div className="card-body p-4" style={{ backgroundColor: colors.backgroundColor }}>

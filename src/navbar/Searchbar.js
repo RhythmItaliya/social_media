@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -6,6 +6,7 @@ import Toolbar from '@mui/material/Toolbar';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { useDarkMode } from '../theme/Darkmode';
+import { Avatar } from '@mui/material';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -75,13 +76,39 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   justifyContent: 'center',
 }));
 
-export default function SearchAppBar() {
+const SearchAppBar = () => {
   const { isDarkMode } = useDarkMode();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/search/${searchTerm}`);
+      const data = await response.json();
+
+      // Assuming the API response structure includes 'success' and 'users' fields
+      if (data.success) {
+        setSearchResults(data.users);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+  };
+
+  const handleChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
-    <Box sx={{
-      flexGrow: 1,
-    }}>
+    <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{
         backgroundColor: isDarkMode ? darkModeColors.backgroundColor : lightModeColors.backgroundColor,
         borderBottom: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}`,
@@ -95,10 +122,37 @@ export default function SearchAppBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              value={searchTerm}
+              onChange={handleChange}
+              onKeyPress={handleKeyPress}
             />
           </Search>
         </Toolbar>
       </AppBar>
+
+      {/* Display search results */}
+      {searchResults.length > 0 && (
+        <div className='bg-black'>
+          <h2>Search Results:</h2>
+          <ul>
+            {searchResults.map((user) => (
+              <li key={user.uuid}>
+                {user.username} - {user.userProfile && user.userProfile.firstName} {user.userProfile && user.userProfile.lastName}
+                {user.userProfile && user.userProfile.profilePhote && (
+                  <Avatar src={`http://static.profile.local/${user.userProfile.profilePhote.photoURL}`} alt={`Profile of ${user.username}`} />
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Display message when no results found */}
+      {searchResults.length === 0 && searchTerm && (
+        <p>No matching users found</p>
+      )}
     </Box>
   );
-}
+};
+
+export default SearchAppBar;
