@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { joinRoom, leaveRoom, sendMessage } from './chatInfo';
 import { Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import './chat.css';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -135,6 +136,7 @@ const UserChatList = ({ onSelectUser }) => {
       height: '100vh',
       overflowY: 'auto',
       width: '100%',
+      padding: '10px',
       borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
     }}>
       <div className='w-100'>
