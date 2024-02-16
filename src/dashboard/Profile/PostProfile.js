@@ -126,7 +126,7 @@ function PostProfile() {
                             src={`http://static.post.local/${selectedImage?.postUploadURLs}`}
                             alt={selectedImage?.title}
                             loading="lazy"
-                            style={{ width: '100%', height: '100%', backgroundColor: colors.backgroundColor }}
+                            style={{ width: '100%', height: '100%', backgroundColor: colors.backgroundColor, userSelect: 'none' }}
                         />
                     </DialogContent>
                 </Dialog>

@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useDarkMode } from "../../theme/Darkmode";
-import Grid from "@mui/material/Grid";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { Container } from '@mui/material';
-import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import PostProfile from './PostProfile';
-
-import IconButton from "@mui/material/IconButton";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import MessageIcon from "@mui/icons-material/Message";
 import { GiHeartKey } from 'react-icons/gi';
 import { GiBrokenSkull } from 'react-icons/gi';
-import Tooltip from "@mui/material/Tooltip";
 import { useSelector } from 'react-redux';
+import CustomButton from './CustomButton';
+import { CloseOutlined } from '@material-ui/icons';
 
+import {
+    IconButton,
+    Tooltip,
+    Grid,
+    Container,
+    Typography,
+    Avatar,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from '@mui/material';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -54,7 +60,6 @@ const ProfileSet = () => {
     const colors = isDarkMode ? darkModeColors : lightModeColors;
     const [userData, setUserData] = useState(null);
     const [postCount, setPostCount] = useState(0);
-    const [friendCount, setFriendPostCount] = useState(0);
     const [userBio, setUserBio] = useState('');
 
     const defaultImageUrl = 'https://robohash.org/yourtext.png';
@@ -62,6 +67,9 @@ const ProfileSet = () => {
     const profileUUID = useSelector(state => state.profileuuid.uuid);
     const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
     const loginUserUsername = useSelector((state) => state.name.username);
+
+    const [isAvtar, setAvtar] = useState(null);
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -120,31 +128,6 @@ const ProfileSet = () => {
         fetchUserPostCount();
     }, [profileUUID]);
 
-    useEffect(() => {
-        const fetchFriendCount = async () => {
-            try {
-                const friendCountResponse = await fetch(`http://localhost:8080/api/friendships/count/${profileUUID}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!friendCountResponse.ok) {
-                    console.error('Failed to fetch friend count');
-                    throw new Error('Failed to fetch friend count');
-                }
-
-                const postfriendData = await friendCountResponse.json();
-                setFriendPostCount(postfriendData.friendshipCount);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchFriendCount();
-    }, [profileUUID]);
 
     const handleAddToFriend = () => {
         console.log("Add to Friend clicked");
@@ -176,9 +159,65 @@ const ProfileSet = () => {
                             <Avatar
                                 src={userPhotoUrl || defaultImageUrl}
                                 alt="Profile Avatar"
-                                style={{ width: '100px', height: '100px' }}
+                                style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+                                onClick={() => {
+                                    setIsAvatarModalOpen(true);
+                                    setAvtar(true);
+                                }}
                             />
                         </Grid>
+
+                        {/* Avatar Modal */}
+                        <Dialog open={isAvatarModalOpen} onClose={() => setIsAvatarModalOpen(false)}>
+
+                            <DialogTitle style={{
+                                color: colors.textColor,
+                                backgroundColor: colors.backgroundColor,
+                                textAlign: 'center',
+                                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
+                                borderBottom: 'none',
+                                boxShadow: colors.boxShadow,
+                                fontSize:'16px'
+                            }}>
+                                {`@${loginUserUsername || ''}`}
+                            </DialogTitle>
+
+                            <DialogContent
+                                style={{
+                                    backgroundColor: colors.backgroundColor,
+                                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
+                                    borderBottom: 'none',
+                                    padding: '20px',
+                                    boxShadow: colors.boxShadow,
+                                }}>
+                                {isAvtar && (
+                                    <Avatar
+                                        src={userPhotoUrl || defaultImageUrl}
+                                        alt="Profile Avatar"
+                                        style={{
+                                            width: '130px',
+                                            height: '130px',
+                                            margin: 'auto',
+                                        }}
+                                    />
+                                )}
+                            </DialogContent>
+
+                            <DialogActions
+                                style={{
+                                    backgroundColor: colors.backgroundColor,
+                                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
+                                    boxShadow: colors.boxShadow,
+                                }}>
+                                <IconButton
+                                    style={{
+                                        color: colors.iconColor
+                                    }} onClick={() => setIsAvatarModalOpen(false)}>
+                                    <CloseOutlined />
+                                </IconButton>
+                            </DialogActions>
+                        </Dialog>
+
 
                         <Grid item>
                             {userData && (
@@ -188,16 +227,15 @@ const ProfileSet = () => {
                             )}
 
                             <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                                <AlternateEmailIcon style={{ color: colors.iconColor, fontSize: "16px" }} />
-                                <Typography style={{ fontSize: "14px", color: colors.labelColor }}>
-                                    {loginUserUsername}
+                                <Typography style={{ fontSize: "16px", color: colors.labelColor }}>
+                                    {`@${loginUserUsername || ''}`}
                                 </Typography>
                             </div>
 
                             {userData && (
                                 <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                                     <LocationOnIcon style={{ color: colors.iconColor, fontSize: "14px" }} />
-                                    <Typography style={{ fontSize: "10px", color: colors.labelColor }}>
+                                    <Typography style={{ fontSize: "12px", color: colors.labelColor }}>
                                         {userData.location}
                                     </Typography>
                                 </div>
@@ -206,7 +244,7 @@ const ProfileSet = () => {
 
                         <Grid item>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount}</Typography>
+                                <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')} </Typography>
                                 <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
                                     Post
                                 </Typography>
@@ -218,35 +256,7 @@ const ProfileSet = () => {
 
             {/* count div */}
             <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
-                <Grid item className='d-flex gap-4 p-3'>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography style={{ fontSize: '30px', color: colors.textColor }}>50</Typography>
-                        <Typography style={{ fontSize: "10px", color: colors.labelColor }}>
-                            Ratting
-                        </Typography>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{friendCount}</Typography>
-                        <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                            Friend
-                        </Typography>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
-                        <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                            Crush Keys
-                        </Typography>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
-                        <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                            Ignore
-                        </Typography>
-                    </div>
-                </Grid>
+                <CustomButton />
             </div>
 
             {/* Button div */}

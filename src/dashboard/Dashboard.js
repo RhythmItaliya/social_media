@@ -5,42 +5,45 @@ import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import CryptoJS from 'crypto-js';
 import Cookies from 'js-cookie';
+import LoadingBar from 'react-top-loading-bar';
 
 const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
+    const [loadingBarProgress, setLoadingBarProgress] = useState(0);
+    const [error, setError] = useState(null);
     const [cookies] = useCookies(['token']);
     const dispatch = useDispatch();
 
     useEffect(() => {
-    
         const savedUsername = Cookies.get('username');
         if (savedUsername) {
-   
             dispatch(setUsername(savedUsername));
         }
-    }, [dispatch]); // Added dispatch as a dependency
+    }, [dispatch]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Simulating data fetching with a 2-second delay
+                setLoadingBarProgress(50);
                 await new Promise(resolve => setTimeout(resolve, 2000));
-                setIsLoading(false); // Set loading to false after data fetching
+                setIsLoading(false);
+                setLoadingBarProgress(100);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                setIsLoading(false); // Set loading to false in case of an error
+                setError('An error occurred while fetching data. Please try again.');
+                setIsLoading(false);
+                setLoadingBarProgress(0);
             }
         };
         fetchData();
     }, []);
 
-    // user uuid
     useEffect(() => {
         const decryptToken = async () => {
             try {
                 const encryptedUuid = cookies.token;
-
                 if (encryptedUuid) {
+                    setLoadingBarProgress(25);
                     const decryptedBytes = CryptoJS.AES.decrypt(encryptedUuid, 'ASDCFVBNLKMNBSDFVBNJNBCV');
                     const uuid = decryptedBytes.toString(CryptoJS.enc.Utf8);
                     dispatch(setUserUuid(uuid));
@@ -49,14 +52,14 @@ const Dashboard = () => {
                 }
             } catch (error) {
                 console.error('Error decrypting token:', error);
-                setIsLoading(false); // Set loading to false in case of an error
+                setError('An error occurred while decrypting the token. Please try again.');
+                setIsLoading(false);
+                setLoadingBarProgress(0);
             }
         };
-
         decryptToken();
     }, [dispatch, cookies.token]);
 
-    // profile uuid
     const fetchUserData = async (uuid) => {
         try {
             const response = await fetch(`http://localhost:8080/users/${uuid}`, {
@@ -73,14 +76,14 @@ const Dashboard = () => {
             }
 
             const data = await response.json();
-
             await fetchUserPhoto(data.userProfile.uuid);
-
             dispatch(setProfileUuid(data.userProfile.uuid));
             console.log('Profile UUID:', data.userProfile.uuid);
         } catch (error) {
             console.error('Error fetching user data:', error);
-            setIsLoading(false); // Set loading to false in case of an error
+            setError('An error occurred while fetching user data. Please try again.');
+            setIsLoading(false);
+            setLoadingBarProgress(0);
         }
     };
 
@@ -104,18 +107,21 @@ const Dashboard = () => {
             console.log(photoData.completeImageUrl);
         } catch (error) {
             console.error(error);
-            setIsLoading(false); // Set loading to false in case of an error
+            setError('An error occurred while fetching user photo. Please try again.');
+            setIsLoading(false);
+            setLoadingBarProgress(0);
         }
     };
 
     return (
         <div className='container-fluid p-0 m-0 overflow-hidden '>
             <div className='row'>
+                <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
                 {isLoading ? (
-                    // Display a loading indicator or message while data is loading
                     <p>Loading...</p>
+                ) : error ? (
+                    <p style={{ color: 'red' }}>{error}</p>
                 ) : (
-                    // Render the VerticalTabs component once the data is loaded
                     <VerticalTabs />
                 )}
             </div>

@@ -1,0 +1,23 @@
+.css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop {
+    background-color: transparent !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+.custom-drawer-container {
+    width: 400px !important;
+    height: 100vh !important;
+    justify-content: center !important;
+
+}
+
+@media (max-width: 991.98px) {
+    .custom-drawer-container {
+        max-width: 350px !important;
+    }
+}
+
+
+.drawer-content {
+    overflow-y: auto !important;
+    max-height: calc(100vh - 64px) !important;
+}
