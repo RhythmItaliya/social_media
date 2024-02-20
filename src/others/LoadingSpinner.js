@@ -1,16 +1,19 @@
-// LoadingSpinner.js
-
-import React from 'react';
-import { Spin } from 'antd';
+import React, { useState } from 'react';
+import LoadingBar from 'react-top-loading-bar';
 import './others.css';
 
 const LoadingSpinner = () => {
+  const [loadingBarProgress, setLoadingBarProgress] = useState(0);
+
   return (
-    <div className="loading-spinner-overlay">
-      <div className="loading-spinner-container">
-        <Spin size="large" className="loading-spinner" />
-      </div>
-    </div>
+    <>
+      <LoadingBar
+        progress={loadingBarProgress}
+        height={3}
+        color="#f11946"
+        onLoaderFinished={() => setLoadingBarProgress(0)}
+      />
+    </>
   );
 };
 

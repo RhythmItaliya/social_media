@@ -6,20 +6,35 @@ import { logoutUser } from '../actions/logoutActions';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import StyledIconButton from '@material-ui/core/IconButton';
 import './others.css';
-import { useDarkMode } from '../theme/Darkmode'; // Replace with the actual path
+import { useDarkMode } from '../theme/Darkmode';
 
 const LogoutButton = ({ logoutUser }) => {
-    const { isDarkMode } = useDarkMode(); // Use the hook to get the current mode
+    const { isDarkMode } = useDarkMode();
     const [, , removeCookies] = useCookies(['auth', 'username', 'token']);
 
-    const handleLogout = () => {
-        // Remove cookies
-        removeCookies('auth');
-        removeCookies('username');
-        removeCookies('token');
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        // Dispatch logout action
-        logoutUser();
+            if (response.ok) {
+              
+                removeCookies('auth');
+                removeCookies('username');
+                removeCookies('token');
+                
+                logoutUser();
+            } else {
+                console.error('Logout failed:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
     };
 
     return (
@@ -27,7 +42,7 @@ const LogoutButton = ({ logoutUser }) => {
             color="inherit"
             onClick={handleLogout}
             className="logout-button"
-            style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }} // Set color based on the current mode
+            style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}
         >
             <ExitToAppIcon />
         </StyledIconButton>

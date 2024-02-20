@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+@media (max-width: 991.98px) {
+    .custom-drawer-container {
+        max-width: 350px !important;
+    }
+
+    .css-1aj9me-MuiPickersLayout-root {
+        display: block !important;
+    }
+}
+
+.MuiDialogActions-root {
+    display: none !important;
+  }
+  

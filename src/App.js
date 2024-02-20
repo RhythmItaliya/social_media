@@ -13,6 +13,7 @@ import { useCookies } from 'react-cookie';
 import NotFound from './others/NotFound';
 import ProfileRoute from './PublicCard/ProfileRoute';
 import { DarkModeProvider } from './theme/Darkmode';
+import ProfilePage from './dashboard/LoginProfile/ProfilePage';
 
 
 const App = () => {
@@ -29,6 +30,8 @@ const App = () => {
           ) : (
             <Route path="/login" element={<Login />} />
           )}
+
+          <Route path="/profile/create" element={<ProfilePage />} />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
 

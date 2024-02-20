@@ -22,6 +22,7 @@ const Dashboard = () => {
     }, [dispatch]);
 
     useEffect(() => {
+        
         const fetchData = async () => {
             try {
                 setLoadingBarProgress(50);

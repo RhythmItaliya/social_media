@@ -22,6 +22,7 @@ import {
     DialogContent,
     DialogActions,
 } from '@mui/material';
+import LoadingBar from 'react-top-loading-bar';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -61,6 +62,7 @@ const ProfileSet = () => {
     const [userData, setUserData] = useState(null);
     const [postCount, setPostCount] = useState(0);
     const [userBio, setUserBio] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const defaultImageUrl = 'https://robohash.org/yourtext.png';
     const uuid = useSelector(state => state.useruuid.uuid);
@@ -94,8 +96,10 @@ const ProfileSet = () => {
                     location: data.userProfile.location,
                 });
                 setUserBio(data.userProfile.bio || '');
+                setLoading(false);
             } catch (error) {
                 console.error(error);
+                setLoading(false);
             }
         };
 
@@ -153,105 +157,109 @@ const ProfileSet = () => {
         <Container maxWidth="sm" style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
             {/* profile div */}
             <div className='gap-3' style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'space-around', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px', marginTop: '10px' }}>
-                <div className='p-3 m-0 rounded-2'>
-                    <Grid container alignItems="center" spacing={3}>
-                        <Grid item>
-                            <Avatar
-                                src={userPhotoUrl || defaultImageUrl}
-                                alt="Profile Avatar"
-                                style={{ width: '100px', height: '100px', cursor: 'pointer' }}
-                                onClick={() => {
-                                    setIsAvatarModalOpen(true);
-                                    setAvtar(true);
-                                }}
-                            />
-                        </Grid>
+                {loading ? (
+                    <LoadingBar color={colors.spinnerColor} height={3} />
+                ) : (
+                    <div className='p-3 m-0 rounded-2'>
+                        <Grid container alignItems="center" spacing={3}>
+                            <Grid item>
+                                <Avatar
+                                    src={userPhotoUrl || defaultImageUrl}
+                                    alt="Profile Avatar"
+                                    style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+                                    onClick={() => {
+                                        setIsAvatarModalOpen(true);
+                                        setAvtar(true);
+                                    }}
+                                />
+                            </Grid>
 
-                        {/* Avatar Modal */}
-                        <Dialog open={isAvatarModalOpen} onClose={() => setIsAvatarModalOpen(false)}>
+                            {/* Avatar Modal */}
+                            <Dialog open={isAvatarModalOpen} onClose={() => setIsAvatarModalOpen(false)}>
 
-                            <DialogTitle style={{
-                                color: colors.textColor,
-                                backgroundColor: colors.backgroundColor,
-                                textAlign: 'center',
-                                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
-                                borderBottom: 'none',
-                                boxShadow: colors.boxShadow,
-                                fontSize:'16px'
-                            }}>
-                                {`@${loginUserUsername || ''}`}
-                            </DialogTitle>
-
-                            <DialogContent
-                                style={{
+                                <DialogTitle style={{
+                                    color: colors.textColor,
                                     backgroundColor: colors.backgroundColor,
+                                    textAlign: 'center',
                                     border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
                                     borderBottom: 'none',
-                                    padding: '20px',
                                     boxShadow: colors.boxShadow,
+                                    fontSize: '16px'
                                 }}>
-                                {isAvtar && (
-                                    <Avatar
-                                        src={userPhotoUrl || defaultImageUrl}
-                                        alt="Profile Avatar"
-                                        style={{
-                                            width: '130px',
-                                            height: '130px',
-                                            margin: 'auto',
-                                        }}
-                                    />
-                                )}
-                            </DialogContent>
-
-                            <DialogActions
-                                style={{
-                                    backgroundColor: colors.backgroundColor,
-                                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
-                                    boxShadow: colors.boxShadow,
-                                }}>
-                                <IconButton
-                                    style={{
-                                        color: colors.iconColor
-                                    }} onClick={() => setIsAvatarModalOpen(false)}>
-                                    <CloseOutlined />
-                                </IconButton>
-                            </DialogActions>
-                        </Dialog>
-
-
-                        <Grid item>
-                            {userData && (
-                                <Typography style={{ color: colors.textColor, fontSize: "18px" }}>
-                                    {`${capitalizeFirstLetter(userData.firstName)} ${capitalizeFirstLetter(userData.lastName)}`}
-                                </Typography>
-                            )}
-
-                            <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                                <Typography style={{ fontSize: "16px", color: colors.labelColor }}>
                                     {`@${loginUserUsername || ''}`}
-                                </Typography>
-                            </div>
+                                </DialogTitle>
 
-                            {userData && (
+                                <DialogContent
+                                    style={{
+                                        backgroundColor: colors.backgroundColor,
+                                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
+                                        borderBottom: 'none',
+                                        padding: '20px',
+                                        boxShadow: colors.boxShadow,
+                                    }}>
+                                    {isAvtar && (
+                                        <Avatar
+                                            src={userPhotoUrl || defaultImageUrl}
+                                            alt="Profile Avatar"
+                                            style={{
+                                                width: '130px',
+                                                height: '130px',
+                                                margin: 'auto',
+                                            }}
+                                        />
+                                    )}
+                                </DialogContent>
+
+                                <DialogActions
+                                    style={{
+                                        backgroundColor: colors.backgroundColor,
+                                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,
+                                        boxShadow: colors.boxShadow,
+                                    }}>
+                                    <IconButton
+                                        style={{
+                                            color: colors.iconColor
+                                        }} onClick={() => setIsAvatarModalOpen(false)}>
+                                        <CloseOutlined />
+                                    </IconButton>
+                                </DialogActions>
+                            </Dialog>
+
+
+                            <Grid item>
+                                {userData && (
+                                    <Typography style={{ color: colors.textColor, fontSize: "18px" }}>
+                                        {`${capitalizeFirstLetter(userData.firstName)} ${capitalizeFirstLetter(userData.lastName)}`}
+                                    </Typography>
+                                )}
+
                                 <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                                    <LocationOnIcon style={{ color: colors.iconColor, fontSize: "14px" }} />
-                                    <Typography style={{ fontSize: "12px", color: colors.labelColor }}>
-                                        {userData.location}
+                                    <Typography style={{ fontSize: "16px", color: colors.labelColor }}>
+                                        {`@${loginUserUsername || ''}`}
                                     </Typography>
                                 </div>
-                            )}
-                        </Grid>
 
-                        <Grid item>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')} </Typography>
-                                <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                                    Post
-                                </Typography>
-                            </div>
+                                {userData && (
+                                    <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+                                        <LocationOnIcon style={{ color: colors.iconColor, fontSize: "14px" }} />
+                                        <Typography style={{ fontSize: "12px", color: colors.labelColor }}>
+                                            {userData.location}
+                                        </Typography>
+                                    </div>
+                                )}
+                            </Grid>
+
+                            <Grid item>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')} </Typography>
+                                    <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
+                                        Post
+                                    </Typography>
+                                </div>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </div>
+                    </div>
+                )}
             </div>
 
             {/* count div */}
@@ -300,6 +308,6 @@ const ProfileSet = () => {
             </div>
         </Container>
     );
-}
+};
 
 export default ProfileSet;
