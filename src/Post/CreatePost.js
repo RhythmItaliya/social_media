@@ -41,36 +41,36 @@ const CreatePost = () => {
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+  const containerStyle = {
+    width: '100%',
+    maxWidth: '1200px',
+    margin: 'auto',
+    padding: '10px',
+  };
+
+  const postContainerStyle = {
+    width: '100%',
+    maxWidth: '550px',
+    height: 'auto',
+    margin: 'auto',
+    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+    borderRadius: '10px',
+  };
+
   return (
-    <Grid container spacing={2} justifyContent="center" alignItems="center">
-      <Grid item lg={6}>
-        <div
-          style={{
-            width: '550px',
-            height: 'auto',
-            margin: 'auto',
-            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-            borderRadius: '10px'
-          }}
-        >
+    <Grid container spacing={2} justifyContent="center" alignItems="center" style={containerStyle}>
+      <Grid item xs={12} lg={6}>
+        <div style={postContainerStyle}>
           <NewPost />
         </div>
       </Grid>
 
-      <Grid item lg={6}>
-        <div
-          style={{
-            width: '550px',
-            height: 'auto',
-            margin: 'auto',
-            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-            borderRadius: '10px'
-          }}
-        >
+      <Grid item xs={12} lg={6}>
+        <div style={postContainerStyle}>
           <PostFrom />
         </div>
       </Grid>
-    </Grid >
+    </Grid>
   );
 };
 

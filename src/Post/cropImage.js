@@ -67,4 +67,3 @@ const loadImage = (src) => {
       throw error;
     }
   };
-  

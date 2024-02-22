@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { TextField, IconButton, Container, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
-
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SendIcon from '@mui/icons-material/Send';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-
 import { Chip, TextareaAutosize } from '@material-ui/core';
-
 import { useDarkMode } from '../theme/Darkmode';
+import LoadingBar from 'react-top-loading-bar';
 import './post.css';
+import { message } from 'antd';
+import LocationPicker from './LocationPicker';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -49,16 +49,29 @@ const PostForm = () => {
     const [caption, setCaption] = useState('');
     const [postText, setPostText] = useState('');
     const [location, setLocation] = useState({ lat: null, lng: null });
-    const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
     const [hashtags, setHashtags] = useState('');
     const [newHashtag, setNewHashtag] = useState('');
     const [addedHashtags, setAddedHashtags] = useState([]);
 
-    // New state for visibility
+    const [validationMessage, setValidationMessage] = useState('');
     const [isPublic, setIsPublic] = useState(true);
 
-    // Function to toggle visibility
+
+    const [loading, setLoading] = useState(false);
+
+    const ref = useRef(null);
+
+    const startLoading = () => {
+        setLoading(true);
+        ref.current.continuousStart();
+    };
+
+    const finishLoading = () => {
+        setLoading(false);
+        ref.current.complete();
+    };
+
+
     const toggleVisibility = () => {
         setIsPublic(prevIsPublic => !prevIsPublic);
     };
@@ -77,42 +90,22 @@ const PostForm = () => {
         setHashtags(prevHashtags => prevHashtags.filter(tag => tag !== removedHashtag));
     };
 
-    const handleLocationClick = async () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    setLocation({ lat: latitude, lng: longitude });
-
-                    try {
-                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                        const data = await response.json();
-
-                        if (data.address) {
-                            const cityValue = data.address.city || data.address.town || data.address.village;
-                            const countryValue = data.address.country;
-
-                            setCity(cityValue);
-                            setCountry(countryValue);
-                        }
-                    } catch (error) {
-                        console.error('Error getting location information:', error.message);
-                    }
-                },
-                (error) => {
-                    console.error('Error getting location:', error.message);
-                }
-            );
-        } else {
-            console.error('Geolocation is not supported by this browser.');
-        }
+    const handleLocationChange = ({ city, country }) => {
+        setLocation({ city, country });
+        console.log(city);
+        console.log(country);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!postBase64) {
+            setValidationMessage('Please upload or save an image.');
+            return;
+        }
         try {
+            startLoading();
+
             const response = await fetch(`http://localhost:8080/api/posts`, {
                 method: 'POST',
                 credentials: 'include',
@@ -122,7 +115,6 @@ const PostForm = () => {
                 body: JSON.stringify({
                     userProfileId: profileUUID,
                     postText,
-                    // isPhoto,
                     caption,
                     location: JSON.stringify([location.lat, location.lng]),
                     isVisibility: isPublic ? '0' : '1',
@@ -137,16 +129,35 @@ const PostForm = () => {
 
             const responseData = await response.json();
             console.log('Post created successfully:', responseData);
+            message.success({
+                content: 'Post uploaded successfully!',
+                duration: 3,
+            });
         } catch (error) {
+
+            message.error({
+                content: 'Failed to upload post. Please try again.',
+                duration: 3,
+            });
             console.error('Error creating post:', error.message);
+        } finally {
+            finishLoading();
         }
     };
 
+
     return (
         <Container maxWidth="sm" style={{ backgroundColor: colors.backgroundColor }}>
+
             <form onSubmit={handleSubmit}>
 
                 <Grid className='mt-1' container spacing={2}>
+
+                    <Grid item xs={12}>
+                        {validationMessage && (
+                            <p style={{ color: 'red' }}>{validationMessage}</p>
+                        )}
+                    </Grid>
 
                     <Grid item xs={12}>
                         <TextField
@@ -242,12 +253,12 @@ const PostForm = () => {
                     <Grid item container spacing={1} alignItems="center" xs={12}>
                         {addedHashtags.map((tag, index) => (
                             <Chip
-                                label={`#${tag}`}
+                                label={tag.startsWith('#') ? tag : `#${tag}`}
                                 onDelete={() => handleRemoveHashtag(tag)}
                                 color="primary"
                                 style={{
-                                    backgroundColor: isDarkMode ? darkModeColors.backgroundColor : lightModeColors.backgroundColor,
-                                    color: isDarkMode ? darkModeColors.textColor : lightModeColors.textColor,
+                                    // backgroundColor: isDarkMode ? darkModeColors.backgroundColor : lightModeColors.backgroundColor,
+                                    // color: isDarkMode ? darkModeColors.textColor : lightModeColors.textColor,
                                 }}
                             />
 
@@ -289,41 +300,11 @@ const PostForm = () => {
 
 
 
-                    <Grid className='mt-1' item container spacing={2} alignItems="center" xs={12}>
-                        <Grid item xs={10}>
-                            <TextField
-                                fullWidth
-                                label="Location"
-                                variant="standard"
-                                value={`City : ${city} , Country :${country}`}
-                                InputProps={{
-                                    style: {
-                                        color: colors.textColor,
-                                        borderBottom: `1px solid ${colors.border}`,
-                                        '&:focus': {
-                                            color: colors.focusColor,
-                                        },
-                                    }
-                                }}
-                                InputLabelProps={{
-                                    style: {
-                                        color: colors.labelColor,
-                                    },
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <IconButton
-                                type="button"
-                                color="primary"
-                                onClick={handleLocationClick}
-                                style={{ color: colors.iconColor }}
-                            >
-                                <LocationOnIcon />
-                            </IconButton>
-                        </Grid>
-                    </Grid>
-
+                    <LocationPicker
+                        onLocationChange={handleLocationChange}
+                        setValidationMessage={setValidationMessage}
+                        setLocation={setLocation}
+                    />
 
 
                     <Grid className='mb-5' item container spacing={2} alignItems="center" xs={12}>
@@ -349,6 +330,8 @@ const PostForm = () => {
                     </Grid>
                 </Grid>
             </form>
+            <LoadingBar color={isDarkMode ? darkModeColors.spinnerColor : lightModeColors.spinnerColor} ref={ref} />
+
         </Container>
     );
 };

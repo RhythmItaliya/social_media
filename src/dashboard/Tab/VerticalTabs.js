@@ -9,15 +9,14 @@ import { DarkModeProvider } from '../../theme/Darkmode';
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
-import { ChatBubble, CreateSharp, Settings } from '@mui/icons-material';
+import { ChatBubble, Settings } from '@mui/icons-material';
 import Chat from '../../Chat/Chat';
 import CreatePost from '../../Post/CreatePost';
 import ProfileSet from '../Profile/ProfileSet';
 import SettingsPage from '../../Settings/Setting';
 import Homemix from '../../mixComponet/Homemix';
 import Searchmix from '../../mixComponet/Searchmix';
-
-
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -76,24 +75,23 @@ export default function VerticalTabs() {
                 <Box className="verticalSidebar d-none d-lg-block d-flex flex-column justify-content-center align-items-center">
                     <Tabs
                         orientation="vertical"
+                        centered
                         variant="scrollable"
                         value={value}
                         onChange={handleChange}
-                        aria-label="Vertical tabs example"
                         sx={{
                             borderRight: 1,
                             borderColor: 'divider',
-                            marginTop: '100%',
-                            transform: 'translateY(100%)',
+                            transform: 'translateY(50%)',
 
                         }}
                     >
-                        <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
-                        <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
-                        <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
-                        <Tab icon={<Settings />} {...a11yProps(3)} className="custom-tab" />
-                        <Tab icon={<ChatBubble />} {...a11yProps(4)} className="custom-tab" />
-                        <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
+                        <Tab label="Home" icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
+                        <Tab label="Account" icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
+                        <Tab label="Chat" icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab" />
+                        <Tab label="Search" icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab" />
+                        <Tab label="Add" icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab" />
+                        <Tab label="Settings" icon={<Settings />} {...a11yProps(5)} className="custom-tab" />
 
                     </Tabs>
                 </Box>
@@ -106,15 +104,13 @@ export default function VerticalTabs() {
                         variant="scrollable"
                         value={value}
                         onChange={handleChange}
-                        aria-label="Vertical tabs example"
                     >
-                        <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
-                        <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
-                        <Tab icon={<SearchIcon />} {...a11yProps(2)} className="custom-tab" />
-                        <Tab icon={<Settings />} {...a11yProps(3)} className="custom-tab" />
-                        <Tab icon={<ChatBubble />} {...a11yProps(4)} className="custom-tab" />
-                        <Tab icon={<CreateSharp />} {...a11yProps(5)} className="custom-tab" />
-
+                        <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab1" />
+                        <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab1" />
+                        <Tab icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab1" />
+                        <Tab icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab1" />
+                        <Tab icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab1" />
+                        <Tab icon={<Settings />} {...a11yProps(5)} className="custom-tab1" />
                     </Tabs>
                 </Box>
 
@@ -123,28 +119,28 @@ export default function VerticalTabs() {
                     <Homemix />
                 </TabPanel>
 
-
                 <TabPanel value={value} index={1}>
                     <ProfileSet />
                 </TabPanel>
 
                 <TabPanel value={value} index={2}>
-                    <Searchmix />
-                </TabPanel>
-
-                <TabPanel value={value} index={3}>
-                    <SettingsPage />
-                </TabPanel>
-
-                <TabPanel value={value} index={4}>
                     <Chat />
                 </TabPanel>
 
-                <TabPanel value={value} index={5}>
+                <TabPanel value={value} index={3}>
+                    <Searchmix />
+                </TabPanel>
+
+                <TabPanel value={value} index={4}>
                     <div className='d-flex align-items-center justify-content-center overflow-scroll' style={{ height: '100vh' }}>
                         <CreatePost />
                     </div>
                 </TabPanel>
+
+                <TabPanel value={value} index={5}>
+                    <SettingsPage />
+                </TabPanel>
+
             </Box>
         </DarkModeProvider>
     );

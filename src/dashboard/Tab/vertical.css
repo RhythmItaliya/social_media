@@ -18,7 +18,6 @@
   background-color: var(--background-color-light);
 }
 
-
 .verticalSidebar {
   height: 100vh;
   border-right: 1px solid var(--border-color-light);
@@ -33,9 +32,17 @@
 }
 
 .custom-tab {
-  color: var(--text-color-light) !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: start !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  color: var(--background-color-light) !important;
 }
 
+.custom-tab {
+  color: var(--text-color-light) !important;
+}
 
 .custom-tab.Mui-selected {
   color: rgba(255, 255, 255, 1);
