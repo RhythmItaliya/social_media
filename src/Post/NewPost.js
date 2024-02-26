@@ -171,7 +171,7 @@ const NewPost = () => {
                         </DialogContent>
                     </Dialog>
 
-                    {loading && <p>Loading...</p>}
+                    {loading && <p style={{ color: colors.textColor }}>Loading...</p>}
 
                 </div>
             ) : (

@@ -17,8 +17,9 @@ import ProfilePage from './dashboard/LoginProfile/ProfilePage';
 
 
 const App = () => {
-  const [cookies] = useCookies(['auth']);
-  const isAuthenticated = !!cookies.auth;
+  const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
+  // const isAuthenticated = !!cookies.auth;
+  const isAuthenticated = !!cookies.auth || !!cookies['X-Access-Token'] || !!cookies.token;
 
   return (
     <BrowserRouter>

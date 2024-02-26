@@ -7,6 +7,8 @@ import { ScaleLoader } from 'react-spinners';
 import { PersonAdd, CheckCircleOutline as CheckCircleOutlineIcon } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import './abc.css';
+import CloseIcon from '@mui/icons-material/Close';
+
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -171,21 +173,19 @@ const SenderComponent = () => {
                 )}
             </Grid>
             {selectedProfile && (
-                <div
-                    className='selected-profile-details-overlay'
-                />
+                <div className='selected-profile-details-overlay' />
             )}
             {selectedProfile && (
-                <div
-                    className='selected-profile-details-container rounded-2 p-3'
-                    style={{
-                        position: 'absolute',
-                        top: cardPosition.top,
-                        left: cardPosition.left,
-                        backgroundColor: colors.backgroundColor,
-                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
-                    }}
-                >
+                <div className='selected-profile-details-container rounded-2 p-3' style={{
+                    position: 'absolute',
+                    top: cardPosition.top,
+                    left: cardPosition.left,
+                    backgroundColor: colors.backgroundColor,
+                    // border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
+                }}>
+                    <div className="close-icon justify-content-end d-flex m-1" onClick={() => setSelectedProfile(null)}>
+                        <CloseIcon style={{ cursor: 'pointer', color: colors.iconColor,fontSize:'16px' }} />
+                    </div>
                     <Avatar
                         className="selected-avatar"
                         alt="Selected User Avatar"

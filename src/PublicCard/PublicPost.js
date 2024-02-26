@@ -43,8 +43,6 @@ const hexToRgb = (hex) => {
 
 function PublicPost({ profileUUID }) {
 
-    console.log('Public Post', profileUUID);
-
     const [posts, setPosts] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -52,9 +50,18 @@ function PublicPost({ profileUUID }) {
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+    const [accessDenied, setAccessDenied] = useState(false);
+
     useEffect(() => {
-        fetch(`http://localhost:8080/api/user/posts/profile/${profileUUID}`)
-            .then(response => response.json())
+        fetch(`http://localhost:8080/api/user/posts/profile/public/${profileUUID}`)
+            .then(response => {
+                if (response.status === 403) {
+                    console.error('Access denied. Users are not friends.');
+                    setAccessDenied(true);
+                    return null;
+                }
+                return response.json();
+            })
             .then(data => {
                 if (Array.isArray(data)) {
                     setPosts(data);
@@ -77,45 +84,54 @@ function PublicPost({ profileUUID }) {
 
     return (
         <div>
-            {/* "See All" Link/Button */}
-            <Typography style={{
-                fontSize: '14px',
-                margin: '10px',
-                display: 'flex',
-                justifyContent: 'end',
-                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
-            }}>
-                <Link style={{ color: colors.textColor, cursor: 'pointer' }} className='text-decoration-none user-select-none'>See All</Link>
-            </Typography>
+            {posts && !accessDenied && (
+                <Typography style={{
+                    fontSize: '14px',
+                    margin: '10px',
+                    display: 'flex',
+                    justifyContent: 'end',
+                    borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
+                }}>
+                    <Link style={{ color: colors.textColor, cursor: 'pointer' }} className='text-decoration-none user-select-none'>See All</Link>
+                </Typography>
+            )}
 
             <div style={{ height: '500px', overflowY: 'auto' }}>
-                {/* ImageList */}
-                <ImageList
-                    sx={{
-                        width: '100%',
-                        height: '100%',
-                        transform: 'translateZ(0)',
-                        backgroundColor: colors.backgroundColor,
-                        padding: '10px'
-                    }}
-                    rowHeight={300}
-                    gap={15}
-                >
-                    {posts.map((post) => (
-                        <ImageListItem key={post.id}>
-                            <img
-                                src={`http://static.post.local/${post.postUploadURLs}`}
-                                alt={post.title}
-                                loading="lazy"
-                                onClick={() => handleImageClick(post)}
-                                style={{
-                                    cursor: 'pointer', padding: '5px',
-                                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                                }}
-                            />
-                        </ImageListItem>
-                    ))}
-                </ImageList>
+                {accessDenied ? (
+                    <Typography style={{ color: 'red' }}>Access denied. Users are not friends.</Typography>
+                ) : (
+                    posts ? (
+                        /* ImageList */
+                        <ImageList
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                transform: 'translateZ(0)',
+                                backgroundColor: colors.backgroundColor,
+                                padding: '10px'
+                            }}
+                            rowHeight={300}
+                            gap={15}
+                        >
+                            {posts.map((post) => (
+                                <ImageListItem key={post.id}>
+                                    <img
+                                        src={`http://static.post.local/${post.postUploadURLs}`}
+                                        alt={post.title}
+                                        loading="lazy"
+                                        onClick={() => handleImageClick(post)}
+                                        style={{
+                                            cursor: 'pointer', padding: '5px',
+                                            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                        }}
+                                    />
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                    ) : (
+                        <Typography style={{ color: 'red' }}>Error fetching user posts.</Typography>
+                    )
+                )}
 
                 {/* Modal */}
                 <Dialog open={modalOpen} onClose={handleCloseModal}>

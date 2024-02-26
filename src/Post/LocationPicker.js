@@ -76,7 +76,7 @@ const LocationPicker = ({ onLocationChange, setValidationMessage, setLocation })
                             const countryValue = data.address.country;
 
                             message.success({
-                                content: `Location fetched successfully: ${city}, ${country}`,
+                                content: `Location fetched successfully ${cityValue}, ${countryValue}`,
                                 duration: 3,
                             });
 

@@ -3,6 +3,10 @@
     -webkit-tap-highlight-color: transparent !important;
 }
 
+.css-aym9vq-MuiButtonBase-root-MuiTab-root {
+    padding-top: 0 !important;
+}
+
 .custom-drawer-container {
     width: 400px !important;
     height: 100vh !important;

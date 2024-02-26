@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { TextField, IconButton, Container, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SendIcon from '@mui/icons-material/Send';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -12,6 +11,8 @@ import LoadingBar from 'react-top-loading-bar';
 import './post.css';
 import { message } from 'antd';
 import LocationPicker from './LocationPicker';
+import { useNavigate } from 'react-router-dom';
+import './otherpost.css';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -48,14 +49,13 @@ const PostForm = () => {
 
     const [caption, setCaption] = useState('');
     const [postText, setPostText] = useState('');
-    const [location, setLocation] = useState({ lat: null, lng: null });
-    const [hashtags, setHashtags] = useState('');
+    const [location, setLocation] = useState({ city: null, country: null });
+    const [hashtags, setHashtags] = useState([]);
     const [newHashtag, setNewHashtag] = useState('');
     const [addedHashtags, setAddedHashtags] = useState([]);
 
     const [validationMessage, setValidationMessage] = useState('');
     const [isPublic, setIsPublic] = useState(true);
-
 
     const [loading, setLoading] = useState(false);
 
@@ -71,6 +71,7 @@ const PostForm = () => {
         ref.current.complete();
     };
 
+    const navigate = useNavigate();
 
     const toggleVisibility = () => {
         setIsPublic(prevIsPublic => !prevIsPublic);
@@ -92,8 +93,6 @@ const PostForm = () => {
 
     const handleLocationChange = ({ city, country }) => {
         setLocation({ city, country });
-        console.log(city);
-        console.log(country);
     };
 
     const handleSubmit = async (e) => {
@@ -116,7 +115,7 @@ const PostForm = () => {
                     userProfileId: profileUUID,
                     postText,
                     caption,
-                    location: JSON.stringify([location.lat, location.lng]),
+                    location: JSON.stringify([location.country, location.city]),
                     isVisibility: isPublic ? '0' : '1',
                     data: postBase64,
                     hashtags: JSON.stringify(hashtags),
@@ -133,6 +132,8 @@ const PostForm = () => {
                 content: 'Post uploaded successfully!',
                 duration: 3,
             });
+
+            // navigate('./home');
         } catch (error) {
 
             message.error({

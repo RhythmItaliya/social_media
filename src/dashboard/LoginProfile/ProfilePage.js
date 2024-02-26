@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -21,7 +20,9 @@ import ProfileAvatarSelector from './ProfileAvatarSelector';
 import ProfilePageSubmit from './ProfilePageSubmit';
 import CryptoJS from 'crypto-js';
 import './profilepage.css';
-import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconButton } from '@mui/material';
+import LoadingBar from 'react-top-loading-bar';
 
 
 const lightModeColors = {
@@ -89,10 +90,15 @@ const ProfilePage = () => {
 
   const [isdecryptedUuid, setDecryptedUuid] = useState(null);
 
+  const [loading, setLoading] = useState(0);
+  const [loadingBarProgress, setLoadingBarProgress] = useState(0);
+
   const springProps = useSpring({
     opacity: 1,
     height: 'auto',
   });
+
+  const navigate = useNavigate();
 
   const handleNextClick = () => {
     setValidationError('');
@@ -185,7 +191,14 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
+
     try {
+      for (let progress = 0; progress <= 100; progress++) {
+        setLoadingBarProgress(progress);
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
       const response = await fetch(`http://localhost:8080/api/profilepage/create/${isdecryptedUuid}`, {
         method: 'POST',
         credentials: 'include',
@@ -204,14 +217,19 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        console.log('Profile data sent successfully');
+        setLoadingBarProgress(100);
+        navigate('/home');
       } else {
         console.error('Failed to send profile data to the server. Status:', response.status, 'Message:', response.statusText);
       }
     } catch (error) {
       console.error('Error while sending profile data:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+
 
 
   return (
@@ -357,7 +375,7 @@ const ProfilePage = () => {
 
             <div className='d-flex justify-content-around align-content-center mt-3'>
               {currentStep !== 0 && (
-                <Button
+                <IconButton
                   type="button"
                   variant="text"
                   onClick={handleBackClick}
@@ -365,21 +383,24 @@ const ProfilePage = () => {
                   style={{ color: colors.textColor }}
                 >
                   Back
-                </Button>
+                </IconButton>
               )}
 
               {currentStep < steps.length - 1 && (
-                <Button type="button" variant="contained" color="primary" onClick={handleNextClick}>
+                <IconButton type="button" variant="contained" color="primary" onClick={handleNextClick}>
                   {currentStep === 0 ? "Let's Start" : "Next"}
-                </Button>
+                </IconButton>
               )}
+
               {currentStep === steps.length - 1 && (
-                <ProfilePageSubmit onClick={handleSubmit} isDisabled={isSubmitDisabled} />
+                <ProfilePageSubmit onClick={handleSubmit} isDisabled={isSubmitDisabled || loading} />
               )}
             </div>
 
           </CardContent>
         </Card>
+
+        <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
 
       </animated.div>
     </Container>

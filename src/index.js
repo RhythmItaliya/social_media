@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './auth/AuthContext';
 import { Provider } from 'react-redux';
 import store from './store/store';
+import './dashboard/Tab/vertical.css'
 // import ThemeProvider from './theme/ThemeProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

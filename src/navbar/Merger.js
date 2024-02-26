@@ -1,13 +1,10 @@
 // Merger.jsx
-import React, { useState } from 'react';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import QuiltedImageList from './Gallery';  // Replace with the correct path
-import { Grid, useMediaQuery, useTheme } from '@mui/material';
-import './Merger.css';  // Import your CSS file for custom styles
-import SenderComponent from './SenderComponent';
+import React from 'react';
+import { Grid, } from '@mui/material';
 import ReceiverComponent from './ReceiverComponent';
 import { useDarkMode } from '../theme/Darkmode';
+import SuggestedFriends from '../friendabout/SuggestedFriends';
+import './Merger.css';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -17,6 +14,10 @@ const lightModeColors = {
     border: '#CCCCCC',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
     spinnerColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
+    valueTextColor: 'rgb(0,0,0)',
+    linkColor: '#000',
+    hashtagColor: 'darkblue',
 };
 
 const darkModeColors = {
@@ -27,76 +28,41 @@ const darkModeColors = {
     border: '#333333',
     boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
     spinnerColor: '#ffffff',
+    labelColor: '#CCC',
+    valueTextColor: '#ffffff',
+    linkColor: '#CCC8',
+    hashtagColor: '#8A2BE2',
+};
+
+const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
 };
 
 function Merger() {
-    const [openImagesModal, setOpenImagesModal] = useState(false);
-    const [openFriendRequestsModal, setOpenFriendRequestsModal] = useState(false);
-
-    const theme = useTheme();
-    const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
-    const handleViewAllImages = () => {
-        setOpenImagesModal(true);
-    };
-
-    const handleViewAllFriendRequests = () => {
-        setOpenFriendRequestsModal(true);
-    };
-
-    const handleCloseImagesModal = () => {
-        setOpenImagesModal(false);
-    };
-
-    const handleCloseFriendRequestsModal = () => {
-        setOpenFriendRequestsModal(false);
-    };
-
     return (
-        <div>
-            {/* View All Friend Requests and View All Images */}
-            <div className="view-all-buttons">
-                <button onClick={handleViewAllFriendRequests}>View All Friend Requests</button>
-                <button onClick={handleViewAllImages}>View All Images</button>
-            </div>
-
-            {isLargeScreen && (
-                <div className="grid-container">
-                    {/* QuiltedImageList takes up 50% of the screen width */}
-                    <Grid item xs={12} lg={6} className='mx-auto justify-content-center bg-info d-flex'>
-                        {/* <QuiltedImageList /> */}
-                    </Grid>
-
-                    {/* SenderComponent takes up 25% of the screen width */}
-                    <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
-                        <div
-                            style={{
-                                border: `1px solid ${isDarkMode ? darkModeColors.border : lightModeColors.border}`,
-                            }}
-                        >
-                            <ReceiverComponent />
-                        </div>
-                    </Grid>
+        <div className='container'>
+            <div className='row'>
+                <div className='col-lg-6 d-flex align-items-center justify-content-center'>
+                    <div className='col-lg-8 mx-auto'>
+                        <SuggestedFriends colors={colors} />
+                    </div>
                 </div>
-            )}
 
-
-            {/* Modal for View All Images */}
-            <Dialog open={openImagesModal} onClose={handleCloseImagesModal}>
-                <DialogTitle>View All Images</DialogTitle>
-                <QuiltedImageList />
-            </Dialog>
-
-            {/* Modal for View All Friend Requests */}
-            <Dialog open={openFriendRequestsModal} onClose={handleCloseFriendRequestsModal}>
-                <DialogTitle>View All Friend Requests</DialogTitle>
-                <SenderComponent />
-                <ReceiverComponent />
-            </Dialog>
-        </div >
+                <div className='col-lg-6 d-flex align-items-center justify-content-center'>
+                    <div className='col-lg-6 mx-auto'>
+                        <ReceiverComponent colors={colors} />
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 

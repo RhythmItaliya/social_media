@@ -27,19 +27,14 @@ export const loginUser = (userData) => (dispatch) => {
                 const uuid = data['uuid'];
                 const username = data['username'];
 
-                // Encrypting uuid
                 const encryptedUuid = CryptoJS.AES.encrypt(uuid, 'ASDCFVBNLKMNBSDFVBNJNBCV').toString();
 
-                // Set the cookie with the authentication token
                 document.cookie = `auth=${token}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                // Set the cookie with the username
                 document.cookie = `username=${username}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                // Set the cookie with the encryptedUuid
                 document.cookie = `token=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                // Execute additional API call after successful login
                 fetch(`http://localhost:8080/api/users/profileCreated/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',

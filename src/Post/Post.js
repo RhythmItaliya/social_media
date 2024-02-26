@@ -143,7 +143,11 @@ export default function InstagramCard() {
             location: post.location,
             isVisibility: post.isVisibility,
             postUploadURLs: post.postUploadURLs,
-            hashtags: post.hashtags ? `#${JSON.parse(post.hashtags).join(' #')}` : '',
+            hashtags: post.hashtags
+              ? Array.isArray(post.hashtags)
+                ? post.hashtags.map((hashtag) => `${hashtag}`).join(' ')
+                : `${post.hashtags}`
+              : '',
             uuid: post.uuid,
             createdAt: new Date(post.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -154,7 +158,6 @@ export default function InstagramCard() {
         };
 
         setNewUserProfile(updatedUserProfile);
-
         await Promise.all(data.posts.map(async (post) => {
           await fetchUserData(post.id);
         }));
@@ -651,22 +654,22 @@ export default function InstagramCard() {
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
-              {/* HASHTAGE */}
+
+              {/* HASHTAGS */}
               <CardContent className='p-0' sx={{
                 ...instagramStyles.instagramCardContent,
                 backgroundColor: colors.backgroundColor,
                 width: '95%',
                 margin: 'auto',
-
               }}>
                 <Typography variant="body2" className='p-1 mt-2'>
-                  {post.hashtags.split(' ').map((hashtag, index) => (
+                  {post.hashtags.replace(/##/g, '#').replace(/[\[\]"\s]/g, '').split(',').map((hashtag, index) => (
                     <React.Fragment key={index}>
                       {index > 0 && ' '}
                       <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
-                        color: colors.hashtagColor,
+                        color: colors.hashtagColor, textDecoration: 'none'
                       }}>
-                        {`${hashtag}`}
+                        {`#${hashtag}`}
                       </Link>
                     </React.Fragment>
                   ))}

@@ -22,13 +22,18 @@ const LogoutButton = ({ logoutUser }) => {
                 },
             });
 
+            const data = await response.json();
+
+            console.log('X-Access-Token removed', data);
+
             if (response.ok) {
-              
                 removeCookies('auth');
                 removeCookies('username');
                 removeCookies('token');
-                
+
                 logoutUser();
+
+                console.log('Logout successful');
             } else {
                 console.error('Logout failed:', response.statusText);
             }

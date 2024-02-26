@@ -155,6 +155,7 @@ const SearchAppBar = () => {
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static" sx={{
                 backgroundColor: colors.backgroundColor,
+                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
             }}>
                 <Toolbar>
                     <Search>
