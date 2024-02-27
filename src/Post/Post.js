@@ -180,15 +180,51 @@ export default function InstagramCard() {
 
 
   // Like click ------------------------------------
-  const handleLikeClick = (postId) => {
-    if (likedPosts.includes(postId)) {
-      setLikedPosts((prevLikedPosts) => prevLikedPosts.filter((id) => id !== postId));
-    } else {
-      setLikedPosts((prevLikedPosts) => [...prevLikedPosts, postId]);
+  const [likeSuccess, setLikeSuccess] = React.useState(false);
+  const handleLikeClick = async (postId) => {
+    try {
+      const response = await fetch('http://localhost:8080/post/like', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileId: profileUUID,
+          postId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to update like status');
+        setLikeSuccess(false);
+        return;
+      }
+
+      setLikedPosts((prevLikedPosts) => {
+        if (prevLikedPosts.includes(postId)) {
+          return prevLikedPosts.filter((id) => id !== postId);
+        } else {
+          return [...prevLikedPosts, postId];
+        }
+      });
+
+      setLikeCounts((prevLikeCounts) => {
+        const updatedCounts = { ...prevLikeCounts };
+        updatedCounts[postId] = likedPosts.includes(postId) ? updatedCounts[postId] - 1 : (updatedCounts[postId] || 0) + 1;
+        return updatedCounts;
+      });
+
+      setLikeSuccess(true);
+      console.log('likeSuccess:', likeSuccess);
+      console.log('colors.iconColor:', colors.iconColor);
+    } catch (error) {
+      console.error('Error in handleLikeClick:', error);
+      setLikeSuccess(false);
     }
-    const updatedLikeCounts = { ...likeCounts, [postId]: likedPosts.includes(postId) ? likeCounts[postId] - 1 : (likeCounts[postId] || 0) + 1 };
-    setLikeCounts(updatedLikeCounts);
   };
+
+
 
   // Share click ------------------------------------
   const handleShareClick = (postId) => {
@@ -448,7 +484,6 @@ export default function InstagramCard() {
 
       setCommentLoading(true);
 
-      // Make a DELETE request to the server to delete the comment
       const response = await fetch(`http://localhost:8080/api/delete/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
@@ -565,9 +600,9 @@ export default function InstagramCard() {
 
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       {loading ? (
-        <p>Loading...</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>
       ) : error ? (
-        <p>Error: {error}</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
       ) : (
         <div>
           {newUserProfile.posts && newUserProfile.posts.map((post) => (
@@ -721,12 +756,20 @@ export default function InstagramCard() {
 
               {/* ICON */}
               <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
-                <IconButton style={{ color: colors.iconColor }} aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
-                  <FavoriteIcon sx={{ color: colors.iconColor }} />
+                <IconButton
+                  style={{
+                    color: likeSuccess ? '#ff7f00' : colors.iconColor,
+                  }}
+                  aria-label="like"
+                  onClick={() => handleLikeClick(post.id)}
+                  sx={instagramStyles.instagramIcons}
+                >
+                  <FavoriteIcon sx={{ color: likeCounts[post.id] === 1 ? '#7f7f7f' : colors.iconColor }} />
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {likeCounts[post.id] || 0}
                   </Typography>
                 </IconButton>
+
 
                 <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <CommentIcon sx={{ color: colors.iconColor }} />
@@ -746,7 +789,7 @@ export default function InstagramCard() {
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* COMMENT HANDALING */}
-              <Collapse in={expandedPosts[post.id]} timeout="auto" unmountOnExit sx={{ borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+              < Collapse in={expandedPosts[post.id]} timeout="auto" unmountOnExit sx={{ borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
                 <CardContent>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <TextField
@@ -777,7 +820,9 @@ export default function InstagramCard() {
                     </IconButton>
                   </div>
 
-                  {commentLoading && <p>Loading...</p>}
+                  {/* {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>} */}
+                  {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}></p>}
+
 
                   {(postComments[post.id] || []).map((comment) => (
                     <Comment
@@ -818,7 +863,8 @@ export default function InstagramCard() {
           ))
           }
         </div >
-      )}
+      )
+      }
     </div >
   );
 }

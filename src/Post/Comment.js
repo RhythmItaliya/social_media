@@ -96,7 +96,7 @@ const Comment = ({ comment, handleLikeComment, handleDeleteComment, handleReplyS
             <StyledIconButton style={{ color: colors.iconColor }} aria-label="like comment" onClick={() => handleLikeComment(comment.id)}>
               <ThumbUpIcon sx={{
                 fontSize: '14px',
-                color: isLiked ? 'red' : colors.iconColor
+                color: isLiked ? '#ff7f00' : colors.iconColor
               }} />
               <Typography variant="caption" sx={{ fontSize: '12px', margin: '5px', color: colors.labelColor }}>
                 {comment.reactionCount}

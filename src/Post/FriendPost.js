@@ -205,14 +205,48 @@ export default function FriendPost() {
 
 
   // Like click ------------------------------------
-  const handleLikeClick = (postId) => {
-    if (likedPosts.includes(postId)) {
-      setLikedPosts((prevLikedPosts) => prevLikedPosts.filter((id) => id !== postId));
-    } else {
-      setLikedPosts((prevLikedPosts) => [...prevLikedPosts, postId]);
+  const [likeSuccess, setLikeSuccess] = React.useState(false);
+  const handleLikeClick = async (postId) => {
+    try {
+      const response = await fetch('http://localhost:8080/post/like', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileId: profileUUID,
+          postId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to update like status');
+        setLikeSuccess(false);
+        return;
+      }
+
+      setLikedPosts((prevLikedPosts) => {
+        if (prevLikedPosts.includes(postId)) {
+          return prevLikedPosts.filter((id) => id !== postId);
+        } else {
+          return [...prevLikedPosts, postId];
+        }
+      });
+
+      setLikeCounts((prevLikeCounts) => {
+        const updatedCounts = { ...prevLikeCounts };
+        updatedCounts[postId] = likedPosts.includes(postId) ? updatedCounts[postId] - 1 : (updatedCounts[postId] || 0) + 1;
+        return updatedCounts;
+      });
+
+      setLikeSuccess(true);
+      console.log('likeSuccess:', likeSuccess);
+      console.log('colors.iconColor:', colors.iconColor);
+    } catch (error) {
+      console.error('Error in handleLikeClick:', error);
+      setLikeSuccess(false);
     }
-    const updatedLikeCounts = { ...likeCounts, [postId]: likedPosts.includes(postId) ? likeCounts[postId] - 1 : (likeCounts[postId] || 0) + 1 };
-    setLikeCounts(updatedLikeCounts);
   };
 
   // Share click ------------------------------------
@@ -344,6 +378,7 @@ export default function FriendPost() {
       // Make a POST request to the server to save the comment
       const response = await fetch('http://localhost:8080/api/post/comment', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -415,6 +450,7 @@ export default function FriendPost() {
       // Make a POST request to the server to update the comment likes
       const likeResponse = await fetch('http://localhost:8080/api/post/comment/like', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -431,6 +467,7 @@ export default function FriendPost() {
       // After successfully updating the comment likes, fetch the updated comments for the post
       const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -474,6 +511,7 @@ export default function FriendPost() {
       // Make a DELETE request to the server to delete the comment
       const response = await fetch(`http://localhost:8080/api/delete/comment/${commentId}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -586,9 +624,9 @@ export default function FriendPost() {
   return (
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       {loading ? (
-        <p>Loading...</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>
       ) : error ? (
-        <p>Error: {error}</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
       ) : (
         <div>
           {mergedData.map((post) => (
@@ -731,8 +769,15 @@ export default function FriendPost() {
 
               {/* ICON */}
               <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
-                <IconButton style={{ color: colors.iconColor }} aria-label="add to favorites" onClick={() => handleLikeClick(post.id)} sx={instagramStyles.instagramIcons}>
-                  <FavoriteIcon sx={{ color: colors.iconColor }} />
+                <IconButton
+                  style={{
+                    color: likeSuccess ? '#ff7f00' : colors.iconColor,
+                  }}
+                  aria-label="like"
+                  onClick={() => handleLikeClick(post.id)}
+                  sx={instagramStyles.instagramIcons}
+                >
+                  <FavoriteIcon sx={{ color: likeCounts[post.id] === 1 ? '#7f7f7f' : colors.iconColor }} />
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {likeCounts[post.id] || 0}
                   </Typography>
@@ -788,7 +833,9 @@ export default function FriendPost() {
                     </IconButton>
                   </div>
 
-                  {commentLoading && <p>Loading...</p>}
+                  {/* {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>} */}
+                  {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}></p>}
+
 
                   {(postComments[post.id] || []).map((comment) => (
                     <Comment
