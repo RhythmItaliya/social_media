@@ -702,31 +702,39 @@ export default function FriendPost() {
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
-              {/* HASHTAGS */}
-              <CardContent className='p-0' sx={{
+              <CardContent className='p-1' sx={{
                 ...instagramStyles.instagramCardContent,
                 backgroundColor: colors.backgroundColor,
-                width: '95%',
-                margin: 'auto',
+                width: '100%',
               }}>
-                <Typography variant="body2" className='p-1 mt-2'>
-                  {post.hashtags.replace(/##/g, '#').replace(/[\[\]"\s]/g, '').split(',').map((hashtag, index) => (
-                    <React.Fragment key={index}>
-                      {index > 0 && ' '}
-                      <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
-                        color: colors.hashtagColor, textDecoration: 'none'
-                      }}>
-                        {`#${hashtag}`}
-                      </Link>
-                    </React.Fragment>
-                  ))}
-                </Typography>
+                {post.hashtags && typeof post.hashtags === 'string' && post.hashtags.trim() !== '' && post.hashtags !== '[]' && post.hashtags !== "''" ? (
+                  <Typography variant="body2" className='p-1 mt-2'>
+                    {post.hashtags
+                      .replace(/##/g, '#')
+                      .replace(/[\[\]"\s]/g, '')
+                      .split(',')
+                      .map((hashtag, index) => (
+                        <React.Fragment key={index}>
+                          {index > 0 && ' '}
+                          <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
+                            color: colors.hashtagColor, textDecoration: 'none'
+                          }}>
+                            {`#${hashtag.replace(/^#/, '')}`}
+                          </Link>
+                        </React.Fragment>
+                      ))}
+                  </Typography>
+                ) :
+                  <span></span>
+                }
               </CardContent>
+
+
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* TEXT */}
-              <CardContent className='p-0'
+              <CardContent className='p-1'
                 sx={{
                   ...instagramStyles.instagramCardContent, backgroundColor: colors.backgroundColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
                 }}>

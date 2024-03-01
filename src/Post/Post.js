@@ -1,12 +1,10 @@
 import * as React from 'react';
-import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -14,9 +12,7 @@ import TextField from '@mui/material/TextField';
 import Collapse from '@mui/material/Collapse';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Popover from '@mui/material/Popover';
-import Box from '@mui/material/Box';
-
+import { Popover, Box, Typography, List, ListItem, ListItemText, Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Chip, Grid } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserProfilePosts } from '../actions/authActions';
@@ -26,6 +22,8 @@ import { Link } from 'react-router-dom';
 
 
 import Comment from './Comment';
+import LocationPicker from './LocationPicker';
+import { AddCircleOutline } from '@material-ui/icons';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -495,7 +493,6 @@ export default function InstagramCard() {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      // If the server confirms successful deletion, update the local state
       const updatedComments = (postComments[postId] || []).filter((comment) => comment.id !== commentId);
 
       setPostComments((prevComments) => ({
@@ -513,18 +510,17 @@ export default function InstagramCard() {
 
   // Reply Submit .....................................................................................
   const handleReplySubmit = (postId, replyText, commentId) => {
-    // Assuming setUsername and setLogo are functions that set state variables
     const newReply = {
       id: Date.now(),
-      username: setUsername, // Invoke the function to get the value
-      avatar: setLogo, // Invoke the function to get the value
+      username: setUsername,
+      avatar: setLogo,
       text: replyText,
       likes: 0,
     };
 
     const updatedComments = (postComments[postId] || []).map((comment) => {
       if (comment.id === commentId) {
-        const updatedReplies = comment.replies || []; // Ensure replies is initialized as an array
+        const updatedReplies = comment.replies || [];
         return {
           ...comment,
           replies: [...updatedReplies, newReply],
@@ -546,7 +542,7 @@ export default function InstagramCard() {
       if (comment.id === commentId) {
         const updatedReplies = comment.replies.map((reply, index) => {
           if (index === replyIndex) {
-            // Toggle like state
+
             const newLikes = reply.liked ? 0 : 1;
             return { ...reply, likes: newLikes, liked: !reply.liked };
           }
@@ -580,7 +576,8 @@ export default function InstagramCard() {
     }));
   };
 
-  // ------------------------------------
+
+  // SETTING // ....................................................................................
 
   const handleMoreVertClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -590,9 +587,259 @@ export default function InstagramCard() {
     setAnchorEl(null);
   };
 
-
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  // EDIT =======================================================================================
+
+  const [oldhashtags, setOldHashtags] = React.useState([]);
+  const [OldLocation, setOldLocation] = React.useState([]);
+
+  const handleOpenEditDialog = async (postId) => {
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(`http://localhost:8080/api/posts/get/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      const postToEdit = data.post;
+
+      setEditedPostId(postId);
+      setEditedData({
+        caption: postToEdit.caption,
+        postText: postToEdit.postText,
+      });
+
+      const parsedLocation = JSON.parse(data.post.location);
+      setOldLocation(parsedLocation);
+
+      const parsedHashtags = JSON.parse(data.post.hashtags);
+      setOldHashtags(parsedHashtags);
+
+      setEditDialogOpen(true);
+
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+      console.error('Error fetching post data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditedPostId(null);
+    setEditDialogOpen(false);
+  };
+
+
+  const [isEditDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [editedPostId, setEditedPostId] = React.useState(null);
+  const [editedData, setEditedData] = React.useState({
+    caption: '',
+    postText: '',
+    location: {
+      city: '',
+      country: '',
+    },
+    newHashtag: '',
+  });
+  const [hashtag, setHashtag] = React.useState([]);
+  const [newHashtag, setNewHashtag] = React.useState('');
+  const [addedHashtags, setAddedHashtags] = React.useState([]);
+  const [location, setLocation] = React.useState({ city: null, country: null });
+
+  const handleLocationChange = ({ city, country }) => {
+    setLocation({ city, country });
+  };
+
+  const handleAddHashtag = () => {
+    if (newHashtag) {
+      const lowercaseHashtag = newHashtag.toLowerCase();
+      setHashtag(prevHashtags => [...prevHashtags, lowercaseHashtag]);
+      setAddedHashtags(prevAddedHashtags => [...prevAddedHashtags, lowercaseHashtag]);
+      setNewHashtag('');
+    }
+  };
+
+  const handleRemoveHashtag = (removedHashtag) => {
+    setAddedHashtags(prevAddedHashtags => prevAddedHashtags.filter(tag => tag !== removedHashtag));
+    setHashtag(prevHashtags => prevHashtags.filter(tag => tag !== removedHashtag));
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`http://localhost:8080/api/posts/update/${editedPostId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          caption: editedData.caption,
+          postText: editedData.postText,
+          location: JSON.stringify([location.country, location.city]),
+          hashtags: JSON.stringify(hashtag),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setNewUserProfile((prevUserProfile) => {
+        const updatedPosts = prevUserProfile.posts.map((post) => {
+          if (post.id === editedPostId) {
+            return {
+              ...post,
+              caption: editedData.caption,
+              postText: editedData.postText,
+              location: JSON.stringify([location.country, location.city]),
+              hashtags: JSON.stringify(hashtag),
+            };
+          }
+          return post;
+        });
+        return {
+          ...prevUserProfile,
+          posts: updatedPosts,
+        };
+      });
+
+    } catch (error) {
+      setError(error.message);
+      console.error('Error editing post:', error);
+    } finally {
+      setLoading(false);
+      handleCloseEditDialog();
+    }
+  };
+
+
+
+
+  // DELETE =======================================================================================
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = React.useState(false);
+  const [postToDeleteId, setPostToDeleteId] = React.useState(null);
+
+  const handleOpenDeleteConfirmation = (postId) => {
+    setPostToDeleteId(postId);
+    setDeleteConfirmationOpen(true);
+  };
+  const handleCloseDeleteConfirmation = () => {
+    setPostToDeleteId(null);
+    setDeleteConfirmationOpen(false);
+  };
+  const handleDeletePost = async (postId) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8080/api/posts/delete/${postId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      setNewUserProfile((prevUserProfile) => {
+        const updatedPosts = prevUserProfile.posts.filter((post) => post.id !== postId);
+        return {
+          ...prevUserProfile,
+          posts: updatedPosts,
+        };
+      });
+      setLoading(false);
+
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+      console.error('Error deleting post:', error);
+    } finally {
+      setLoading(false);
+      handleCloseDeleteConfirmation();
+    }
+  };
+
+  // HIDE =======================================================================================
+  const [hideConfirmationOpen, setHideConfirmationOpen] = React.useState(false);
+  const [postToHideId, setPostToHideId] = React.useState(null);
+
+  const handleOpenHideConfirmation = (postId) => {
+    setPostToHideId(postId);
+    setHideConfirmationOpen(true);
+  };
+
+  const handleCloseHideConfirmation = () => {
+    setPostToHideId(null);
+    setHideConfirmationOpen(false);
+  };
+
+  const handleHidePost = async (postId) => {
+    try {
+      setLoading(true);
+      // Assuming the following line of code sends the request to the server
+      // Update the URL or parameters as needed
+      const response = await fetch(`http://localhost:8080/api/posts/visibility/${postId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postId: postId,
+          isVisibility: '1',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setNewUserProfile((prevUserProfile) => {
+        const updatedPosts = prevUserProfile.posts.filter((post) => post.id !== postToHideId);
+        return {
+          ...prevUserProfile,
+          posts: updatedPosts,
+        };
+      });
+
+      handleCloseHideConfirmation();
+    } catch (error) {
+      setError(error.message);
+      console.error('Error hiding post:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ==============================================================================================
+
+  const handleVisitProfile = () => {
+    console.log('Visiting profile');
+    handleMoreVertClose();
+  };
+
 
   {/* ------------------------------------------------------------------------------------------------- */ }
 
@@ -689,32 +936,38 @@ export default function InstagramCard() {
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
-
-              {/* HASHTAGS */}
-              <CardContent className='p-0' sx={{
+              <CardContent className='p-1' sx={{
                 ...instagramStyles.instagramCardContent,
                 backgroundColor: colors.backgroundColor,
-                width: '95%',
-                margin: 'auto',
+                width: '100%',
               }}>
-                <Typography variant="body2" className='p-1 mt-2'>
-                  {post.hashtags.replace(/##/g, '#').replace(/[\[\]"\s]/g, '').split(',').map((hashtag, index) => (
-                    <React.Fragment key={index}>
-                      {index > 0 && ' '}
-                      <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
-                        color: colors.hashtagColor, textDecoration: 'none'
-                      }}>
-                        {`#${hashtag}`}
-                      </Link>
-                    </React.Fragment>
-                  ))}
-                </Typography>
+                {post.hashtags && typeof post.hashtags === 'string' && post.hashtags.trim() !== '' && post.hashtags !== '[]' && post.hashtags !== "''" ? (
+                  <Typography variant="body2" className='p-1 mt-2'>
+                    {post.hashtags
+                      .replace(/##/g, '#')
+                      .replace(/[\[\]"\s]/g, '')
+                      .split(',')
+                      .map((hashtag, index) => (
+                        <React.Fragment key={index}>
+                          {index > 0 && ' '}
+                          <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
+                            color: colors.hashtagColor, textDecoration: 'none'
+                          }}>
+                            {`#${hashtag.replace(/^#/, '')}`}
+                          </Link>
+                        </React.Fragment>
+                      ))}
+                  </Typography>
+                ) :
+                  <span></span>
+                }
               </CardContent>
+
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* TEXT */}
-              <CardContent className='p-0'
+              <CardContent className='p-1'
                 sx={{
                   ...instagramStyles.instagramCardContent, backgroundColor: colors.backgroundColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
                 }}>
@@ -823,7 +1076,6 @@ export default function InstagramCard() {
                   {/* {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>} */}
                   {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}></p>}
 
-
                   {(postComments[post.id] || []).map((comment) => (
                     <Comment
                       key={comment.id}
@@ -841,11 +1093,12 @@ export default function InstagramCard() {
               </Collapse>
 
               {/* POST SETTINGS */}
-              < Popover
+              <Popover
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleMoreVertClose}
+                onExited={handleMoreVertClose}
                 anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'right',
@@ -853,12 +1106,218 @@ export default function InstagramCard() {
                 transformOrigin={{
                   vertical: 'top',
                   horizontal: 'right',
+                  top: 0,
+                }}
+                style={{
+                  cursor: 'pointer'
                 }}
               >
-                <Box sx={{ p: 2 }}>
-                  <Typography>Settings about post</Typography>
+                <Box style={{ background: colors.backgroundColor, color: colors.textColor, border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
+                  <List>
+
+                    <ListItem button onClick={() => handleOpenEditDialog(post.id)}>
+                      <ListItemText primary="Edit Post" />
+                    </ListItem>
+
+                    <Dialog
+                      open={isEditDialogOpen}
+                      onClose={handleCloseEditDialog}
+                      aria-labelledby="edit-dialog-title"
+                      aria-describedby="edit-dialog-description"
+                      style={{
+                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+                        boxShadow: colors.boxShadow,
+                      }}
+                    >
+                      <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="edit-dialog-title">
+                        {"Edit Post"}
+                      </DialogTitle>
+                      <DialogContent sx={{ backgroundColor: colors.backgroundColor }}>
+                        <div style={{ marginBottom: '16px', marginTop: '20px' }}>
+                          <TextField
+                            label="Caption"
+                            value={editedData.caption}
+                            onChange={(e) => setEditedData({ ...editedData, caption: e.target.value })}
+                            InputProps={{
+                              style: {
+                                color: colors.textColor,
+                                borderBottom: `1px solid ${colors.border}`,
+                                '&:focus': {
+                                  color: colors.focusColor,
+                                },
+                              },
+                            }}
+                            InputLabelProps={{
+                              style: {
+                                color: colors.labelColor,
+                              },
+                            }}
+                          />
+                        </div>
+                        <div style={{ marginBottom: '16px' }}>
+                          <TextField
+                            label="Post Text"
+                            value={editedData.postText}
+                            onChange={(e) => setEditedData({ ...editedData, postText: e.target.value })}
+                            InputProps={{
+                              style: {
+                                color: colors.textColor,
+                                borderBottom: `1px solid ${colors.border}`,
+                                '&:focus': {
+                                  color: colors.focusColor,
+                                },
+                              },
+                            }}
+                            InputLabelProps={{
+                              style: {
+                                color: colors.labelColor,
+                              },
+                            }}
+                          />
+                        </div>
+
+                        <div className='w-100' style={{ marginBottom: '16px' }}>
+                          <LocationPicker
+                            onLocationChange={handleLocationChange}
+                            setLocation={setLocation}
+                          />
+                        </div>
+
+                        <div className='w-100' style={{ marginBottom: '16px' }}>
+                          <Grid className='mt-1' item container spacing={2} alignItems="center" xs={12}>
+                            <Grid item xs={10}>
+                              <TextField
+                                fullWidth
+                                label="New Hashtag"
+                                variant="standard"
+                                size="small"
+                                value={newHashtag}
+                                onChange={(e) => setNewHashtag(e.target.value)}
+                                InputProps={{
+                                  style: {
+                                    color: colors.textColor,
+                                    borderBottom: `1px solid ${colors.border}`,
+                                    '&:focus': {
+                                      color: colors.focusColor,
+                                    },
+                                  },
+                                }}
+                                InputLabelProps={{
+                                  style: {
+                                    color: colors.labelColor,
+                                  },
+                                }}
+                              />
+                            </Grid>
+
+                            <Grid item xs={2}>
+                              <IconButton
+                                type="button"
+                                color="primary"
+                                onClick={handleAddHashtag}
+                                style={{
+                                  color: colors.iconColor
+                                }}
+                              >
+                                <AddCircleOutline />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        </div>
+
+                        <Grid item container spacing={1} alignItems="center" xs={12}>
+                          {[...oldhashtags, ...addedHashtags].map((tag, index) => (
+                            <Chip
+                              key={index}
+                              label={tag.startsWith('#') ? tag : `#${tag}`}
+                              onDelete={() => handleRemoveHashtag(tag)}
+                              color="primary"
+                            />
+                          ))}
+                        </Grid>
+
+                      </DialogContent>
+                      <DialogContent className='d-flex justify-content-around align-content-center p-2' sx={{ backgroundColor: colors.backgroundColor }}>
+                        <Button onClick={handleCloseEditDialog} color="primary">
+                          Cancel
+                        </Button>
+                        <Button onClick={handleSaveChanges} color="success" autoFocus>
+                          Save Changes
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+
+                    {/* VISIT PROFILE */}
+                    <ListItem button onClick={handleVisitProfile}>
+                      <ListItemText primary="Visit Profile" />
+                    </ListItem>
+
+                    {/* HIDE POST */}
+                    <ListItem button onClick={() => handleOpenHideConfirmation(post.id)}>
+                      <ListItemText primary="Hide Post" />
+                    </ListItem>
+
+                    <Dialog
+                      open={hideConfirmationOpen}
+                      onClose={handleCloseHideConfirmation}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                      style={{
+                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+                        boxShadow: colors.boxShadow,
+                      }}
+                    >
+                      <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Hide"}</DialogTitle>
+                      <DialogContent sx={{ backgroundColor: colors.backgroundColor }}>
+                        <DialogContentText id="alert-dialog-description" style={{ color: colors.textColor }}>
+                          Are you sure you want to hide this post?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogContent className='d-flex justify-content-around align-content-center p-2' sx={{ backgroundColor: colors.backgroundColor }}>
+                        <Button onClick={handleCloseHideConfirmation} color="primary" disabled={loading}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => handleHidePost(postToHideId)} color="warning" autoFocus disabled={loading}>
+                          Hide
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+
+                    {/* DELETE POST */}
+                    <ListItem button onClick={() => handleOpenDeleteConfirmation(post.id)}>
+                      <ListItemText primary="Delete Post" />
+                    </ListItem>
+
+                    <Dialog
+                      open={deleteConfirmationOpen}
+                      onClose={handleCloseDeleteConfirmation}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                      style={{
+                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+                        boxShadow: colors.boxShadow
+                      }}
+                    >
+                      <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+                      <DialogContent sx={{ backgroundColor: colors.backgroundColor }}>
+                        <DialogContentText id="alert-dialog-description" style={{ color: colors.textColor }}>
+                          Are you sure you want to delete this post?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogContent className='d-flex justify-content-around align-content-center p-2' sx={{ backgroundColor: colors.backgroundColor }}>
+                        <Button onClick={handleCloseDeleteConfirmation} color="primary" disabled={loading}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => handleDeletePost(postToDeleteId)} color="warning" autoFocus disabled={loading}>
+                          Delete
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+
+                  </List>
                 </Box>
-              </Popover >
+              </Popover>
+
             </Card>
           ))
           }
