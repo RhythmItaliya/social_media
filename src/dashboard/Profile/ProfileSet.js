@@ -243,7 +243,7 @@ const ProfileSet = () => {
                                     <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                                         <LocationOnIcon style={{ color: colors.iconColor, fontSize: "14px" }} />
                                         <Typography style={{ fontSize: "12px", color: colors.labelColor }}>
-                                            {userData.location}
+                                            {`${userData.location || ''}`}
                                         </Typography>
                                     </div>
                                 )}
@@ -251,7 +251,7 @@ const ProfileSet = () => {
 
                             <Grid item>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')} </Typography>
+                                    <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')}</Typography>
                                     <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
                                         Post
                                     </Typography>
@@ -268,7 +268,7 @@ const ProfileSet = () => {
             </div>
 
             {/* Button div */}
-            <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
+            {/* <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
                 <Grid container justifyContent="space-around">
                     <Tooltip style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} title="Add to Friend" arrow>
                         <IconButton style={{ color: colors.iconColor }} onClick={handleAddToFriend}>
@@ -291,7 +291,7 @@ const ProfileSet = () => {
                         </IconButton>
                     </Tooltip>
                 </Grid>
-            </div>
+            </div> */}
 
             {/* Bio div */}
             <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px' }}>
