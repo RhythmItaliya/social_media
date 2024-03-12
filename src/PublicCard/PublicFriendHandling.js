@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Grid, IconButton, Tooltip } from "@mui/material";
+import { message } from "antd";
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -9,7 +10,8 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
+const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
+
     const [loading, setLoading] = useState(true);
     const [friendRequestStatus, setFriendRequestStatus] = useState(null);
     const [isCrushAdded, setCrushAdded] = useState(false);
@@ -20,7 +22,7 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
         const fetchData = () => {
             setLoading(true);
 
-            const friendRequestPromise = fetch(`http://localhost:8080/get/public/friendRequests/?senderId=${uuid}&receiverId=${profileUUID}`)
+            const friendRequestPromise = fetch(`http://localhost:8080/get/public/friendRequests/${profileUUID}`)
                 .then((friendRequestResponse) => {
                     if (!friendRequestResponse.ok) {
                         throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);
@@ -33,7 +35,7 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                     }
                 });
 
-            const crushPromise = fetch(`http://localhost:8080/get/public/crushesRequest/?senderId=${uuid}&receiverId=${profileUUID}`)
+            const crushPromise = fetch(`http://localhost:8080/get/public/crushesRequest/${profileUUID}`)
                 .then((crushResponse) => {
                     if (!crushResponse.ok) {
                         throw new Error(`Crush status request failed: ${crushResponse.status}`);
@@ -46,20 +48,34 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                     }
                 });
 
-            Promise.all([friendRequestPromise, crushPromise])
+            const ignorePromise = fetch(`http://localhost:8080/get/public/ignoreRequest/${profileUUID}`)
+                .then((ignoreResponse) => {
+                    if (!ignoreResponse.ok) {
+                        throw new Error(`Ignore status request failed: ${ignoreResponse.status}`);
+                    }
+                    return ignoreResponse.json();
+                })
+                .then((ignoreData) => {
+                    if (ignoreData.success) {
+                        setIgnored((prevStatus) => ignoreData.status);
+                    }
+                });
+
+            Promise.all([friendRequestPromise, crushPromise, ignorePromise])
                 .then(() => setLoading(false))
                 .catch((error) => {
                     console.error('Error fetching data:', error.message);
-                    setError('Error fetching data. Please try again.');
+                    // setError('Error fetching data. Please try again.');
                     setLoading(false);
                 });
         };
 
-        if (uuid && profileUUID) {
+        if (userUUID && profileUUID) {
             fetchData();
         }
-    }, [uuid, profileUUID]);
+    }, [userUUID, profileUUID]);
 
+    // FRIEND-API
     const handleAddToFriend = () => {
         setLoading(true);
 
@@ -70,23 +86,24 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                senderId: uuid,
+                senderId: userUUID,
                 receiverId: profileUUID,
             }),
         })
             .then((response) => {
                 if (response.ok) {
                     return response.json();
+                } else if (response.status === 422) {
+                    message.error('Cannot send a Friend request to own profile');
                 } else {
-                    throw new Error('Failed to handle friend request');
+                    throw new Error('Failed to handle crush request');
                 }
             })
             .then((responseData) => {
                 if (responseData.success) {
                     setFriendRequestStatus((prevStatus) => responseData.status);
 
-                    // After the successful POST, make a GET request to update the state based on the response
-                    fetch(`http://localhost:8080/get/public/friendRequests/?senderId=${uuid}&receiverId=${profileUUID}`)
+                    fetch(`http://localhost:8080/get/public/friendRequests/${profileUUID}`)
                         .then((friendRequestResponse) => {
                             if (!friendRequestResponse.ok) {
                                 throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);
@@ -106,17 +123,19 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                         });
                 } else {
                     console.error('Failed to handle friend request');
-                    setError('Failed to handle friend request. Please try again.');
+                    // setError('Failed to handle friend request. Please try again.');
+                    window.location.reload();
                     setLoading(false);
                 }
             })
             .catch((error) => {
                 console.error('Error handling friend request:', error);
-                setError('Error handling friend request. Please try again.');
+                // setError('Error handling friend request. Please try again.');
                 setLoading(false);
             });
     };
 
+    // CRUSH-API
     const handleSetCrush = () => {
         setLoading(true);
 
@@ -127,13 +146,15 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                senderId: uuid,
+                senderId: userUUID,
                 receiverId: profileUUID,
             }),
         })
             .then((response) => {
                 if (response.ok) {
                     return response.json();
+                } else if (response.status === 422) {
+                    message.error('Cannot send a crush request to this profile');
                 } else {
                     throw new Error('Failed to handle crush request');
                 }
@@ -142,7 +163,7 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                 if (responseData.success) {
                     setCrushAdded((prevStatus) => responseData.status === '2');
 
-                    fetch(`http://localhost:8080/get/public/crushesRequest/?senderId=${uuid}&receiverId=${profileUUID}`)
+                    fetch(`http://localhost:8080/get/public/crushesRequest/${profileUUID}`)
                         .then((crushResponse) => {
                             if (!crushResponse.ok) {
                                 throw new Error(`Crush status request failed: ${crushResponse.status}`);
@@ -162,13 +183,74 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
                         });
                 } else {
                     console.error('Failed to handle crush request');
-                    setError('Failed to handle crush request. Please try again.');
+                    // setError('Failed to handle crush request. Please try again.');
+                    window.location.reload();
                     setLoading(false);
                 }
             })
             .catch((error) => {
                 console.error('Error handling crush request:', error);
-                setError('Error handling crush request. Please try again.');
+                // setError('Error handling crush request. Please try again.');
+                setLoading(false);
+            });
+    };
+
+    // IGNORE-API
+    const handleAddToIgnore = () => {
+        setLoading(true);
+
+        fetch('http://localhost:8080/public/ignoreRequest', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                senderId: userUUID,
+                receiverId: profileUUID,
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 422) {
+                    message.error("You can't ignore your own profile");
+                } else {
+                    throw new Error('Failed to handle ignore request');
+                }
+            })
+            .then((responseData) => {
+                if (responseData.success) {
+                    setIgnored((prevStatus) => responseData.status === '2');
+
+                    fetch(`http://localhost:8080/get/public/ignoreRequest/${profileUUID}`)
+                        .then((ignoreResponse) => {
+                            if (!ignoreResponse.ok) {
+                                throw new Error(`Ignore status request failed: ${ignoreResponse.status}`);
+                            }
+                            return ignoreResponse.json();
+                        })
+                        .then((ignoreData) => {
+                            if (ignoreData.success) {
+                                setIgnored((prevStatus) => ignoreData.status);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching data after POST:', error.message);
+                        })
+                        .finally(() => {
+                            setLoading(false);
+                        });
+                } else {
+                    console.error('Failed to handle ignore request');
+                    // setError('Failed to handle ignore request. Please try again.');
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                console.error('Error handling ignore request:', error);
+                // setError('Error handling ignore request. Please try again.');
+                window.location.reload();
                 setLoading(false);
             });
     };
@@ -177,61 +259,107 @@ const PublicFriendHandling = ({ colors, uuid, profileUUID }) => {
         console.log("Message clicked");
     };
 
-    const handleAddToIgnore = () => {
-        setIgnored((prevState) => !prevState);
-    };
-
     const buttonStyle = {
-        fontSize: '16px',
+        fontSize: '14px',
         color: colors.textColor,
         backgroundColor: friendRequestStatus === "1" ? colors.backgroundColor : colors.backgroundColor,
         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+        marginLeft: '5px',
+        marginRight: '5px'
+    };
+
+    const getTextForFriendButton = (status) => {
+        switch (status) {
+            case "1":
+                return `Friend Request Sent to ${username}`;
+            case "2":
+                return 'You are now Friends';
+            default:
+                return 'Add as Friend';
+        }
+    };
+
+    const getTextForCrushButton = (status) => {
+        switch (status) {
+            case "1":
+                return 'Crush';
+            case "2":
+                return 'You have a new Crush';
+            default:
+                return 'Crush';
+        }
+    };
+
+    const getTextForIgnoreButton = (status) => {
+        switch (status) {
+            case "1":
+                return 'Ignore';
+            case "2":
+                return 'You have Ignored';
+            default:
+                return 'Ignore';
+        }
     };
 
     return (
-        <>
-            {loading && <p style={{ color: colors.textColor }}>Loading...</p>}
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {!loading && !error && (
-                <Grid container justifyContent="space-around">
-                    <Tooltip title="Add to Friend" arrow>
-                        <IconButton
-                            className='rounded-1'
-                            style={buttonStyle}
-                            onClick={handleAddToFriend}
-                        >
-                            {friendRequestStatus === "1" ? 'Friend Request Sent' : (friendRequestStatus === "2" ? 'You are now Friends' : 'Friend')}
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Send Message" arrow>
-                        <IconButton
-                            className='rounded-1'
-                            style={{ fontSize: '16px', color: colors.textColor, backgroundColor: colors.backgroundColor, border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}
-                            onClick={handleMessage}>
-                            Message
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={isCrushAdded === "1" ? 'Crush' : (isCrushAdded === "2" ? 'You have a new Crush' : 'Crush')} arrow>
-                        <IconButton
-                            className='rounded-1'
-                            style={buttonStyle}
-                            onClick={handleSetCrush}
-                        >
-                            {isCrushAdded === "1" ? 'Crush' : (isCrushAdded === "2" ? 'You have a new Crush' : 'Crush')}
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Add to Ignore" arrow>
-                        <IconButton
-                            className='rounded-1'
-                            style={buttonStyle}
-                            onClick={handleAddToIgnore}
-                        >
-                            {isIgnored ? 'Ignored' : 'Ignore'}
-                        </IconButton>
-                    </Tooltip>
-                </Grid>
-            )}
-        </>
+        <div>
+            <div>
+                {loading && <p style={{ color: colors.textColor }}>Loading...</p>}
+                {/* {error && <p style={{ color: 'red' }}>{error}</p>} */}
+
+                {!loading && !error && (
+                    <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}>
+
+                            {/* Add to Friend Button */}
+                            <Tooltip title={`Add ${username} as Friend`} arrow>
+                                <IconButton
+                                    className='rounded-1'
+                                    style={buttonStyle}
+                                    onClick={handleAddToFriend}
+                                >
+                                    {getTextForFriendButton(friendRequestStatus)}
+                                </IconButton>
+                            </Tooltip>
+
+                            {/* Send Message Button */}
+                            <Tooltip title={`Send Message to ${username}`} arrow>
+                                <IconButton
+                                    className='rounded-1'
+                                    style={buttonStyle}
+                                    onClick={handleMessage}
+                                >
+                                    Message
+                                </IconButton>
+                            </Tooltip>
+
+                            {/* Set Crush Button */}
+                            <Tooltip title={`Add ${username} as Crush`} arrow>
+                                <IconButton
+                                    className='rounded-1'
+                                    style={buttonStyle}
+                                    onClick={handleSetCrush}
+                                >
+                                    {getTextForCrushButton(isCrushAdded)}
+                                </IconButton>
+                            </Tooltip>
+
+                            {/* Add to Ignore Button */}
+                            <Tooltip title={`Add ${username} as Ignore`} arrow>
+                                <IconButton
+                                    className='rounded-1'
+                                    style={buttonStyle}
+                                    onClick={handleAddToIgnore}
+                                >
+                                    {getTextForIgnoreButton(isIgnored)}
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+        </div>
     );
 };
 

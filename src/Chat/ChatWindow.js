@@ -171,7 +171,7 @@ const ChatWindow = ({ selectedUser }) => {
     <div className='chatWindow' style={{ padding: '25px', height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto', scrollBehavior: 'smooth' }}>
       {selectedUser ? (
         <div style={{ display: 'flex', alignItems: 'center', padding: '10px', borderRadius: '10px 10px 0 0', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
-          <Avatar src={selectedUser.photoURL} alt={`${selectedUser.firstName} ${selectedUser.lastName}`} style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px', }} />
+          <Avatar src={selectedUser.photoURL} alt={`${selectedUser.firstName} ${selectedUser.lastName}`} style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px', cursor: 'pointer' }} />
           <div style={{ cursor: 'default' }}>
             <div style={{ fontWeight: 'bold', marginBottom: '5px', color: colors.textColor }}>
               {selectedUser.firstName.charAt(0).toUpperCase() + selectedUser.firstName.slice(1)} {selectedUser.lastName.charAt(0).toUpperCase() + selectedUser.lastName.slice(1)}
@@ -182,88 +182,93 @@ const ChatWindow = ({ selectedUser }) => {
           </div>
         </div>
       ) : (
-        <div style={{ textAlign: 'center', color: colors.textColor, marginTop: '10px' }}>
-          Select a user to start a chat.
+        <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <p style={{ color: colors.textColor }}>Select a user to start a chat.</p>
         </div>
-      )}
+      )
+      }
 
-      {selectedUser && (
-        <div style={{ flex: 1, overflowY: 'auto', borderLeft: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '10px' }}>
-          {allMessages.slice().reverse().map((message, index) => (
-            <div key={`message-${index}`} className={`d-flex flex-row justify-content-${message.sender === senderUuid ? 'end' : 'start'} mb-4`}>
-              {message.sender !== senderUuid && (
-                <Avatar src={selectedUser?.photoURL || ''} alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} style={{ width: '20px', height: '20px', marginRight: '5px' }} />
-              )}
-              <div>
-                <p className={`small p-2 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ backgroundColor: message.sender === senderUuid ? 'bg-primary' : '#ccc', color: message.sender === senderUuid ? '#000' : '#fff' }}>
-                  {message.content}
-                  <p className="small mb-1 text-muted justify-content-end d-flex">{formatTimestamp(message.createdAt)}</p>
-                </p>
+      {
+        selectedUser && (
+          <div style={{ flex: 1, overflowY: 'auto', borderLeft: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '10px' }}>
+            {allMessages.slice().reverse().map((message, index) => (
+              <div key={`message-${index}`} className={`d-flex flex-row justify-content-${message.sender === senderUuid ? 'end' : 'start'} mb-4`}>
+                {message.sender !== senderUuid && (
+                  <Avatar src={selectedUser?.photoURL || ''} alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} style={{ width: '30px', height: '30px', marginRight: '5px' }} />
+                )}
+                <div>
+                  <p className={`small p-2 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ fontSize: '16px', backgroundColor: colors.backgroundColor, color: colors.textColor }}>
+                    {message.content}
+                    <p style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor }} className="mb-1 text-muted justify-content-end d-flex">{formatTimestamp(message.createdAt)}</p>
+                  </p>
+                </div>
+                {message.sender === senderUuid && (
+                  <Avatar src={senderPhotoUrl} alt={senderUserUsername} style={{ width: '30px', height: '30px', marginLeft: '5px', cursor: 'pointer' }} />
+                )}
               </div>
-              {message.sender === senderUuid && (
-                <Avatar src={senderPhotoUrl} alt={senderUserUsername} style={{ width: '20px', height: '20px', borderRadius: '50%', marginLeft: '5px' }} />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )
+      }
 
-      {selectedUser && (
-        <div className='col-12 d-flex' style={{ width: '100%', boxSizing: 'border-box' }}>
-          <input
-            id="chatInput"
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            style={{
-              flex: '1',
-              borderRadius: '0 0 0 10px',
-              border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-              backgroundColor: colors.backgroundColor,
-              color: colors.textColor,
-              padding: '10px 10px',
-              outline: 'none',
-            }}
-          />
-          <IconButton
-            variant="contained"
-            style={{
-              borderLeft: 'none',
-              borderRight: 'none',
-              padding: '10px',
-              color: colors.textColor,
-              borderRadius: '0',
-              backgroundColor: colors.backgroundColor,
-              border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-            }}
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          >
-            <EmojiEmotions />
-          </IconButton>
+      {
+        selectedUser && (
+          <div className='col-12 d-flex' style={{ width: '100%', boxSizing: 'border-box' }}>
+            <input
+              id="chatInput"
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              style={{
+                flex: '1',
+                borderRadius: '0 0 0 10px',
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+                backgroundColor: colors.backgroundColor,
+                color: colors.textColor,
+                padding: '10px 10px',
+                outline: 'none',
+              }}
+            />
+            <IconButton
+              variant="contained"
+              style={{
+                borderLeft: 'none',
+                borderRight: 'none',
+                padding: '10px',
+                color: colors.textColor,
+                borderRadius: '0',
+                backgroundColor: colors.backgroundColor,
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+              }}
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <EmojiEmotions />
+            </IconButton>
 
-          {showEmojiPicker && (
-            <div style={{ position: 'fixed', bottom: '70px', right: '10px', zIndex: '1', overflow: 'auto' }}>
-              <EmojiPicker set='emojione' onSelect={handleEmojiSelect} />
-            </div>
-          )}
+            {showEmojiPicker && (
+              <div style={{ position: 'fixed', bottom: '70px', right: '10px', zIndex: '1', overflow: 'auto' }}>
+                <EmojiPicker set='emojione' onSelect={handleEmojiSelect} />
+              </div>
+            )}
 
-          <IconButton
-            onClick={handleSendMessage}
-            variant="contained"
-            style={{
-              borderLeft: 'none',
-              padding: '10px 30px',
-              color: colors.textColor,
-              borderRadius: '0 0 10px 0',
-              backgroundColor: colors.backgroundColor,
-              border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-            }}
-          >
-            <SendAndArchiveOutlined />
-          </IconButton>
-        </div>
-      )}
-    </div>
+            <IconButton
+              onClick={handleSendMessage}
+              variant="contained"
+              style={{
+                borderLeft: 'none',
+                padding: '10px 30px',
+                color: colors.textColor,
+                borderRadius: '0 0 10px 0',
+                backgroundColor: colors.backgroundColor,
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+              }}
+            >
+              <SendAndArchiveOutlined />
+            </IconButton>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

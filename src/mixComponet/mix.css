@@ -1,0 +1,46 @@
+/* mix.css */
+* {
+  box-sizing: border-box;
+}
+
+/* Responsive styles */
+@media (max-width: 991.98px) {
+  .story-container {
+    width: 100% !important;
+  }
+}
+
+@media screen and (min-width: 991.99px) and (max-width: 1024px) {
+  .story-container {
+    width: 100% !important;
+  }
+}
+
+/* Your existing styles */
+
+.story-container {
+  /* Set initial values for height and width */
+  height: 0;
+  width: 0;
+  overflow: hidden;
+
+  /* Add transition properties for smooth animation */
+  transition: height 0.3s ease, width 0.3s ease;
+}
+
+.visible {
+  /* Set the final values when the component is visible */
+  height: auto;
+  width: 50%;
+  /* or any other desired width */
+}
+
+.smooth-visible-transition {
+  /* Enable smooth transitions for height changes */
+  transition: height 0.3s ease;
+}
+
+.smooth-width-transition {
+  /* Enable smooth transitions for width changes */
+  transition: width 0.3s ease;
+}

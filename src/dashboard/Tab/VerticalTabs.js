@@ -1,4 +1,6 @@
-import React, { } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -17,6 +19,7 @@ import SettingsPage from '../../Settings/Setting';
 import Homemix from '../../mixComponet/Homemix';
 import Searchmix from '../../mixComponet/Searchmix';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -41,7 +44,6 @@ function TabPanel(props) {
     );
 }
 
-
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.number.isRequired,
@@ -56,12 +58,27 @@ function a11yProps(index) {
 }
 
 export default function VerticalTabs() {
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
+    const navigate = useNavigate();
+
+    const location = useLocation();
+
+    const tabNames = ['post', 'account', 'chat', 'search', 'add', 'settings'];
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+        const selectedTabName = tabNames[newValue];
+        navigate(`/${selectedTabName}`);
     };
 
+    useEffect(() => {
+        const path = location.pathname;
+        const selectedTabName = path.split('/')[1];
+        const tabValue = tabNames.indexOf(selectedTabName);
+        if (tabValue !== -1) {
+            setValue(tabValue);
+        }
+    }, [location.pathname, tabNames]);
 
     return (
         <DarkModeProvider>
@@ -70,8 +87,6 @@ export default function VerticalTabs() {
                     display: 'flex',
                 }}
             >
-
-                {/* Display sidebar only on large devices */}
                 <Box className="verticalSidebar d-none d-lg-block d-flex flex-column justify-content-center align-items-center">
                     <Tabs
                         orientation="vertical"
@@ -83,21 +98,17 @@ export default function VerticalTabs() {
                             borderRight: 1,
                             borderColor: 'divider',
                             transform: 'translateY(50%)',
-
                         }}
                     >
-                        <Tab label="Home" icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" />
-                        <Tab label="Account" icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" />
-                        <Tab label="Chat" icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab" />
-                        <Tab label="Search" icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab" />
-                        <Tab label="Add" icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab" />
-                        <Tab label="Settings" icon={<Settings />} {...a11yProps(5)} className="custom-tab" />
-
+                        <Tab label="Home" icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab" component={Link} to="/post" />
+                        <Tab label="Account" icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab" component={Link} to="/account" />
+                        <Tab label="Chat" icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab" component={Link} to="/chat" />
+                        <Tab label="Search" icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab" component={Link} to="/search" />
+                        <Tab label="Add" icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab" component={Link} to="/add" />
+                        <Tab label="Settings" icon={<Settings />} {...a11yProps(5)} className="custom-tab" component={Link} to="/settings" />
                     </Tabs>
                 </Box>
 
-
-                {/* small devices */}
                 <Box className="horizontalSidebar fixed-bottom d-lg-none d-flex justify-content-center align-items-center">
                     <Tabs
                         orientation="horizontal"
@@ -105,16 +116,15 @@ export default function VerticalTabs() {
                         value={value}
                         onChange={handleChange}
                     >
-                        <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab1" />
-                        <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab1" />
-                        <Tab icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab1" />
-                        <Tab icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab1" />
-                        <Tab icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab1" />
-                        <Tab icon={<Settings />} {...a11yProps(5)} className="custom-tab1" />
+                        <Tab icon={<HomeIcon />} {...a11yProps(0)} className="custom-tab1" component={Link} to="/post" />
+                        <Tab icon={<AccountCircleIcon />} {...a11yProps(1)} className="custom-tab1" component={Link} to="/account" />
+                        <Tab icon={<ChatBubble />} {...a11yProps(2)} className="custom-tab1" component={Link} to="/chat" />
+                        <Tab icon={<SearchIcon />} {...a11yProps(3)} className="custom-tab1" component={Link} to="/search" />
+                        <Tab icon={<AddCircleIcon />} {...a11yProps(4)} className="custom-tab1" component={Link} to="/add" />
+                        <Tab icon={<Settings />} {...a11yProps(5)} className="custom-tab1" component={Link} to="/settings" />
                     </Tabs>
                 </Box>
 
-                {/* Inside your render method or functional component */}
                 <TabPanel value={value} index={0}>
                     <Homemix />
                 </TabPanel>
@@ -140,7 +150,6 @@ export default function VerticalTabs() {
                 <TabPanel value={value} index={5}>
                     <SettingsPage />
                 </TabPanel>
-
             </Box>
         </DarkModeProvider>
     );

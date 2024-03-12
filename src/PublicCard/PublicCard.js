@@ -6,6 +6,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { Container } from '@mui/material';
 import PublicPost from './PublicPost';
 import PublicFriendHandling from './PublicFriendHandling';
+import PublicCustomButton from './PublicCustomButton';
 
 
 const hexToRgb = (hex) => {
@@ -16,7 +17,7 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading }) => {
+const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading, userUUID }) => {
 
     const [userData, setUserData] = useState(null);
     const [postCount, setPostCount] = useState(0);
@@ -165,42 +166,13 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading }) 
 
                 {/* count div */}
                 <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
-                    <Grid item className='d-flex gap-4 p-3'>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography style={{ fontSize: '30px', color: colors.textColor }}>50</Typography>
-                            <Typography style={{ fontSize: "10px", color: colors.labelColor }}>
-                                Ratting
-                            </Typography>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{friendCount.toString().padStart(2, '0')}</Typography>
-                            <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                                Friend
-                            </Typography>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
-                            <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                                Crush Keys
-                            </Typography>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>50</Typography>
-                            <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
-                                Ignore
-                            </Typography>
-                        </div>
-                    </Grid>
+                    <PublicCustomButton userUUID={userUUID} colors={colors} uuid={uuid} profileUUID={profileUUID} username={username} photoURL={photoURL} loading={loading} />
                 </div>
 
                 {/* Button div */}
                 <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', marginBottom: '10px' }}>
-                    <PublicFriendHandling colors={colors} uuid={uuid} profileUUID={profileUUID} username={username} photoURL={photoURL} loading={loading} />
+                    <PublicFriendHandling userUUID={userUUID} colors={colors} uuid={uuid} profileUUID={profileUUID} username={username} photoURL={photoURL} loading={loading} />
                 </div>
-
 
                 {/* Bio div */}
                 <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px' }}>
@@ -212,7 +184,7 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading }) 
                 {/* post div */}
                 <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Grid>
-                        <PublicPost profileUUID={profileUUID} />
+                        <PublicPost userUUID={userUUID} profileUUID={profileUUID} />
                     </Grid>
                 </div>
             </Container >

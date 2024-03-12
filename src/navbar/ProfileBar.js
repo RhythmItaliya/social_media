@@ -9,6 +9,7 @@ import { useDarkMode } from '../theme/Darkmode';
 import Logout from '../others/Logout';
 import Layout from '../theme/Layout';
 import { useSelector } from 'react-redux';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -53,7 +54,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
     },
 }));
 
-export default function Profilebar() {
+export default function Profilebar({ toggleStoryVisibility }) {
     const { isDarkMode } = useDarkMode();
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -87,7 +88,12 @@ export default function Profilebar() {
                         <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
                             <PersonAdd />
                         </StyledIconButton>
+
+                        <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
+                            <KeyboardDoubleArrowLeftIcon onClick={toggleStoryVisibility} style={{ cursor: 'pointer' }} />
+                        </StyledIconButton>
                     </CenteredIcons>
+
 
                     {/* User information */}
                     <UserInfo>

@@ -185,7 +185,6 @@ const ProfilePage = () => {
     const decryptedUuidBytes = CryptoJS.AES.decrypt(encryptedUuidCookie, encryptionKey);
     const decryptedUuid = decryptedUuidBytes.toString(CryptoJS.enc.Utf8);
     setDecryptedUuid(decryptedUuid);
-    console.log('Decrypted UUID:', decryptedUuid);
   }, []);
 
   const handleSubmit = async (e) => {

@@ -38,7 +38,7 @@ function Layout({ children }) {
 
             toggleDarkMode(initialDarkModeValue);
             setInitialLoad(true);
-            break; 
+            break;
           } else {
             console.error('Error fetching initial dark mode status:', response.statusText);
           }
@@ -56,6 +56,11 @@ function Layout({ children }) {
       fetchInitialDarkModeStatus();
     }
   }, [userUUID, toggleDarkMode, initialLoad]);
+
+  useEffect(() => {
+    // Save dark mode preference to local storage
+    localStorage.setItem('darkMode', isDarkMode ? '1' : '0');
+  }, [isDarkMode]);
 
   const handleDarkModeToggle = async () => {
     setLoading(true);

@@ -31,6 +31,17 @@
   background: var(--background-color-light);
 }
 
+.custom-tab1 {
+  color: var(--background-color-light) !important;
+}
+
+.custom-tab1 {
+  color: var(--text-color-light) !important;
+}
+.custom-tab1.Mui-selected {
+  color: rgba(255, 255, 255, 1);
+}
+
 .custom-tab {
   flex-direction: row !important;
   align-items: center !important;

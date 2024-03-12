@@ -1,3 +1,4 @@
+// SubOptionsComponent.js
 import React, { useEffect, useState } from 'react';
 import {
   Avatar,
@@ -16,8 +17,10 @@ import { ArrowForward, Update } from '@mui/icons-material';
 import SubSubOptionsComponent from './SubSubOptionsComponent';
 import { useSelector } from 'react-redux';
 import ProfilePhoto from '../dashboard/Profile/ProfilePhotoUpload';
-import DatePicker from 'react-datepicker'; // Importing react-datepicker
-import 'react-datepicker/dist/react-datepicker.css'; // Importing styles
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ArrowBack, ArrowBackIos } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -39,6 +42,10 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
 
   const handleSubOptionClick = (index) => {
     setSelectedSubOption(index);
+  };
+
+  const handleBackButtonClick = () => {
+    setSelectedSubOption(null);
   };
 
   const handleInputChange = (subOption, value) => {
@@ -339,7 +346,7 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
     <>
       {selectedSubOption !== null ? (
         <>
-          <SubSubOptionsComponent subSubOptions={subOptions[selectedSubOption].subOptions} colors={colors} />
+          <SubSubOptionsComponent backbutton={handleBackButtonClick} subSubOptions={subOptions[selectedSubOption].subOptions} colors={colors} />
           {renderInputRow()}
           {renderAvatar()}
         </>
@@ -348,9 +355,16 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align="center" style={{ color: colors.textColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
-                  Set Your Account
+
+                <TableCell align="center" style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+                  <div>
+                    <IconButton style={{ color: colors.iconColor }}>
+                      <Link to="/tab/setting"><ArrowBackIos /></Link>
+                    </IconButton>
+                    Set Your Account
+                  </div>
                 </TableCell>
+
               </TableRow>
             </TableHead>
             <TableBody>

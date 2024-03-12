@@ -96,9 +96,27 @@ function PublicPost({ profileUUID }) {
                 </Typography>
             )}
 
-            <div style={{ height: '500px', overflowY: 'auto' }}>
+            <div style={{ height: '600px', overflowY: 'auto' }}>
                 {accessDenied ? (
-                    <Typography style={{ color: 'red' }}>Access denied. Users are not friends.</Typography>
+                    <Typography style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '400px',
+                    }}>
+                        <div className='w-100 h-25 rounded-2 text-center'
+                            style={{
+                                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                color: colors.textColor,
+                                fontSize: '16px',
+                                padding: '10px',
+                            }}>
+                            Access denied. To view posts, become friends.
+                        </div>
+                    </Typography>
                 ) : (
                     posts ? (
                         /* ImageList */

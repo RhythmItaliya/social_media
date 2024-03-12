@@ -5,7 +5,8 @@ const Searchmix = () => {
     return (
         <>
             <SearchAppBar />
-            <Merger /></>
+            <Merger />
+        </>
     )
 }
 

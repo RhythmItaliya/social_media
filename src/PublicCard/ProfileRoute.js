@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import NotFound from "../others/NotFound";
 import PublicCard from "./PublicCard";
 import { DarkModeProvider, useDarkMode } from '../theme/Darkmode';
+import CryptoJS from 'crypto-js';
+import LoadingBar from "react-top-loading-bar";
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -36,54 +38,94 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const ProfileRoute = () => {
 
+const ProfileRoute = () => {
     const { username } = useParams();
-    const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const [isdecryptedUuid, setDecryptedUuid] = useState(null);
+    const encryptionKey = 'ASDCFVBNLKMNBSDFVBNJNBCV';
+    const loadingBarRef = useRef(null);
 
     useEffect(() => {
-        setLoading(true);
+        const fetchDecryptedUuid = async () => {
+            try {
+                const encryptedUuidCookie = document.cookie
+                    .split('; ')
+                    .find((row) => row.startsWith('token='))
+                    .split('=')[1];
 
-        fetch(`http://localhost:8080/${username}`)
-            .then(response => response.json())
-            .then(data => {
+                const decryptedUuidBytes = CryptoJS.AES.decrypt(encryptedUuidCookie, encryptionKey);
+                const decryptedUuid = decryptedUuidBytes.toString(CryptoJS.enc.Utf8);
+                setDecryptedUuid(decryptedUuid);
+            } catch (error) {
+                console.error('Error decrypting UUID:', error);
+                setDecryptedUuid(null);
+            }
+        };
+
+        fetchDecryptedUuid();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (loadingBarRef.current) {
+                loadingBarRef.current.continuousStart();
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/${username}`);
+                const data = await response.json();
+
                 setUserProfile(data.user);
-                setLoading(false);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error fetching user profile:', error);
                 setUserProfile(null);
-                setLoading(false);
-            });
+            } finally {
+                if (loadingBarRef.current) {
+                    loadingBarRef.current.complete();
+                }
+            }
+        };
+
+        fetchData();
+
+        return () => {
+            if (loadingBarRef.current) {
+                loadingBarRef.current.complete();
+            }
+        };
     }, [username]);
 
-    if (loading) {
-        return <p style={{ color: colors.textColor }}>Loading...</p>;
+    if (userProfile === null) {
+        return (
+            <div>
+                <LoadingBar
+                    ref={loadingBarRef}
+                    height={3}
+                    color="#f11946"
+                />
+                <NotFound />
+            </div>
+        );
     }
 
-    if (userProfile) {
-        const { username, uuid, userProfile: { uuid: profileUUID, profilePhote } } = userProfile;
-
-        console.log('uuid', uuid);
-        console.log('Profile uuid', profileUUID);
-        console.log('username', username);
-
-        const photoURL = profilePhote?.photoURL;
-
-        console.log('photoURL', photoURL);
+    if (userProfile && userProfile.uuid) {
+        const { username, uuid, userProfile: { uuid: profileUUID, profilePhoto } } = userProfile;
+        const photoURL = profilePhoto?.photoURL;
 
         return (
-            <>
-                <DarkModeProvider>
-                    <PublicCard uuid={uuid} profileUUID={profileUUID} username={username} photoURL={photoURL} colors={colors} loading={loading} />
-                </DarkModeProvider>
-            </>
+            <DarkModeProvider>
+                <PublicCard userUUID={isdecryptedUuid} uuid={uuid} profileUUID={profileUUID} username={username} photoURL={photoURL} colors={colors} loading={false} />
+            </DarkModeProvider>
         );
     } else {
-        return <NotFound />;
+        return (
+            <div>
+                <NotFound />
+            </div>
+        );
     }
 };
 

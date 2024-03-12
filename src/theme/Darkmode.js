@@ -4,7 +4,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const DarkModeContext = createContext();
 
 export const DarkModeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Check local storage for dark mode preference on initial load
+  const savedDarkMode = localStorage.getItem('darkMode') === '1';
+  const [isDarkMode, setIsDarkMode] = useState(savedDarkMode);
 
   useEffect(() => {
     const body = document.body;
@@ -13,6 +15,9 @@ export const DarkModeProvider = ({ children }) => {
     } else {
       body.classList.remove('dark-mode');
     }
+
+    // Save dark mode preference to local storage
+    localStorage.setItem('darkMode', isDarkMode ? '1' : '0');
   }, [isDarkMode]);
 
   const toggleDarkMode = () => {

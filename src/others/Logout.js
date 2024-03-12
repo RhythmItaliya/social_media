@@ -7,6 +7,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import StyledIconButton from '@material-ui/core/IconButton';
 import './others.css';
 import { useDarkMode } from '../theme/Darkmode';
+import { persistStore } from 'redux-persist';
+import { store } from '../store/store';
 
 const LogoutButton = ({ logoutUser }) => {
     const { isDarkMode } = useDarkMode();
@@ -27,10 +29,20 @@ const LogoutButton = ({ logoutUser }) => {
             console.log('X-Access-Token removed', data);
 
             if (response.ok) {
-                removeCookies('auth');
-                removeCookies('username');
-                removeCookies('token');
 
+                // Clear Redux persistor
+                const persistor = persistStore(store);
+                persistor.purge();
+
+                // Clear localStorage
+                localStorage.clear();
+
+                // Remove cookies
+                removeCookies('auth', { path: '/' });
+                removeCookies('username', { path: '/' });
+                removeCookies('token', { path: '/' });
+
+                // Dispatch logout action
                 logoutUser();
 
                 console.log('Logout successful');
