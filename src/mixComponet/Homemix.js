@@ -20,6 +20,7 @@ const lightModeColors = {
     valueTextColor: 'rgb(0,0,0)',
     linkColor: '#000',
     hashtagColor: 'darkblue',
+    transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const darkModeColors = {
@@ -34,6 +35,7 @@ const darkModeColors = {
     valueTextColor: '#ffffff',
     linkColor: '#CCC8',
     hashtagColor: '#8A2BE2',
+    transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const hexToRgb = (hex) => {

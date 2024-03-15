@@ -21,7 +21,7 @@ const authReducerLogin = (state = initialState, action) => {
         ...state,
         loggingIn: true,
         error: null,
-        loading: true, // Set loading to true when login request is initiated
+        loading: true,
       };
     case types.LOGIN_SUCCESS:
       return {
@@ -29,7 +29,7 @@ const authReducerLogin = (state = initialState, action) => {
         loggingIn: false,
         user: action.payload,
         error: null,
-        loading: false, // Set loading to false when login is successful
+        loading: false, 
       };
     case types.LOGIN_FAILURE:
       return {
@@ -37,7 +37,7 @@ const authReducerLogin = (state = initialState, action) => {
         loggingIn: false,
         user: null,
         error: action.payload,
-        loading: false, // Set loading to false when login fails
+        loading: false, 
       };
     default:
       return state;

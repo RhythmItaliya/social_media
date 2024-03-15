@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Backdrop, Fade, IconButton, Avatar, TextareaAutosize, Slider, Tooltip, LinearProgress } from '@mui/material';
+import { Modal, Backdrop, Fade, IconButton, Avatar, TextareaAutosize, Slider, Tooltip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogContentText, Button } from '@mui/material';
 import { Close, Visibility, Add, Upload, ArrowBack, ArrowForward } from '@mui/icons-material';
 import AvatarEditor from 'react-avatar-editor';
 import { ChromePicker } from 'react-color';
-
 import { message } from 'antd';
+import { DeleteForever } from '@material-ui/icons';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -171,6 +171,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
           image: firstStory.image,
           text: firstStory.text,
           textColor: firstStory.textColor,
+          uuid: firstStory.uuid
         });
 
         setStoryModalVisible(true);
@@ -198,6 +199,41 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
       setStoryDetails(stories[(currentIndex - 1 + stories.length) % stories.length]);
     }
   };
+
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [storyToDelete, setStoryToDelete] = useState(null);
+
+  const handleCloseDeleteConfirmation = () => {
+    setDeleteConfirmationOpen(false);
+    setStoryToDelete(null);
+  };
+
+  const handleDeleteConfirmation = () => {
+    setStoryToDelete(storyDetails.uuid);
+    setDeleteConfirmationOpen(true);
+  };
+
+
+  const handleDeleteStory = async () => {
+    if (storyToDelete) {
+      try {
+        const response = await fetch(`http://localhost:8080/delete/story/${storyToDelete}`, {
+          credentials: 'include',
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          message.success('Story deleted successfully.');
+          onClose();
+        } else {
+          console.error('Failed to delete story:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error deleting story:', error);
+      }
+    }
+  };
+
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -249,6 +285,9 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
       BackdropProps={{
         timeout: 500,
       }}
+      style={{
+        backgroundColor: colors.transparentColor
+    }}
     >
       <Fade in={open}>
         <div style={{
@@ -507,11 +546,43 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                       <IconButton style={{ position: 'absolute', top: '45%', right: 0 }} onClick={handleNextStory}>
                         <ArrowForward style={{ color: colors.textColor }} />
                       </IconButton>
+
+                      <Tooltip title="Action" placement="top">
+                        <IconButton style={{ position: 'absolute', bottom: '0', right: 0 }} onClick={() => handleDeleteConfirmation(storyDetails.uuid)}>
+                          <DeleteForever style={{ color: colors.textColor }} />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Dialog
+                        open={deleteConfirmationOpen}
+                        onClose={handleCloseDeleteConfirmation}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                        style={{
+                          border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
+                          boxShadow: colors.boxShadow
+                        }}
+                      >
+                        <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+                        <DialogContent sx={{ backgroundColor: colors.backgroundColor }}>
+                          <DialogContentText id="alert-dialog-description" style={{ color: colors.textColor }}>
+                            Are you sure you want to delete this Story?
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogContent className='d-flex justify-content-around align-content-center p-2' sx={{ backgroundColor: colors.backgroundColor }}>
+                          <Button onClick={handleCloseDeleteConfirmation} color="primary">
+                            Cancel
+                          </Button>
+                          <Button onClick={handleDeleteStory} color="warning" autoFocus>
+                            Delete
+                          </Button>
+                        </DialogContent>
+                      </Dialog>
+
                     </>
                   )}
                 </div>
               </div>
-
             </Fade>
           </Modal>
 
@@ -534,7 +605,6 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
               </Tooltip>
             </div>
           )}
-
         </div>
       </Fade>
     </Modal >

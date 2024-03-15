@@ -19,6 +19,8 @@ const lightModeColors = {
   valueTextColor: 'rgb(0,0,0)',
   linkColor: '#000',
   hashtagColor: 'darkblue',
+  transparentColor: 'rgba(255, 255, 255, 0.5)',
+  activeTransparentColor: 'rgba(0, 0, 0, 0.1)'
 };
 
 const darkModeColors = {
@@ -33,6 +35,8 @@ const darkModeColors = {
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
   hashtagColor: '#8A2BE2',
+  transparentColor: 'rgba(255, 255, 255, 0.5)',
+  activeTransparentColor: 'rgba(255, 255, 255, 0.1)'
 };
 
 const hexToRgb = (hex) => {
@@ -179,8 +183,7 @@ const UserChatList = ({ onSelectUser }) => {
         </div>
       </div>
 
-
-      <ul className="p-3"
+      <ul className="p-1"
         style={{
           listStyleType: 'none',
         }}>
@@ -190,10 +193,10 @@ const UserChatList = ({ onSelectUser }) => {
             style={{
               marginBottom: '10px',
               cursor: 'pointer',
-              backgroundColor: selectedUser && selectedUser.uuid === friend.uuid ? '#efefef' : colors.backgroundColor,
+              backgroundColor: selectedUser && selectedUser.uuid === friend.uuid ? colors.activeTransparentColor : colors.backgroundColor,
               color: selectedUser && selectedUser.uuid === friend.uuid ? colors.textColor : colors.textColor,
               padding: '2px',
-              borderRadius: '3px'
+              borderRadius: '5px'
             }}
             onClick={() => handleUserSelect(friend)}
           >
@@ -214,12 +217,12 @@ const UserChatList = ({ onSelectUser }) => {
                     {friend.firstName.charAt(0).toUpperCase() + friend.firstName.slice(1)}{' '}
                     {friend.lastName.charAt(0).toUpperCase() + friend.lastName.slice(1)}
                   </span>
-                  <span className="user-select-none" style={{ fontSize: '10px' }}>
+                  <span className="user-select-none" style={{ fontSize: '10px', opacity: '0.8' }}>
                     {friend.lastMessage ? formatTimestamp(friend.lastMessage.timestamp) : ''}
                   </span>
                 </div>
                 {friend.lastMessage && (
-                  <span className="user-select-none" style={{ fontSize: '12px', color: colors.labelColor }}>
+                  <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
                     {''}
                     {friend.lastMessage.message}
                   </span>
@@ -229,7 +232,7 @@ const UserChatList = ({ onSelectUser }) => {
           </li>
         ))}
       </ul>
-    </div>
+    </div >
   );
 };
 

@@ -24,6 +24,8 @@ const lightModeColors = {
   valueTextColor: 'rgb(0,0,0)',
   linkColor: '#000',
   hashtagColor: 'darkblue',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
+
 };
 
 const darkModeColors = {
@@ -38,6 +40,8 @@ const darkModeColors = {
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
   hashtagColor: '#8A2BE2',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
+
 };
 
 const hexToRgb = (hex) => {
@@ -199,7 +203,7 @@ const ChatWindow = ({ selectedUser }) => {
                 <div>
                   <p className={`small p-2 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ fontSize: '16px', backgroundColor: colors.backgroundColor, color: colors.textColor }}>
                     {message.content}
-                    <p style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor }} className="mb-1 text-muted justify-content-end d-flex">{formatTimestamp(message.createdAt)}</p>
+                    <p style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor, opacity: '0.4' }} className="mb-1 justify-content-end d-flex">{formatTimestamp(message.createdAt)}</p>
                   </p>
                 </div>
                 {message.sender === senderUuid && (

@@ -52,3 +52,7 @@ export const setUsername = (username) => ({
     type: types.SET_USERNAME,
     payload: username,
 });
+
+export const removePostBase64 = () => ({
+    type: types.REMOVE_POST_BASE64,
+});

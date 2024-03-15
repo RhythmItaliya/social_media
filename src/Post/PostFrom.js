@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { TextField, IconButton, Container, Grid } from '@mui/material';
-import { useSelector } from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { TextField, IconButton, Container, Grid, LinearProgress } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SendIcon from '@mui/icons-material/Send';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -10,6 +10,8 @@ import { useDarkMode } from '../theme/Darkmode';
 import LoadingBar from 'react-top-loading-bar';
 import { message } from 'antd';
 import LocationPicker from './LocationPicker';
+import { removePostBase64 } from '../actions/authActions';
+import { useNavigate } from 'react-router-dom';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -52,7 +54,12 @@ const PostForm = () => {
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [formState, setFormState] = useState(initialState);
+
+    const dispatch = useDispatch();
+
+    const navigate = useNavigate();
 
     const {
         caption,
@@ -107,8 +114,24 @@ const PostForm = () => {
     };
 
     const resetForm = () => {
-        setFormState(initialState);
+        setFormState(prevState => ({
+            ...prevState,
+            validationMessage: '',
+            postBase64: '',
+        }));
     };
+
+    useEffect(() => {
+        const cleanup = () => {
+            dispatch(removePostBase64());
+        };
+
+        window.addEventListener('beforeunload', cleanup);
+
+        return () => {
+            window.removeEventListener('beforeunload', cleanup);
+        };
+    }, [dispatch]);
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -120,18 +143,40 @@ const PostForm = () => {
 
         try {
             startLoading();
-            setTimeout(async () => {
-                resetForm();
+            const response = await fetch(`http://localhost:8080/api/create/posts/${profileUUID}`, {
+                credentials: 'include',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: postBase64,
+                    postText: postText,
+                    caption: caption,
+                    location: JSON.stringify(location),
+                    isVisibility: isPublic ? '1' : '0',
+                    hashtags: JSON.stringify(hashtags),
+                }),
+                onUploadProgress: progressEvent => {
+                    const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                    setUploadProgress(progress);
+                }
+            });
+            const data = await response.json();
 
-                message.success({
-                    content: 'Post uploaded successfully!',
-                    duration: 3,
-                });
+            resetForm();
 
-                finishLoading();
-            }, 1000);
+            dispatch(removePostBase64());
+
+            message.success({
+                content: data.message,
+                duration: 3,
+            });
+
+            finishLoading();
+
+            navigate('/post');
         } catch (error) {
-            // Handle error
             message.error({
                 content: 'Failed to upload post. Please try again.',
                 duration: 3,
@@ -287,7 +332,7 @@ const PostForm = () => {
                             <IconButton
                                 type="submit"
                                 color="primary"
-                                style={{ color: colors.iconColor }}
+                                style={{ color: colors.iconColor, borderRadius: 0 }}
                             >
                                 <span
                                     style={{
@@ -304,6 +349,14 @@ const PostForm = () => {
                     </Grid>
 
                 </Grid>
+
+                {loading && (
+                    <div>
+                        <p style={{ color: colors.textColor }}>Uploading: {uploadProgress}%</p>
+                        <LinearProgress style={{ color: colors.textColor }} variant="determinate" value={uploadProgress} />
+                    </div>
+                )}
+
             </form>
             <LoadingBar color={isDarkMode ? darkModeColors.spinnerColor : lightModeColors.spinnerColor} ref={ref} />
         </Container>

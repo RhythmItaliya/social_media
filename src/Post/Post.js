@@ -37,6 +37,7 @@ const lightModeColors = {
   valueTextColor: 'rgb(0,0,0)',
   linkColor: '#000',
   hashtagColor: 'darkblue',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const darkModeColors = {
@@ -51,6 +52,7 @@ const darkModeColors = {
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
   hashtagColor: '#8A2BE2',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const hexToRgb = (hex) => {
@@ -1114,7 +1116,6 @@ export default function InstagramCard() {
               >
                 <Box style={{ background: colors.backgroundColor, color: colors.textColor, border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
                   <List>
-
                     <ListItem button onClick={() => handleOpenEditDialog(post.id)}>
                       <ListItemText primary="Edit Post" />
                     </ListItem>
@@ -1126,7 +1127,7 @@ export default function InstagramCard() {
                       aria-describedby="edit-dialog-description"
                       style={{
                         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-                        boxShadow: colors.boxShadow,
+                        backgroundColor: colors.transparentColor
                       }}
                     >
                       <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="edit-dialog-title">
@@ -1264,7 +1265,7 @@ export default function InstagramCard() {
                       aria-describedby="alert-dialog-description"
                       style={{
                         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-                        boxShadow: colors.boxShadow,
+                        backgroundColor: colors.transparentColor
                       }}
                     >
                       <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Hide"}</DialogTitle>
@@ -1295,7 +1296,7 @@ export default function InstagramCard() {
                       aria-describedby="alert-dialog-description"
                       style={{
                         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-                        boxShadow: colors.boxShadow
+                        backgroundColor: colors.transparentColor
                       }}
                     >
                       <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>

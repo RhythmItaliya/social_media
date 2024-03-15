@@ -20,8 +20,7 @@ const rootReducer = combineReducers({
     userPhoto: userPhotoReducer,
     post: imageReducer,
     postData: profileReducer,
-    name: usernameReducer
-
+    name: usernameReducer,
 });
 
 export default rootReducer;

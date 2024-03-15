@@ -12,6 +12,11 @@ const imageReducer = (state = initialState, action) => {
                 ...state,
                 base64Data: action.payload,
             };
+        case types.REMOVE_POST_BASE64:
+            return {
+                ...state,
+                base64Data: null,
+            };
         default:
             return state;
     }

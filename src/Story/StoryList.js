@@ -1,9 +1,8 @@
-// StoryList.js
 import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { Avatar, IconButton } from '@mui/material';
+import { Avatar, IconButton, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import UserStory from './UserStory';
 import FriendStory from './FriendStory';
@@ -19,89 +18,61 @@ const hexToRgb = (hex) => {
 const StoryList = ({ colors }) => {
   const [openModalFriend, setOpenModalFriend] = useState(false);
   const [openModalUser, setOpenModalUser] = useState(false);
-
   const [dynamicProfiles, setDynamicProfiles] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const [loadingAvatar, setLoadingAvatar] = useState({});
 
   const profileuuid = useSelector((state) => state.profileuuid.uuid);
   const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
   const loginUserUsername = useSelector((state) => state.name.username);
 
   useEffect(() => {
-    const generateRandomProfiles = () => {
-      const numberOfProfiles = 7;
+    const fetchProfiles = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/friendships/users/story/${profileuuid}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      const newProfiles = Array.from({ length: numberOfProfiles }, (_, index) => ({
-        id: index + 1,
-        name: `User${index + 1}`,
-        route: `/user${index + 1}`,
-        image: `https://picsum.photos/200/200?random=${index + 1}`,
-        storyText: `This is User${index + 1}'s story text.`,
-      }));
-
-      setDynamicProfiles(newProfiles);
-    };
-
-    generateRandomProfiles();
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (openModalFriend || openModalUser) {
-        if (event.key === 'ArrowRight') {
-          navigateProfile(1);
-        } else if (event.key === 'ArrowLeft') {
-          navigateProfile(-1);
+        if (response.ok) {
+          const data = await response.json();
+          setDynamicProfiles(data.friends);
+          setLoadingProfiles(false);
+        } else {
+          console.error('Failed to fetch profiles');
         }
+      } catch (error) {
+        console.error('Error fetching profiles:', error);
       }
     };
 
-    const handleTouchStart = (event) => {
-      if (openModalFriend || openModalUser) {
-        touchStartX = event.touches[0].clientX;
+    fetchProfiles();
+
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setSliderSettings({ ...sliderSettings, slidesToShow: 2 });
+      } else if (window.innerWidth < 900) {
+        setSliderSettings({ ...sliderSettings, slidesToShow: 4 });
+      } else {
+        setSliderSettings({ ...sliderSettings, slidesToShow: 5 });
       }
     };
 
-    const handleTouchMove = (event) => {
-      if (openModalFriend || openModalUser) {
-        touchEndX = event.touches[0].clientX;
-      }
-    };
+    window.addEventListener('resize', handleResize);
 
-    const handleTouchEnd = () => {
-      if (openModalFriend || openModalUser) {
-        const touchDiff = touchStartX - touchEndX;
+    return () => window.removeEventListener('resize', handleResize);
+  }, [profileuuid]);
 
-        if (touchDiff > 50) {
-          navigateProfile(1);
-        } else if (touchDiff < -50) {
-          navigateProfile(-1);
-        }
-      }
-    };
-
-    const navigateProfile = (direction) => {
-      const currentIndex = dynamicProfiles.findIndex((profile) => profile === selectedUser);
-      const newIndex = (currentIndex + direction + dynamicProfiles.length) % dynamicProfiles.length;
-
-      setSelectedUser(dynamicProfiles[newIndex]);
-    };
-
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('touchstart', handleTouchStart);
-    window.addEventListener('touchmove', handleTouchMove);
-    window.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [openModalFriend, openModalUser, dynamicProfiles, selectedUser]);
+  const handleAvatarLoad = (profileId) => {
+    setLoadingAvatar((prevLoadingAvatar) => ({
+      ...prevLoadingAvatar,
+      [profileId]: false,
+    }));
+  };
 
   const handleOpenModalForFriend = (profile) => {
     setSelectedUser(profile);
@@ -113,69 +84,75 @@ const StoryList = ({ colors }) => {
     setOpenModalFriend(false);
   };
 
-  const handleOpenModalForUser = (profile) => {
-    setSelectedUser(profile);
+  const handleOpenModalForUser = () => {
     setOpenModalUser(true);
-  }
+  };
 
   const handleCloseModalUser = () => {
     setOpenModalUser(false);
-  }
+  };
 
-  const sliderSettings = {
+  const [sliderSettings, setSliderSettings] = useState({
     dots: false,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToScroll: 1,
     arrows: true,
     swipe: true,
     initialSlide: 0,
-    slidesToShow: 6,
-  };
-
-  if (window.innerWidth < 600) {
-    sliderSettings.slidesToShow = 2;
-  } else if (window.innerWidth < 900) {
-    sliderSettings.slidesToShow = 4;
-  }
+    slidesToShow: 5,
+    vertical: false,
+  });
 
   return (
-    <div style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, backgroundColor: colors.backgroundColor }} className='w-100 p-3 mt-4 d-flex justify-content-around align-items-center'>
-
-      {/* userStory */}
-      <div style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <IconButton style={{ color: colors.iconColor }} onClick={() => handleOpenModalForUser(selectedUser)}>
-            <Avatar style={{ cursor: 'pointer' }} alt={loginUserUsername} src={userPhotoUrl} />
-          </IconButton>
-        </div>
-        <div style={{ color: colors.textColor, textAlign: 'center' }}>
-          {loginUserUsername}
-        </div>
-      </div>
-
-      {/* friendStory */}
-      <Slider {...sliderSettings} className='w-50 mx-auto'>
-        {dynamicProfiles.map((profile) => (
-          <div key={profile.id} style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <div>
+      {loadingProfiles ? (
+        <p style={{ color: colors.textColor, justifyContent: 'center', display: 'flex', alignContent: 'center' }}>Loading...</p>
+      ) : (
+        <div style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, backgroundColor: colors.backgroundColor }} className='w-100 p-3 mt-4 d-flex justify-content-around align-items-center'>
+          {/* User Story */}
+          <div style={{ justifyContent: 'center', alignItems: 'center' }}>
             <div style={{ textAlign: 'center' }}>
-              <IconButton style={{ color: colors.iconColor }} onClick={() => handleOpenModalForFriend(profile)}>
-                <Avatar style={{ cursor: 'pointer' }} alt={profile.name} src={profile.image} />
+              <IconButton style={{ color: colors.iconColor }} onClick={handleOpenModalForUser}>
+                {loadingAvatar[userPhotoUrl] ? (
+                  <CircularProgress size={30} style={{ color: colors.iconColor }} />
+                ) : (
+                  <Avatar style={{ cursor: 'pointer' }} alt={loginUserUsername} src={userPhotoUrl} onLoad={() => handleAvatarLoad(userPhotoUrl)} />
+                )}
               </IconButton>
             </div>
             <div style={{ color: colors.textColor, textAlign: 'center' }}>
-              {profile.name}
+              {loginUserUsername}
             </div>
           </div>
-        ))}
-      </Slider>
 
-      {/* New UserModal component */}
-      <FriendStory open={openModalFriend} onClose={handleCloseModalForFriend} selectedUser={selectedUser} colors={colors} uuid={profileuuid} />
+          {/* Friend Stories */}
+          <Slider {...sliderSettings} className='w-50 mx-auto' style={{ flexDirection: 'row' }}>
+            {dynamicProfiles.map((profile) => (
+              <div key={profile.uuid} style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <IconButton style={{ color: colors.iconColor }} onClick={() => handleOpenModalForFriend(profile)}>
+                    {loadingAvatar[profile.photoURL] ? (
+                      <CircularProgress size={30} style={{ color: colors.iconColor }} />
+                    ) : (
+                      <Avatar style={{ cursor: 'pointer' }} alt={profile.username} src={profile.photoURL || `https://via.placeholder.com/200`} onLoad={() => handleAvatarLoad(profile.photoURL)} />
+                    )}
+                  </IconButton>
+                </div>
+                <div style={{ color: colors.textColor, textAlign: 'center' }}>
+                  {profile.username}
+                </div>
+              </div>
+            ))}
+          </Slider>
 
-      {/* New UserModal component */}
-      <UserStory open={openModalUser} onClose={handleCloseModalUser} selectedUser={selectedUser} colors={colors} uuid={profileuuid} username={loginUserUsername} />
+          {/* Friend Story Modal */}
+          <FriendStory open={openModalFriend} onClose={handleCloseModalForFriend} colors={colors} uuid={profileuuid} selectedUser={selectedUser} />
 
+          {/* User Story Modal */}
+          <UserStory open={openModalUser} onClose={handleCloseModalUser} selectedUser={selectedUser} colors={colors} uuid={profileuuid} username={loginUserUsername} />
+        </div>
+      )}
     </div>
   );
 };
