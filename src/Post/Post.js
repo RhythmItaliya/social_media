@@ -852,6 +852,8 @@ export default function InstagramCard() {
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>
       ) : error ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
+      ) : newUserProfile.posts.length === 0 ? (
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>No posts found</p>
       ) : (
         <div>
           {newUserProfile.posts && newUserProfile.posts.map((post) => (

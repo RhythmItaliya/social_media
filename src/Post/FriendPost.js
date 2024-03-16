@@ -627,6 +627,8 @@ export default function FriendPost() {
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>
       ) : error ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
+      ) : mergedData.length === 0 ? (
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>No post found</p>
       ) : (
         <div>
           {mergedData.map((post) => (
