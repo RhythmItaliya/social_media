@@ -75,7 +75,7 @@ function PostProfile() {
     };
 
     return (
-        <div>
+        <div className='user-select-none'>
             {/* "See All" Link/Button */}
             <Typography style={{
                 fontSize: '14px',

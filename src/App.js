@@ -28,7 +28,7 @@ const App = () => {
   const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
   // const isAuthenticated = !!cookies.auth;
   const isAuthenticated = !!cookies.auth || !!cookies['X-Access-Token'] || !!cookies.token;
- 
+
   return (
     <BrowserRouter>
       <GlobalLoading />
@@ -62,28 +62,7 @@ const App = () => {
           <Route path="/add" element={<ProtectedRoute condition={isAuthenticated}><VerticalTabs /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute condition={isAuthenticated}><VerticalTabs /></ProtectedRoute>} />
 
-          <Route
-            path="/:username"
-            element={
-              isAuthenticated ? (
-                <ProfileRoute />
-              ) : (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100vh',
-                    backgroundColor: '#f0f0f0',
-                  }}
-                >
-                  <div style={{ textAlign: 'center' }}>
-                    <p>Please log in to view profiles.</p> <Link to="/login">Go to Login</Link>
-                  </div>
-                </div>
-              )
-            }
-          />
+          <Route path="/:username" element={<ProfileRoute />} />
 
           <Route path="*" element={<NotFound />} />
 
