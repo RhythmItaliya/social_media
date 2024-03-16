@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import NotFound from "../others/NotFound";
 import PublicCard from "./PublicCard";
 import { DarkModeProvider, useDarkMode } from '../theme/Darkmode';
@@ -47,6 +47,8 @@ const ProfileRoute = () => {
     const [isdecryptedUuid, setDecryptedUuid] = useState(null);
     const [responseStatus, setResponseStatus] = useState(null);
     const encryptionKey = 'ASDCFVBNLKMNBSDFVBNJNBCV';
+
+    const navigate = useNavigate();
     const loadingBarRef = useRef(null);
 
     useEffect(() => {
@@ -56,6 +58,10 @@ const ProfileRoute = () => {
                 const response = await fetch(`http://localhost:8080/${username}`);
                 setResponseStatus(response.status);
                 if (!response.ok) {
+                    const timeout = setTimeout(() => {
+                        navigate('/login');
+                    }, 4000);
+                    return () => clearTimeout(timeout);
                     throw new Error('User not found');
                 }
 
@@ -63,6 +69,10 @@ const ProfileRoute = () => {
                     .split('; ')
                     .find((row) => row.startsWith('token='));
                 if (!tokenCookie) {
+                    const timeout = setTimeout(() => {
+                        navigate('/login');
+                    }, 4000);
+                    return () => clearTimeout(timeout);
                     throw new Error('Token cookie not found. Please log in.');
                 }
 
@@ -90,7 +100,7 @@ const ProfileRoute = () => {
                 loadingBarRef.current.complete();
             }
         };
-    }, [username]);
+    }, [username, navigate, loadingBarRef]);
 
     useEffect(() => {
         if (responseStatus === 202) {
@@ -102,6 +112,10 @@ const ProfileRoute = () => {
                         ?.split('=')[1];
 
                     if (!encryptedUuidCookie) {
+                        const timeout = setTimeout(() => {
+                            navigate('/login');
+                        }, 4000);
+                        return () => clearTimeout(timeout);
                         throw new Error('Token cookie not found. Please log in.');
                     }
 
@@ -116,7 +130,7 @@ const ProfileRoute = () => {
 
             fetchDecryptedUuid();
         }
-    }, [responseStatus, encryptionKey]);
+    }, [responseStatus, encryptionKey, navigate]);
 
     if (loading) {
         return (
@@ -126,7 +140,7 @@ const ProfileRoute = () => {
                     height={3}
                     color="#f11946"
                 />
-                <p>Loading...</p>
+                <p style={{ color: colors.textColor, textAlign: 'center' }}>Loading...</p>
             </div>
         );
     }
@@ -142,7 +156,7 @@ const ProfileRoute = () => {
     if (responseStatus === 202 && !isdecryptedUuid) {
         return (
             <div>
-                <p>Please log in to view this profile.</p>
+                <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '20px' }}>Please log in to view this profile.</p>
             </div>
         );
     }
