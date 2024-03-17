@@ -124,7 +124,7 @@ export default function InstagramCard() {
 
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/find/api/posts/${profileUUID}`);
+        const response = await fetch(`http://localhost:8080/find/api/posts/user/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }

@@ -23,6 +23,7 @@ import './profilepage.css';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import LoadingBar from 'react-top-loading-bar';
+import { ArrowForward, ArrowOutwardSharp } from '@mui/icons-material';
 
 
 const lightModeColors = {
@@ -381,13 +382,13 @@ const ProfilePage = () => {
                   startIcon={<ArrowBackIcon style={{ color: colors.iconColor }} />}
                   style={{ color: colors.textColor }}
                 >
-                  Back
+                  <ArrowBackIcon />
                 </IconButton>
               )}
 
               {currentStep < steps.length - 1 && (
                 <IconButton type="button" variant="contained" color="primary" onClick={handleNextClick}>
-                  {currentStep === 0 ? "Let's Start" : "Next"}
+                  {currentStep === 0 ? "Let's Start" : <ArrowForward />}
                 </IconButton>
               )}
 

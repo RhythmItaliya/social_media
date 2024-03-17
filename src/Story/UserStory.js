@@ -287,7 +287,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
       }}
       style={{
         backgroundColor: colors.transparentColor
-    }}
+      }}
     >
       <Fade in={open}>
         <div style={{

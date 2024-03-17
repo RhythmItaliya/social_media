@@ -123,12 +123,15 @@ export default function FriendPost() {
 
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/find/api/posts/${profileUUID}`);
+        const response = await fetch(`http://localhost:8080/find/api/posts/friend/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
+
+        console.log('friend data', data)
+        console.log(profileUUID);
 
         const updatedUserProfile = {
           posts: data.friendsPosts.map((post) => ({

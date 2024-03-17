@@ -14,11 +14,36 @@ export const joinRoom = (senderUuid, receiverUuid, updateMessages) => {
   const room = generateRoomId(senderUuid, receiverUuid);
   console.log(`Joining room: ${room}`);
 
+  
+
   socket.emit('join-room', { room });
+
+  const fetchMessages = async () => {
+    try {
+      if (receiverUuid) {
+        const response = await fetch(`http://localhost:8080/get-messages/${receiverUuid}`);
+        const data = await response.json();
+ 
+
+        if (response.ok) {
+          const allMessages = [...data.messages];
+          allMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+          updateMessages(allMessages || []);
+        } else {
+          console.error('Error fetching messages:', data.error);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
 
   const handleNewMessage = (newMessage) => {
     console.log('New message received:', newMessage);
-    updateMessages((prevMessages) => [...prevMessages, newMessage]);
+    fetchMessages()
+    // updateMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
   socket.on('new-message', handleNewMessage);

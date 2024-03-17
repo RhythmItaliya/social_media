@@ -67,24 +67,23 @@ const ChatWindow = ({ selectedUser }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
 
-  const handleEmojiSelect = (emoji) => {
-    const emojiUnicode = emoji.unified.split('-').map((code) => String.fromCodePoint(`0x${code}`)).join('');
-    setNewMessage((prevMessage) => prevMessage + emojiUnicode);
-    setSelectedEmoji(emojiUnicode);
-    const inputElement = document.getElementById('chatInput');
-    if (inputElement) {
-      inputElement.value += emojiUnicode;
-    }
+
+  const handleEmojiSelect = (emojiObject) => {
+    // const emojiUnicode = emoji.unified.split('-').map((code) => String.fromCodePoint(`0x${code}`)).join('');
+    setNewMessage((prevInput) => prevInput + emojiObject.emoji);
+    // setSelectedEmoji(emojiUnicode);
+    // const inputElement = document.getElementById('chatInput');
+    // if (inputElement) {
+    //   inputElement.value += emojiUnicode;
+    // }
   };
-
-
-
 
   const fetchMessages = async () => {
     try {
       if (selectedUser && receiverUUID) {
         const response = await fetch(`http://localhost:8080/get-messages/${receiverUUID}`);
         const data = await response.json();
+
 
         if (response.ok) {
           const allMessages = [...data.messages];
@@ -108,9 +107,9 @@ const ChatWindow = ({ selectedUser }) => {
   const handleSendMessage = async () => {
     const currentRoom = generateRoomId(senderUuid, receiverUUID);
     const messageToSend = selectedEmoji ? `${newMessage} ${selectedEmoji}` : newMessage;
-
+    fetchMessages()
     try {
-      await sendMessage(senderUuid, receiverUUID, messageToSend, currentRoom);
+      sendMessage(senderUuid, receiverUUID, messageToSend, currentRoom);
       setNewMessage('');
       setSelectedEmoji(null);
     } catch (error) {
@@ -118,17 +117,23 @@ const ChatWindow = ({ selectedUser }) => {
       return;
     }
 
-    setAllMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        content: messageToSend,
-        sender: senderUuid,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+    // setAllMessages((prevMessages) => [
+    //   ...prevMessages,
+    //   {
+    //     content: messageToSend,
+    //     sender: senderUuid,
+    //     createdAt: new Date().toISOString(),
+    //   },
+    // ]);
   };
 
 
+
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [allMessages]);
 
   const joinChatRoom = () => {
     if (selectedUser && receiverUUID) {
@@ -169,6 +174,7 @@ const ChatWindow = ({ selectedUser }) => {
     return formattedTime;
   };
 
+  console.log("all messeges123", allMessages)
 
 
   return (
@@ -197,6 +203,7 @@ const ChatWindow = ({ selectedUser }) => {
           <div style={{ flex: 1, overflowY: 'auto', borderLeft: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '10px' }}>
             {allMessages.slice().reverse().map((message, index) => (
               <div key={`message-${index}`} className={`d-flex flex-row justify-content-${message.sender === senderUuid ? 'end' : 'start'} mb-4`}>
+                {console.log()}
                 {message.sender !== senderUuid && (
                   <Avatar src={selectedUser?.photoURL || ''} alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} style={{ width: '30px', height: '30px', marginRight: '5px' }} />
                 )}
@@ -211,6 +218,7 @@ const ChatWindow = ({ selectedUser }) => {
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
         )
       }
@@ -251,7 +259,7 @@ const ChatWindow = ({ selectedUser }) => {
 
             {showEmojiPicker && (
               <div style={{ position: 'fixed', bottom: '70px', right: '10px', zIndex: '1', overflow: 'auto' }}>
-                <EmojiPicker set='emojione' onSelect={handleEmojiSelect} />
+                <EmojiPicker set='emojione' onEmojiClick={handleEmojiSelect} />
               </div>
             )}
 

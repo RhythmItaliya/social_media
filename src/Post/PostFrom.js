@@ -54,12 +54,16 @@ const PostForm = () => {
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
-    const [uploadProgress, setUploadProgress] = useState(0);
     const [formState, setFormState] = useState(initialState);
 
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
+
+
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const ref = useRef(null);
 
     const {
         caption,
@@ -71,19 +75,6 @@ const PostForm = () => {
         validationMessage,
         isPublic,
     } = formState;
-
-    const [loading, setLoading] = useState(false);
-    const ref = useRef(null);
-
-    const startLoading = () => {
-        setLoading(true);
-        ref.current.continuousStart();
-    };
-
-    const finishLoading = () => {
-        setLoading(false);
-        ref.current.complete();
-    };
 
     const toggleVisibility = () => {
         setFormState(prevState => ({ ...prevState, isPublic: !prevState.isPublic }));
@@ -133,7 +124,9 @@ const PostForm = () => {
         };
     }, [dispatch]);
 
+    // API_UPLOAD
     const handleSubmit = async e => {
+
         e.preventDefault();
 
         if (!postBase64) {
@@ -142,7 +135,14 @@ const PostForm = () => {
         }
 
         try {
-            startLoading();
+
+            setLoading(true);
+            const intervals = [10, 20, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 100];
+            for (const interval of intervals) {
+                await simulateUpload(interval);
+                setUploadProgress(interval);
+            }
+
             const response = await fetch(`http://localhost:8080/api/create/posts/${profileUUID}`, {
                 credentials: 'include',
                 method: 'POST',
@@ -169,11 +169,9 @@ const PostForm = () => {
             dispatch(removePostBase64());
 
             message.success({
-                content: data.message,
+                content: 'Post Upload Successfully.',
                 duration: 3,
             });
-
-            finishLoading();
 
             navigate('/post');
         } catch (error) {
@@ -182,9 +180,18 @@ const PostForm = () => {
                 duration: 3,
             });
             console.error('Error creating post:', error.message);
-
-            finishLoading();
+        } finally {
+            setLoading(false);
+            setUploadProgress(0);
         }
+    };
+
+    const simulateUpload = (interval) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, interval);
+        });
     };
 
     return (
