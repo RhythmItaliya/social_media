@@ -122,7 +122,13 @@ const ProfileAvatarSelector = ({ onCroppedImage }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '16px' }}>
-            {loading && <p>Loading...</p>}
+            {loading && <p>
+                <div className="loading-dots">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </p>}
             {error && <p style={{ color: 'red' }}>{error.message}</p>}
 
             <FormControl style={{ display: 'flex', justifyContent: 'center', width: '350px' }}>

@@ -141,7 +141,13 @@ const ProfileRoute = () => {
                     height={3}
                     color="#ec1b90"
                 />
-                <p style={{ color: colors.textColor, textAlign: 'center' }}>Loading...</p>
+                <p style={{ color: colors.textColor, textAlign: 'center' }}>
+                    <div className="loading-dots">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </p>
             </div>
         );
     }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { Done, Close, RefreshSharp } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
-import { ScaleLoader } from 'react-spinners';
+
 import IconButton from '@mui/material/IconButton';
 import { Grid } from '@mui/material';
 import './abc.css';
@@ -16,8 +16,7 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-
-const ReceiverComponent = ({ colors }) => {
+const MarkasRead = ({ colors }) => {
     const receiverUUID = useSelector((state) => state.profileuuid.uuid);
     const [loading, setLoading] = useState(true);
     const [receiverData, setReceiverData] = useState([]);
@@ -213,9 +212,8 @@ const ReceiverComponent = ({ colors }) => {
 
     return (
         <div
-            className='mt-5 p-1 overflow-y-scroll w-100'
+            className='p-1 w-100'
             style={{
-                height: '700px',
                 border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
             }}>
 
@@ -321,4 +319,4 @@ const ReceiverComponent = ({ colors }) => {
     );
 };
 
-export default ReceiverComponent;
+export default MarkasRead;

@@ -20,6 +20,8 @@ import Terms from './pages/Terms';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 
+import '../src/loading.css';
+
 const App = () => {
   const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
   // const isAuthenticated = !!cookies.auth;

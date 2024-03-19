@@ -110,7 +110,13 @@ const SuggestedFriends = ({ colors }) => {
 
             {loading && (
                 <div className="loading-spinner">
-                    <p style={{ color: colors.textColor }}>Loading...</p>
+                    <p style={{ color: colors.textColor }}>
+                        <div className="loading-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </p>
                 </div>
             )}
             {!loading && userProfiles.length === 0 && (

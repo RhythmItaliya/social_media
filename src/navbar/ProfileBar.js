@@ -4,12 +4,15 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { IconButton, Avatar, Typography } from '@mui/material';
-import { Notifications, PersonAdd } from '@mui/icons-material';
+import { KeyboardDoubleArrowDown, Notifications, PersonAdd } from '@mui/icons-material';
 import { useDarkMode } from '../theme/Darkmode';
 import Logout from '../others/Logout';
 import Layout from '../theme/Layout';
 import { useSelector } from 'react-redux';
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import Tooltip from '@mui/material/Tooltip';
+import MarkasRead from './MarkasRead';
+
+import './Merger.css';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -59,6 +62,27 @@ export default function Profilebar({ toggleStoryVisibility }) {
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+    const [isOpen, setIsOpen] = React.useState(false);
+    const dropdownRef = React.useRef(null);
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [dropdownRef]);
+
+    const handleClick = () => {
+        setIsOpen(!isOpen);
+    };
+
+
     // userPhotoUrl
     const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
 
@@ -80,20 +104,31 @@ export default function Profilebar({ toggleStoryVisibility }) {
                 <Toolbar>
                     <CenteredIcons>
                         {/* Notification icon */}
-                        <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
-                            <Notifications />
-                        </StyledIconButton>
+                        <Tooltip title="Notifications">
+                            <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
+                                <Notifications />
+                            </StyledIconButton>
+                        </Tooltip>
 
                         {/* Friend request icon */}
-                        <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
-                            <PersonAdd />
-                        </StyledIconButton>
+                        <Tooltip title="Friend Requests">
+                            <StyledIconButton color="inherit" style={{ color: colors.iconColor }} onClick={handleClick}>
+                                <PersonAdd />
+                            </StyledIconButton>
+                        </Tooltip>
 
-                        <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
-                            <KeyboardDoubleArrowLeftIcon onClick={toggleStoryVisibility} style={{ cursor: 'pointer' }} />
-                        </StyledIconButton>
+                        {/* Story */}
+                        <Tooltip title="See Story">
+                            <StyledIconButton color="inherit" style={{ color: colors.iconColor }}>
+                                <KeyboardDoubleArrowDown onClick={toggleStoryVisibility} style={{ cursor: 'pointer' }} />
+                            </StyledIconButton>
+                        </Tooltip>
                     </CenteredIcons>
 
+
+                    <div ref={dropdownRef} className={`smooth-div ${isOpen ? 'open' : ''}`}>
+                        <MarkasRead colors={colors} />
+                    </div>
 
                     {/* User information */}
                     <UserInfo>

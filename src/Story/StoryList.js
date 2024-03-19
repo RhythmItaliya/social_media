@@ -109,7 +109,13 @@ const StoryList = ({ colors }) => {
   return (
     <div>
       {loadingProfiles ? (
-        <p style={{ color: colors.textColor, justifyContent: 'center', display: 'flex', alignContent: 'center' }}>Loading...</p>
+        <p style={{ color: colors.textColor, justifyContent: 'center', display: 'flex', alignContent: 'center' }}>
+          <div className="loading-dots">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </p>
       ) : (
         <div style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, backgroundColor: colors.backgroundColor }} className='w-100 p-3 mt-4 d-flex justify-content-around align-items-center'>
           {/* User Story */}

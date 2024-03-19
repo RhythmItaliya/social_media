@@ -678,7 +678,13 @@ export default function FriendPost() {
   return (
     <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       {loading ? (
-        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>
+          <div className="loading-dots">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </p>
       ) : error ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
       ) : mergedData.length === 0 ? (
@@ -907,8 +913,14 @@ export default function FriendPost() {
                     </IconButton>
                   </div>
 
-                  {/* {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Loading...</p>} */}
-                  {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}></p>}
+                  {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>
+                    <div className="loading-dots">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </p>}
+                  {/* {commentLoading && <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}></p>} */}
 
 
                   {(postComments[post.id] || []).map((comment) => (
