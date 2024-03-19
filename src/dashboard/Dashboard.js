@@ -9,7 +9,6 @@ import Cookies from 'js-cookie';
 import LoadingBar from 'react-top-loading-bar';
 // import LinearProgress from '@mui/material/LinearProgress';
 import '../App.css';
-import { LinearProgress } from '@material-ui/core';
 import config from '../configuration';
 
 
