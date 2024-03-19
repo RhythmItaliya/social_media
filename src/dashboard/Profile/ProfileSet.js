@@ -137,7 +137,7 @@ const ProfileSet = () => {
             {/* profile div */}
             <div className='gap-3' style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'space-around', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px', marginTop: '10px' }}>
                 {loading ? (
-                    <LoadingBar color={colors.spinnerColor} height={3} />
+                    <LoadingBar color="#ec1b90" height={3} />
                 ) : (
                     <div className='p-3 m-0 rounded-2'>
                         <Grid container alignItems="center" spacing={3}>

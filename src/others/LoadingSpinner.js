@@ -10,7 +10,7 @@ const LoadingSpinner = () => {
       <LoadingBar
         progress={loadingBarProgress}
         height={3}
-        color="#f11946"
+        color="#ec1b90"
         onLoaderFinished={() => setLoadingBarProgress(0)}
       />
     </>

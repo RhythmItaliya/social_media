@@ -188,7 +188,7 @@ const SearchAppBar = () => {
                     </Search>
                 </Toolbar>
             </AppBar>
-            <LoadingBar color={colors.spinnerColor} ref={loadingBarRef} />
+            <LoadingBar color="#ec1b90" ref={loadingBarRef} />
             <SearchOverlay
                 searchTerm={searchTerm}
                 searchResults={searchResults}

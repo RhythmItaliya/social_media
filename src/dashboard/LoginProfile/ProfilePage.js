@@ -400,7 +400,7 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
+        <LoadingBar progress={loadingBarProgress} height={3} color="#ec1b90" onLoaderFinished={() => setLoadingBarProgress(0)} />
 
       </animated.div>
     </Container>

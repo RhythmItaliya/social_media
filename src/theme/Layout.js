@@ -100,7 +100,7 @@ function Layout({ children }) {
 
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : ''}`}>
-      <LoadingBar color="#f11946" progress={progress} height={3} />
+      <LoadingBar color="#ec1b90" progress={progress} height={3} />
       <StyledIconButton color="inherit" onClick={handleDarkModeToggle} className="dark-mode-toggle-button">
         {isDarkMode ?
           <Brightness7Icon style={{ color: '#FFFFFF' }} /> : // Set color for dark mode

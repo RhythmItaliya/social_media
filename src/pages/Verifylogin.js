@@ -123,7 +123,7 @@ const VerifyLogin = () => {
                 </p>
             </div>
 
-            {loading && <LoadingBar progress={progress} color='#f11946' height={3} />}
+            {loading && <LoadingBar progress={progress} color='#ec1b90' height={3} />}
         </>
     );
 };

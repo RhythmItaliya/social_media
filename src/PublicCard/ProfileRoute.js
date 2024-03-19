@@ -139,7 +139,7 @@ const ProfileRoute = () => {
                 <LoadingBar
                     ref={loadingBarRef}
                     height={3}
-                    color="#f11946"
+                    color="#ec1b90"
                 />
                 <p style={{ color: colors.textColor, textAlign: 'center' }}>Loading...</p>
             </div>
