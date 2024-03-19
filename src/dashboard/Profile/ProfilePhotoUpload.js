@@ -3,6 +3,7 @@ import { PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Modal, Upload, Button, message } from 'antd';
 import '../Tab/vertical.css';
 import { useSelector } from 'react-redux';
+import config from '../../configuration';
 
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -47,7 +48,7 @@ const ProfilePhoto = () => {
 
 
                 // Check if a profile photo already exists for the user
-                const response = await fetch(`http://localhost:8080/profilephotoes/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -57,7 +58,7 @@ const ProfilePhoto = () => {
                 if (data.found) {
                     // If a profile photo exists, update it
                     try {
-                        const updateResponse = await fetch(`http://localhost:8080/profilephotoes/update/${uuid}`, {
+                        const updateResponse = await fetch(`${config.apiUrl}/profilephotoes/update/${uuid}`, {
                             method: 'PUT',
                             credentials: 'include',
                             headers: {
@@ -83,7 +84,7 @@ const ProfilePhoto = () => {
                 } else {
                     // If no profile photo exists, add a new one
                     try {
-                        const addResponse = await fetch(`http://localhost:8080/profilephotoes/${uuid}`, {
+                        const addResponse = await fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ const ProfilePhoto = () => {
     const handleDeleteImage = async () => {
         // Add logic to permanently delete the image
         try {
-            await fetch(`http://localhost:8080/profilephotoes/delete/${uuid}`, {
+            await fetch(`${config.apiUrl}/profilephotoes/delete/${uuid}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });

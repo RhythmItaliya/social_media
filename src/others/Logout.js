@@ -9,6 +9,7 @@ import './others.css';
 import { useDarkMode } from '../theme/Darkmode';
 import { persistStore } from 'redux-persist';
 import { store } from '../store/store';
+import config from '../configuration';
 
 const LogoutButton = ({ logoutUser }) => {
     const { isDarkMode } = useDarkMode();
@@ -16,7 +17,7 @@ const LogoutButton = ({ logoutUser }) => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('http://localhost:8080/logout', {
+            const response = await fetch(`${config.apiUrl}/auth/logout`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

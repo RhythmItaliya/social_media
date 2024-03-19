@@ -21,7 +21,7 @@
 //     useEffect(() => {
 //         const fetchUserData = async () => {
 //             try {
-//                 const response = await fetch(`http://localhost:8080/users/${uuid}`, {
+//                 const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
 //                     method: 'GET',
 //                     credentials: 'include',
 //                     headers: {

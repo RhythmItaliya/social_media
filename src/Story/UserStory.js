@@ -5,6 +5,7 @@ import AvatarEditor from 'react-avatar-editor';
 import { ChromePicker } from 'react-color';
 import { message } from 'antd';
 import { DeleteForever } from '@material-ui/icons';
+import config from '../configuration';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -92,7 +93,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
 
         const croppedImage = editor.getImageScaledToCanvas().toDataURL();
 
-        const response = await fetch(`http://localhost:8080/stories/${uuid}`, {
+        const response = await fetch(`${config.apiUrl}/stories/stories/${uuid}`, {
           credentials: 'include',
           method: 'POST',
           headers: {
@@ -154,7 +155,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:8080/get/stories/${uuid}`);
+      const response = await fetch(`${config.apiUrl}/stories/get/stories/${uuid}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -217,7 +218,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
   const handleDeleteStory = async () => {
     if (storyToDelete) {
       try {
-        const response = await fetch(`http://localhost:8080/delete/story/${storyToDelete}`, {
+        const response = await fetch(`${config.apiUrl}/stories/delete/story/${storyToDelete}`, {
           credentials: 'include',
           method: 'DELETE',
         });

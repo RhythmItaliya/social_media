@@ -4,6 +4,7 @@ import ImageListItem from '@mui/material/ImageListItem';
 import { Dialog, DialogContent, Typography, Link } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useDarkMode } from '../../theme/Darkmode';
+import config from '../../configuration';
 
 
 const lightModeColors = {
@@ -52,7 +53,7 @@ function PostProfile() {
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/user/posts/profile/${profileUUID}`)
+        fetch(`${config.apiUrl}/api/user/posts/profile/${profileUUID}`)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {

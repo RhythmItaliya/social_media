@@ -21,6 +21,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ArrowBack, ArrowBackIos } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import config from '../configuration';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -295,7 +296,7 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
         dataToUpdate = { [subOption.toLowerCase()]: apiData[subOption.toLowerCase()] };
       }
 
-      const response = await fetch(`http://localhost:8080/userProfile/update/${profileuuid}`, {
+      const response = await fetch(`${config.apiUrl}/userProfile/update/${profileuuid}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -314,7 +315,7 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/userProfile/get/${profileuuid}`, {
+        const response = await fetch(`${config.apiUrl}/userProfile/get/${profileuuid}`, {
           method: 'GET',
           credentials: 'include',
         });

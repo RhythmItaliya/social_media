@@ -17,6 +17,7 @@ import './ProfileSet.css';
 import { CloseOutlined } from '@material-ui/icons';
 import { useSelector } from 'react-redux';
 import { Close } from '@mui/icons-material';
+import config from '../../configuration';
 
 
 const lightModeColors = {
@@ -93,7 +94,7 @@ const CustomButton = () => {
         setFriendDrawerOpen(true);
         if (friend.length === 0) {
           try {
-            const friendsListResponse = await fetch(`http://localhost:8080/api/friendships/users/${profileUUID}`, {
+            const friendsListResponse = await fetch(`${config.apiUrl}/api/friendships/users/${profileUUID}`, {
               method: 'GET',
               credentials: 'include',
               headers: {
@@ -119,7 +120,7 @@ const CustomButton = () => {
         setCrushDrawerOpen(true);
         if (crushes.length === 0) {
           try {
-            const crushResponse = await fetch(`http://localhost:8080/get/userProfileCrushes/${profileUUID}`, {
+            const crushResponse = await fetch(`${config.apiUrl}/crushes/get/userProfileCrushes/${profileUUID}`, {
               method: 'GET',
               credentials: 'include',
               headers: {
@@ -130,6 +131,8 @@ const CustomButton = () => {
             if (crushResponse.ok) {
               const crushData = await crushResponse.json();
               setCrushes(crushData.crushesInfo);
+              // Inside the useEffect for crushes
+              console.log("Crushes:", crushData.crushesInfo);
             } else {
               console.error('Failed to fetch crushes data');
             }
@@ -142,7 +145,7 @@ const CustomButton = () => {
         setIgnoreDrawerOpen(true);
         if (ignores.length === 0) {
           try {
-            const ignoreResponse = await fetch(`http://localhost:8080/get/userProfileIgnores/${profileUUID}`, {
+            const ignoreResponse = await fetch(`${config.apiUrl}/ignores/get/userProfileIgnores/${profileUUID}`, {
               method: 'GET',
               credentials: 'include',
               headers: {
@@ -152,6 +155,7 @@ const CustomButton = () => {
             if (ignoreResponse.ok) {
               const ignoreData = await ignoreResponse.json();
               setIgnores(ignoreData.ignoreInfo);
+
             } else {
               console.error('Failed to fetch ignores data');
             }
@@ -206,7 +210,7 @@ const CustomButton = () => {
   useEffect(() => {
     const fetchFriendCount = async () => {
       try {
-        const friendCountResponse = await fetch(`http://localhost:8080/api/friendships-crushes-ignores/count/${profileUUID}`, {
+        const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships-crushes-ignores/count/${profileUUID}`, {
           method: 'GET',
           credentials: 'include',
           headers: {

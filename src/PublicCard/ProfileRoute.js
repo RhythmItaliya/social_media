@@ -5,6 +5,7 @@ import PublicCard from "./PublicCard";
 import { DarkModeProvider, useDarkMode } from '../theme/Darkmode';
 import CryptoJS from 'crypto-js';
 import LoadingBar from "react-top-loading-bar";
+import config from "../configuration";
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -55,7 +56,7 @@ const ProfileRoute = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:8080/${username}`);
+                const response = await fetch(`${config.apiUrl}/${username}`);
                 setResponseStatus(response.status);
                 if (!response.ok) {
                     const timeout = setTimeout(() => {
@@ -78,7 +79,7 @@ const ProfileRoute = () => {
 
                 const data = await response.json();
                 if (response.status === 202 && data.success) {
-                    const profileResponse = await fetch(`http://localhost:8080/found/${username}`);
+                    const profileResponse = await fetch(`${config.apiUrl}/found/${username}`);
                     const profileData = await profileResponse.json();
                     setUserProfile(profileData.user);
                 } else {

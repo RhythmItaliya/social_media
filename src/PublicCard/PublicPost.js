@@ -3,6 +3,7 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import { Dialog, DialogContent, Typography, Link } from '@mui/material';
 import { useDarkMode } from '../theme/Darkmode';
+import config from '../configuration';
 
 
 const lightModeColors = {
@@ -53,7 +54,7 @@ function PublicPost({ profileUUID }) {
     const [accessDenied, setAccessDenied] = useState(false);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/user/posts/profile/public/${profileUUID}`)
+        fetch(`${config.apiUrl}/api/user/posts/profile/public/${profileUUID}`)
             .then(response => {
                 if (response.status === 403) {
                     console.error('Access denied. Users are not friends.');

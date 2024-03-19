@@ -23,6 +23,7 @@ import {
     DialogActions,
 } from '@mui/material';
 import LoadingBar from 'react-top-loading-bar';
+import config from '../../configuration';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -76,7 +77,7 @@ const ProfileSet = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/users/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -109,7 +110,7 @@ const ProfileSet = () => {
     useEffect(() => {
         const fetchUserPostCount = async () => {
             try {
-                const postCountResponse = await fetch(`http://localhost:8080/api/userPostsCount/${profileUUID}`, {
+                const postCountResponse = await fetch(`${config.apiUrl}/api/userPostsCount/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

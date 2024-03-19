@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Backdrop, Fade, IconButton, Avatar } from '@mui/material';
 import { Close, ArrowBack, ArrowForward } from '@mui/icons-material';
+import config from '../configuration';
 
 const FriendStory = ({ open, onClose, selectedUser, colors }) => {
     const [storyDetails, setStoryDetails] = useState(null);
@@ -10,7 +11,7 @@ const FriendStory = ({ open, onClose, selectedUser, colors }) => {
     useEffect(() => {
         const fetchStoryDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/get/friend/stories/${selectedUser.uuid}`, {
+                const response = await fetch(`${config.apiUrl}/stories/get/friend/stories/${selectedUser.uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

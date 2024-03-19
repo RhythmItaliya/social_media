@@ -25,7 +25,11 @@ import { useDarkMode } from '../theme/Darkmode';
 import { Link } from 'react-router-dom';
 
 import Comment from './Comment';
+import config from '../configuration';
 
+
+import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
+import FavoriteBorderTwoToneIcon from '@mui/icons-material/FavoriteBorderTwoTone';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -39,6 +43,7 @@ const lightModeColors = {
   valueTextColor: 'rgb(0,0,0)',
   linkColor: '#000',
   hashtagColor: 'darkblue',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const darkModeColors = {
@@ -53,6 +58,7 @@ const darkModeColors = {
   valueTextColor: '#ffffff',
   linkColor: '#CCC8',
   hashtagColor: '#8A2BE2',
+  transparentColor: 'rgba(255, 255, 255, 0.5)'
 };
 
 const hexToRgb = (hex) => {
@@ -116,6 +122,7 @@ export default function FriendPost() {
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
+
   // POST_FACTCH_FRIEND -------------------------------------------------
   useEffect(() => {
     const fetchPosts = async () => {
@@ -123,15 +130,12 @@ export default function FriendPost() {
 
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/find/api/posts/friend/${profileUUID}`);
+        const response = await fetch(`${config.apiUrl}/find/api/posts/friend/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-
-        console.log('friend data', data)
-        console.log(profileUUID);
 
         const updatedUserProfile = {
           posts: data.friendsPosts.map((post) => ({
@@ -154,7 +158,8 @@ export default function FriendPost() {
               month: 'long',
               day: 'numeric',
             }),
-          }))
+          })),
+          likedPosts: data.likedPosts
         };
 
         const updatedUserinfo = {
@@ -206,12 +211,22 @@ export default function FriendPost() {
   }, [mergedData, dispatch]);
 
 
-
   // Like click ------------------------------------
   const [likeSuccess, setLikeSuccess] = React.useState(false);
+
+
+  const getIcon = (postId) => {
+    // Check if the post is liked
+    const isLiked = likedPosts.includes(postId);
+    // Determine which icon to display based on the liked status
+    return isLiked ? <FavoriteTwoToneIcon style={{ color: colors.iconColor }} /> : <FavoriteBorderTwoToneIcon style={{ color: colors.iconColor }} />;
+  };
+
+
   const handleLikeClick = async (postId) => {
     try {
-      const response = await fetch('http://localhost:8080/post/like', {
+      // Make a POST request to like/unlike the post
+      const response = await fetch(`${config.apiUrl}/post/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -225,32 +240,50 @@ export default function FriendPost() {
 
       if (!response.ok) {
         console.error('Failed to update like status');
-        setLikeSuccess(false);
         return;
       }
 
+      const responseData = await response.json();
+
+      // Update likeCounts based on server response
+      setLikeCounts((prevLikeCounts) => ({
+        ...prevLikeCounts,
+        [postId]: responseData.like ? (prevLikeCounts[postId] || 0) + 1 : (prevLikeCounts[postId] || 0) - 1,
+      }));
+
+      // Update likedPosts based on server response
       setLikedPosts((prevLikedPosts) => {
-        if (prevLikedPosts.includes(postId)) {
-          return prevLikedPosts.filter((id) => id !== postId);
-        } else {
+        if (responseData.like) {
           return [...prevLikedPosts, postId];
+        } else {
+          return prevLikedPosts.filter((id) => id !== postId);
         }
       });
 
-      setLikeCounts((prevLikeCounts) => {
-        const updatedCounts = { ...prevLikeCounts };
-        updatedCounts[postId] = likedPosts.includes(postId) ? updatedCounts[postId] - 1 : (updatedCounts[postId] || 0) + 1;
-        return updatedCounts;
+      // Update mergedData to reflect the like status
+      setMergedData((prevMergedData) => {
+        const updatedMergedData = prevMergedData.map((existingPost) => {
+          if (existingPost.id === postId) {
+            const updatedLikedPosts = responseData.like
+              ? [...(existingPost.likedPosts || []), profileUUID]
+              : (existingPost.likedPosts || []).filter((id) => id !== profileUUID);
+            return { ...existingPost, likedPosts: updatedLikedPosts };
+          }
+          return existingPost;
+        });
+        return updatedMergedData;
       });
-
-      setLikeSuccess(true);
-      console.log('likeSuccess:', likeSuccess);
-      console.log('colors.iconColor:', colors.iconColor);
     } catch (error) {
       console.error('Error in handleLikeClick:', error);
-      setLikeSuccess(false);
     }
   };
+
+
+
+
+
+
+
 
   // Share click ------------------------------------
   const handleShareClick = (postId) => {
@@ -271,7 +304,7 @@ export default function FriendPost() {
   // Comment Count....................................................................................
   const fetchUserData = async (postId) => {
     try {
-      const commentCountResponse = await fetch(`http://localhost:8080/api/post/comments/count/${postId}`, {
+      const commentCountResponse = await fetch(`${config.apiUrl}/api/post/comments/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -280,15 +313,33 @@ export default function FriendPost() {
       });
 
       if (!commentCountResponse.ok) {
-        console.error('Failed to fetch post count');
-        throw new Error('Failed to fetch post count');
+        throw new Error('Failed to fetch comment count');
+      }
+
+      const likeCountResponse = await fetch(`${config.apiUrl}/api/post/likes/count/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!likeCountResponse.ok) {
+        throw new Error('Failed to fetch like count');
       }
 
       const commentData = await commentCountResponse.json();
+      const likeData = await likeCountResponse.json();
 
+      // Update state with both like and comment counts for the post
       setCommentCounts((prevCounts) => ({
         ...prevCounts,
         [postId]: commentData.commentCount,
+      }));
+
+      setLikeCounts((prevCounts) => ({
+        ...prevCounts,
+        [postId]: likeData.likeCount,
       }));
     } catch (error) {
       console.error(error);
@@ -302,7 +353,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Fetch comments for the post
-      const response = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +391,7 @@ export default function FriendPost() {
 
 
       // Like comment 
-      const likedCommentsResponse = await fetch(`http://localhost:8080/find/api/user/liked-comments/${profileUUID}`, {
+      const likedCommentsResponse = await fetch(`${config.apiUrl}/find/api/user/liked-comments/${profileUUID}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -379,7 +430,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Make a POST request to the server to save the comment
-      const response = await fetch('http://localhost:8080/api/post/comment', {
+      const response = await fetch(`${config.apiUrl}/api/post/comment`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -399,7 +450,7 @@ export default function FriendPost() {
       }
 
       // After successfully posting the comment, fetch the updated comments for the post
-      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -451,7 +502,7 @@ export default function FriendPost() {
     try {
 
       // Make a POST request to the server to update the comment likes
-      const likeResponse = await fetch('http://localhost:8080/api/post/comment/like', {
+      const likeResponse = await fetch(`${config.apiUrl}/api/post/comment/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -468,7 +519,7 @@ export default function FriendPost() {
       }
 
       // After successfully updating the comment likes, fetch the updated comments for the post
-      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -512,7 +563,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Make a DELETE request to the server to delete the comment
-      const response = await fetch(`http://localhost:8080/api/delete/comment/${commentId}`, {
+      const response = await fetch(`${config.apiUrl}/api/delete/comment/${commentId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -642,7 +693,6 @@ export default function FriendPost() {
               backgroundColor: colors.backgroundColor,
               border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
             }}>
-
 
               <CardHeader
                 avatar={
@@ -782,19 +832,30 @@ export default function FriendPost() {
 
               {/* ICON */}
               <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
-                <IconButton
-                  style={{
-                    color: likeSuccess ? '#ff7f00' : colors.iconColor,
-                  }}
-                  aria-label="like"
-                  onClick={() => handleLikeClick(post.id)}
-                  sx={instagramStyles.instagramIcons}
-                >
-                  <FavoriteIcon sx={{ color: likeCounts[post.id] === 1 ? '#7f7f7f' : colors.iconColor }} />
-                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
-                    {likeCounts[post.id] || 0}
-                  </Typography>
-                </IconButton>
+
+                <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
+                  <IconButton
+                    aria-label="like"
+                    onClick={() => handleLikeClick(post.id)}
+                    sx={instagramStyles.instagramIcons}
+                    style={{
+                      color: colors.iconColor
+                    }}
+                  >
+                    {likedPosts.includes(post.id) ? (
+                      <FavoriteTwoToneIcon /> // Display filled heart icon if post is liked
+                    ) : (
+                      <FavoriteBorderTwoToneIcon /> // Display outlined heart icon if post is not liked
+                    )}
+                    <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                      {likeCounts[post.id] || 0}
+                    </Typography>
+                  </IconButton>
+                  {/* Other icons for comment and share */}
+                </CardActions>
+
+
+
 
                 <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <CommentIcon sx={{ color: colors.iconColor }} />

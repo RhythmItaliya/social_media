@@ -12,6 +12,7 @@ import { message } from 'antd';
 import LocationPicker from './LocationPicker';
 import { removePostBase64 } from '../actions/authActions';
 import { useNavigate } from 'react-router-dom';
+import config from '../configuration';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -143,7 +144,7 @@ const PostForm = () => {
                 setUploadProgress(interval);
             }
 
-            const response = await fetch(`http://localhost:8080/api/create/posts/${profileUUID}`, {
+            const response = await fetch(`${config.apiUrl}/api/create/posts/${profileUUID}`, {
                 credentials: 'include',
                 method: 'POST',
                 headers: {

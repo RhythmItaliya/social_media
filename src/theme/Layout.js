@@ -6,6 +6,7 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import { useSelector } from 'react-redux';
 import LoadingBar from 'react-top-loading-bar';
+import config from '../configuration';
 
 function Layout({ children }) {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -24,7 +25,7 @@ function Layout({ children }) {
       try {
         let response;
         for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
-          response = await fetch(`http://localhost:8080/api/user/profiles/${userUUID}/mode`, {
+          response = await fetch(`${config.apiUrl}/api/user/profiles/${userUUID}/mode`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -67,7 +68,7 @@ function Layout({ children }) {
     try {
       let response;
       for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
-        response = await fetch(`http://localhost:8080/api/user/profiles/${userUUID}/mode`, {
+        response = await fetch(`${config.apiUrl}/api/user/profiles/${userUUID}/mode`, {
           method: 'PUT',
           credentials: 'include',
           headers: {

@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
+import config from '../configuration';
 
-const socket = io('http://localhost:8080', {});
+const socket = io(`${config.apiUrl}`, {});
 
 const connectSocket = () => {
   socket.on('connect', () => {
@@ -14,16 +15,16 @@ export const joinRoom = (senderUuid, receiverUuid, updateMessages) => {
   const room = generateRoomId(senderUuid, receiverUuid);
   console.log(`Joining room: ${room}`);
 
-  
+
 
   socket.emit('join-room', { room });
 
   const fetchMessages = async () => {
     try {
       if (receiverUuid) {
-        const response = await fetch(`http://localhost:8080/get-messages/${receiverUuid}`);
+        const response = await fetch(`${config.apiUrl}/get-messages/${receiverUuid}`);
         const data = await response.json();
- 
+
 
         if (response.ok) {
           const allMessages = [...data.messages];

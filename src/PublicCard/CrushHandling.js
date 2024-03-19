@@ -1,6 +1,7 @@
 // CrushHandling.js
 import React, { useEffect, useState } from "react";
 import { Grid, IconButton, Tooltip } from "@mui/material";
+import config from "../configuration";
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -21,7 +22,7 @@ const CrushHandling = ({ colors, uuid, profileUUID }) => {
             try {
                 setLoading(true);
 
-                const response = await fetch(`http://localhost:8080/get/public/crushesRequest/?senderId=${uuid}&receiverId=${profileUUID}`);
+                const response = await fetch(`${config.apiUrl}/crushes/get/public/crushesRequest/?senderId=${uuid}&receiverId=${profileUUID}`);
 
                 if (!response.ok) {
                     throw new Error(`Network response was not ok: ${response.status}`);
@@ -52,7 +53,7 @@ const CrushHandling = ({ colors, uuid, profileUUID }) => {
         try {
             setLoading(true);
 
-            const response = await fetch('http://localhost:8080/public/crushesRequest', {
+            const response = await fetch(`${config.apiUrl}/crushes/public/crushesRequest`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

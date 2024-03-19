@@ -24,6 +24,11 @@ import { Link } from 'react-router-dom';
 import Comment from './Comment';
 import LocationPicker from './LocationPicker';
 import { AddCircleOutline } from '@material-ui/icons';
+import config from '../configuration';
+
+
+import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
+import FavoriteBorderTwoToneIcon from '@mui/icons-material/FavoriteBorderTwoTone';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -115,7 +120,6 @@ export default function InstagramCard() {
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
-
   // POST_FACTCH -------------------------------------------------
   useEffect(() => {
     const fetchPosts = async () => {
@@ -124,7 +128,7 @@ export default function InstagramCard() {
 
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/find/api/posts/user/${profileUUID}`);
+        const response = await fetch(`${config.apiUrl}/find/api/posts/user/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -155,12 +159,15 @@ export default function InstagramCard() {
               day: 'numeric',
             }),
           })),
+          likedPosts: data.likedPosts
         };
 
         setNewUserProfile(updatedUserProfile);
+
         await Promise.all(data.posts.map(async (post) => {
           await fetchUserData(post.id);
         }));
+
 
         setLoading(false);
       } catch (error) {
@@ -181,9 +188,14 @@ export default function InstagramCard() {
 
   // Like click ------------------------------------
   const [likeSuccess, setLikeSuccess] = React.useState(false);
+
+  const getIcon = (liked) => {
+    return liked ? <FavoriteTwoToneIcon style={{ color: colors.iconColor }} /> : <FavoriteBorderTwoToneIcon style={{ color: colors.iconColor }} />;
+  };
+
   const handleLikeClick = async (postId) => {
     try {
-      const response = await fetch('http://localhost:8080/post/like', {
+      const response = await fetch(`${config.apiUrl}/post/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -201,6 +213,9 @@ export default function InstagramCard() {
         return;
       }
 
+      const responseData = await response.json();
+      setLikeSuccess(responseData.like);
+
       setLikedPosts((prevLikedPosts) => {
         if (prevLikedPosts.includes(postId)) {
           return prevLikedPosts.filter((id) => id !== postId);
@@ -209,21 +224,86 @@ export default function InstagramCard() {
         }
       });
 
+      // Update likedPosts state immediately after like/unlike
+      setNewUserProfile((prevUserProfile) => {
+        const updatedLikedPosts = prevUserProfile.likedPosts.includes(postId)
+          ? prevUserProfile.likedPosts.filter((id) => id !== postId)
+          : [...prevUserProfile.likedPosts, postId];
+
+        return {
+          ...prevUserProfile,
+          likedPosts: updatedLikedPosts,
+        };
+      });
+
       setLikeCounts((prevLikeCounts) => {
         const updatedCounts = { ...prevLikeCounts };
-        updatedCounts[postId] = likedPosts.includes(postId) ? updatedCounts[postId] - 1 : (updatedCounts[postId] || 0) + 1;
+        updatedCounts[postId] = likedPosts.includes(postId)
+          ? updatedCounts[postId] - 1
+          : (updatedCounts[postId] || 0) + 1;
         return updatedCounts;
       });
 
-      setLikeSuccess(true);
       console.log('likeSuccess:', likeSuccess);
-      console.log('colors.iconColor:', colors.iconColor);
     } catch (error) {
       console.error('Error in handleLikeClick:', error);
       setLikeSuccess(false);
     }
   };
 
+  // const [colors1, setColors1] = React.useState({});
+
+  // const getIconColor = (liked, colors1) => liked ? '#ff7f00' : colors1.iconColor;
+
+  // const handleLikeClick = async (postId) => {
+  //   try {
+  //     const response = await fetch(`${config.apiUrl}/post/like`, {
+  //       method: 'POST',
+  //       credentials: 'include',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         userProfileId: profileUUID,
+  //         postId,
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       console.error('Failed to update like status');
+  //       setLikeSuccess(false);
+  //       return;
+  //     }
+
+  //     const responseData = await response.json();
+  //     setLikeSuccess(responseData.like);
+
+  //     if (responseData.like) {
+  //       setLikeCounts((prevLikeCounts) => ({
+  //         ...prevLikeCounts,
+  //         [postId]: (prevLikeCounts[postId] || 0) + 1,
+  //       }));
+  //       setColors1((prevColors1) => ({
+  //         ...prevColors1,
+  //         [postId]: '#ff7f00',
+  //       }));
+  //     } else {
+  //       setLikeCounts((prevLikeCounts) => ({
+  //         ...prevLikeCounts,
+  //         [postId]: (prevLikeCounts[postId] || 0) - 1,
+  //       }));
+  //       setColors1((prevColors1) => ({
+  //         ...prevColors1,
+  //         [postId]: responseData.like ? '#ff7f00' : colors1.iconColor,
+  //       }));
+  //     }
+
+  //     console.log('likeSuccess:', likeSuccess);
+  //   } catch (error) {
+  //     console.error('Error in handleLikeClick:', error);
+  //     setLikeSuccess(false);
+  //   }
+  // };
 
 
   // Share click ------------------------------------
@@ -243,10 +323,10 @@ export default function InstagramCard() {
 
   // COMMENT HANDLING ------------------------------------
 
-  // Comment Count....................................................................................
+  // COMMENT LIKE COUNT
   const fetchUserData = async (postId) => {
     try {
-      const commentCountResponse = await fetch(`http://localhost:8080/api/post/comments/count/${postId}`, {
+      const commentCountResponse = await fetch(`${config.apiUrl}/api/post/comments/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -255,15 +335,33 @@ export default function InstagramCard() {
       });
 
       if (!commentCountResponse.ok) {
-        console.error('Failed to fetch post count');
-        throw new Error('Failed to fetch post count');
+        throw new Error('Failed to fetch comment count');
+      }
+
+      const likeCountResponse = await fetch(`${config.apiUrl}/api/post/likes/count/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!likeCountResponse.ok) {
+        throw new Error('Failed to fetch like count');
       }
 
       const commentData = await commentCountResponse.json();
+      const likeData = await likeCountResponse.json();
 
+      // Update state with both like and comment counts for the post
       setCommentCounts((prevCounts) => ({
         ...prevCounts,
         [postId]: commentData.commentCount,
+      }));
+
+      setLikeCounts((prevCounts) => ({
+        ...prevCounts,
+        [postId]: likeData.likeCount,
       }));
     } catch (error) {
       console.error(error);
@@ -278,7 +376,7 @@ export default function InstagramCard() {
       setCommentLoading(true);
 
       // Fetch comments for the post
-      const response = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -316,7 +414,7 @@ export default function InstagramCard() {
 
 
       // Like comment 
-      const likedCommentsResponse = await fetch(`http://localhost:8080/find/api/user/liked-comments/${profileUUID}`, {
+      const likedCommentsResponse = await fetch(`${config.apiUrl}/find/api/user/liked-comments/${profileUUID}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -355,7 +453,7 @@ export default function InstagramCard() {
       setCommentLoading(true);
 
       // Make a POST request to the server to save the comment
-      const response = await fetch('http://localhost:8080/api/post/comment', {
+      const response = await fetch(`${config.apiUrl}/api/post/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -374,7 +472,7 @@ export default function InstagramCard() {
       }
 
       // After successfully posting the comment, fetch the updated comments for the post
-      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -426,7 +524,7 @@ export default function InstagramCard() {
     try {
 
       // Make a POST request to the server to update the comment likes
-      const likeResponse = await fetch('http://localhost:8080/api/post/comment/like', {
+      const likeResponse = await fetch(`${config.apiUrl}/api/post/comment/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -442,7 +540,7 @@ export default function InstagramCard() {
       }
 
       // After successfully updating the comment likes, fetch the updated comments for the post
-      const commentsResponse = await fetch(`http://localhost:8080/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -484,7 +582,7 @@ export default function InstagramCard() {
 
       setCommentLoading(true);
 
-      const response = await fetch(`http://localhost:8080/api/delete/comment/${commentId}`, {
+      const response = await fetch(`${config.apiUrl}/api/delete/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -602,7 +700,7 @@ export default function InstagramCard() {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:8080/api/posts/get/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/api/posts/get/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -689,7 +787,7 @@ export default function InstagramCard() {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:8080/api/posts/update/${editedPostId}`, {
+      const response = await fetch(`${config.apiUrl}/api/posts/update/${editedPostId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -753,7 +851,7 @@ export default function InstagramCard() {
   const handleDeletePost = async (postId) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8080/api/posts/delete/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/api/posts/delete/${postId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -800,9 +898,7 @@ export default function InstagramCard() {
   const handleHidePost = async (postId) => {
     try {
       setLoading(true);
-      // Assuming the following line of code sends the request to the server
-      // Update the URL or parameters as needed
-      const response = await fetch(`http://localhost:8080/api/posts/visibility/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/api/posts/visibility/${postId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -1013,15 +1109,31 @@ export default function InstagramCard() {
 
               {/* ICON */}
               <CardActions classes='gap-1' disableSpacing className="justify-content-between d-flex">
-                <IconButton
+
+                {/* <IconButton
                   style={{
-                    color: likeSuccess ? '#ff7f00' : colors.iconColor,
+                    color: colors1[post.id] || colors1.iconColor,
                   }}
                   aria-label="like"
                   onClick={() => handleLikeClick(post.id)}
                   sx={instagramStyles.instagramIcons}
                 >
-                  <FavoriteIcon sx={{ color: likeCounts[post.id] === 1 ? '#7f7f7f' : colors.iconColor }} />
+                  <FavoriteIcon sx={{ color: getIconColor(newUserProfile.likedPosts.includes(post.id), colors1) }} />
+                  <Typography sx={{ color: colors1[post.id] === '#ff7f00' ? '#ff7f00' : colors1.labelColor, fontSize: '12px' }}>
+                    {likeCounts[post.id] || 0}
+                  </Typography>
+                </IconButton> */}
+
+
+                <IconButton
+                  aria-label="like"
+                  onClick={() => handleLikeClick(post.id)}
+                  sx={instagramStyles.instagramIcons}
+                  style={{
+                    color: colors.iconColor
+                  }}
+                >
+                  {getIcon(newUserProfile.likedPosts.includes(post.id))}
                   <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {likeCounts[post.id] || 0}
                   </Typography>

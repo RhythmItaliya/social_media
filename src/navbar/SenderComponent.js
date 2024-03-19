@@ -8,6 +8,7 @@ import { PersonAdd, CheckCircleOutline as CheckCircleOutlineIcon } from '@mui/ic
 import Grid from '@mui/material/Grid';
 import './abc.css';
 import CloseIcon from '@mui/icons-material/Close';
+import config from '../configuration';
 
 
 const lightModeColors = {
@@ -47,7 +48,7 @@ const SenderComponent = () => {
     useEffect(() => {
         const fetchUserProfiles = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/userProfiles/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/api/userProfiles/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -76,7 +77,7 @@ const SenderComponent = () => {
 
     const sendFriendRequest = async (receiverId) => {
         try {
-            const response = await fetch('http://localhost:8080/friendRequests', {
+            const response = await fetch(`${config.apiUrl}/friendRequests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

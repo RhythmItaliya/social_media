@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid, IconButton, Tooltip } from "@mui/material";
 import { message } from "antd";
+import config from "../configuration";
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -22,7 +23,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
         const fetchData = () => {
             setLoading(true);
 
-            const friendRequestPromise = fetch(`http://localhost:8080/get/public/friendRequests/${profileUUID}`)
+            const friendRequestPromise = fetch(`${config.apiUrl}/get/public/friendRequests/${profileUUID}`)
                 .then((friendRequestResponse) => {
                     if (!friendRequestResponse.ok) {
                         throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);
@@ -35,7 +36,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                     }
                 });
 
-            const crushPromise = fetch(`http://localhost:8080/get/public/crushesRequest/${profileUUID}`)
+            const crushPromise = fetch(`${config.apiUrl}/crushes/get/public/crushesRequest/${profileUUID}`)
                 .then((crushResponse) => {
                     if (!crushResponse.ok) {
                         throw new Error(`Crush status request failed: ${crushResponse.status}`);
@@ -48,7 +49,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                     }
                 });
 
-            const ignorePromise = fetch(`http://localhost:8080/get/public/ignoreRequest/${profileUUID}`)
+            const ignorePromise = fetch(`${config.apiUrl}/ignores/get/public/ignoreRequest/${profileUUID}`)
                 .then((ignoreResponse) => {
                     if (!ignoreResponse.ok) {
                         throw new Error(`Ignore status request failed: ${ignoreResponse.status}`);
@@ -79,7 +80,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
     const handleAddToFriend = () => {
         setLoading(true);
 
-        fetch('http://localhost:8080/public/friendRequests', {
+        fetch(`${config.apiUrl}/public/friendRequests`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -103,7 +104,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                 if (responseData.success) {
                     setFriendRequestStatus((prevStatus) => responseData.status);
 
-                    fetch(`http://localhost:8080/get/public/friendRequests/${profileUUID}`)
+                    fetch(`${config.apiUrl}/get/public/friendRequests/${profileUUID}`)
                         .then((friendRequestResponse) => {
                             if (!friendRequestResponse.ok) {
                                 throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);
@@ -139,7 +140,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
     const handleSetCrush = () => {
         setLoading(true);
 
-        fetch('http://localhost:8080/public/crushesRequest', {
+        fetch(`${config.apiUrl}/crushes/public/crushesRequest`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -163,7 +164,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                 if (responseData.success) {
                     setCrushAdded((prevStatus) => responseData.status === '2');
 
-                    fetch(`http://localhost:8080/get/public/crushesRequest/${profileUUID}`)
+                    fetch(`${config.apiUrl}/crushes/get/public/crushesRequest/${profileUUID}`)
                         .then((crushResponse) => {
                             if (!crushResponse.ok) {
                                 throw new Error(`Crush status request failed: ${crushResponse.status}`);
@@ -199,7 +200,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
     const handleAddToIgnore = () => {
         setLoading(true);
 
-        fetch('http://localhost:8080/public/ignoreRequest', {
+        fetch(`${config.apiUrl}/ignores/public/ignoreRequest`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -223,7 +224,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                 if (responseData.success) {
                     setIgnored((prevStatus) => responseData.status === '2');
 
-                    fetch(`http://localhost:8080/get/public/ignoreRequest/${profileUUID}`)
+                    fetch(`${config.apiUrl}/ignores/get/public/ignoreRequest/${profileUUID}`)
                         .then((ignoreResponse) => {
                             if (!ignoreResponse.ok) {
                                 throw new Error(`Ignore status request failed: ${ignoreResponse.status}`);

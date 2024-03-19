@@ -2,13 +2,14 @@
 
 import { message } from 'antd';
 import { registerRequest, registerSuccess, registerFailure, setGlobalLoading } from './authActions';
+import config from '../configuration';
 
 export const registerUser = (userData) => async (dispatch) => {
     dispatch(registerRequest());
     dispatch(setGlobalLoading(true));
 
     try {
-        const res = await fetch('http://localhost:8080/register', {
+        const res = await fetch(`${config.apiUrl}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

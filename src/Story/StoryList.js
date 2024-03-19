@@ -6,6 +6,8 @@ import { Avatar, IconButton, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import UserStory from './UserStory';
 import FriendStory from './FriendStory';
+import config from '../configuration';
+
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -30,7 +32,7 @@ const StoryList = ({ colors }) => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/friendships/users/story/${profileuuid}`, {
+        const response = await fetch(`${config.apiUrl}/stories/api/friendships/users/story/${profileuuid}`, {
           method: 'GET',
           credentials: 'include',
           headers: {

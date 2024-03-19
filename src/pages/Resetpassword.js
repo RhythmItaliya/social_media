@@ -5,6 +5,7 @@ import { MailOutlineOutlined } from '@material-ui/icons';
 import LoadingSpinner from '../others/LoadingSpinner';
 import { useDarkMode } from '../theme/Darkmode';
 import './Form.css';
+import config from '../configuration';
 
 
 const lightModeColors = {
@@ -70,7 +71,7 @@ const ResetPassword = () => {
     useEffect(() => {
         const checkLinkExpire = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/resetlink/verify/${token}`, {
+                const res = await fetch(`${config.apiUrl}/auth/resetlink/verify/${token}`, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
                 });
@@ -108,7 +109,7 @@ const ResetPassword = () => {
                 return message.warning("Password Can't be matched");
             }
 
-            const res = await fetch(`http://localhost:8080/reset/password/${token}`, {
+            const res = await fetch(`${config.apiUrl}/auth/reset/password/${token}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

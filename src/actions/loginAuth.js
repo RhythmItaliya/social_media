@@ -1,12 +1,13 @@
 import { message } from "antd";
 import { loginRequest, loginSuccess, loginFailure, setGlobalLoading } from "./authActions";
 import CryptoJS from 'crypto-js';
+import config from "../configuration";
 
 export const loginUser = (userData) => (dispatch) => {
     dispatch(loginRequest());
     dispatch(setGlobalLoading(true));
 
-    fetch('http://localhost:8080/login', {
+    fetch(`${config.apiUrl}/auth/login`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -35,7 +36,7 @@ export const loginUser = (userData) => (dispatch) => {
 
                 document.cookie = `token=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                fetch(`http://localhost:8080/api/users/profileCreated/${uuid}`, {
+                fetch(`${config.apiUrl}/api/users/profileCreated/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

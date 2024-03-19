@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Input, Button, Form, Select, DatePicker, Row, Col } from 'antd';
 import ProfilePhoto from './ProfilePhoto';
 import { useSelector } from 'react-redux';
+import config from '../../configuration';
 
 const { Option } = Select;
 
@@ -16,7 +17,7 @@ const EditProfile = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/userProfile/get/${profileuuid}`, {
+                const response = await fetch(`${config.apiUrl}/userProfile/get/${profileuuid}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -41,7 +42,7 @@ const EditProfile = () => {
 
     const onFinish = async (values) => {
         try {
-            const response = await fetch(`http://localhost:8080/userProfile/create/${useruuid}`, {
+            const response = await fetch(`${config.apiUrl}/userProfile/create/${useruuid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

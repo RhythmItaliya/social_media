@@ -7,6 +7,7 @@ import { noop } from "antd/es/_util/warning";
 import { MailOutlineOutlined } from '@material-ui/icons';
 
 import './Form.css';
+import config from '../configuration';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -77,7 +78,7 @@ const ForgotPassword = () => {
 
         setLoading(true);
 
-        fetch('http://localhost:8080/reset/request', {
+        fetch(`${config.apiUrl}/auth/reset/request`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: mail }),

@@ -7,6 +7,7 @@ import { Container } from '@mui/material';
 import PublicPost from './PublicPost';
 import PublicFriendHandling from './PublicFriendHandling';
 import PublicCustomButton from './PublicCustomButton';
+import config from '../configuration';
 
 
 const hexToRgb = (hex) => {
@@ -29,7 +30,7 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading, us
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/users/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -60,7 +61,7 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading, us
     useEffect(() => {
         const fetchUserPostCount = async () => {
             try {
-                const postCountResponse = await fetch(`http://localhost:8080/api/userPostsCount/${profileUUID}`, {
+                const postCountResponse = await fetch(`${config.apiUrl}/api/userPostsCount/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -86,7 +87,7 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, loading, us
     useEffect(() => {
         const fetchFriendCount = async () => {
             try {
-                const friendCountResponse = await fetch(`http://localhost:8080/api/friendships/count/${profileUUID}`, {
+                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships/count/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

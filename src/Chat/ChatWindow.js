@@ -10,6 +10,7 @@ import { EmojiEmotions, SendAndArchiveOutlined } from '@mui/icons-material';
 import EmojiPicker from 'emoji-picker-react';
 
 import './chat.css';
+import config from '../configuration';
 
 
 const lightModeColors = {
@@ -81,7 +82,7 @@ const ChatWindow = ({ selectedUser }) => {
   const fetchMessages = async () => {
     try {
       if (selectedUser && receiverUUID) {
-        const response = await fetch(`http://localhost:8080/get-messages/${receiverUUID}`);
+        const response = await fetch(`${config.apiUrl}/get-messages/${receiverUUID}`);
         const data = await response.json();
 
 

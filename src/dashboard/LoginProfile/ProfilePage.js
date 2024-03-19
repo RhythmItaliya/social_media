@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import LoadingBar from 'react-top-loading-bar';
 import { ArrowForward, ArrowOutwardSharp } from '@mui/icons-material';
-
+import config from '../../configuration';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -199,7 +199,7 @@ const ProfilePage = () => {
         await new Promise(resolve => setTimeout(resolve, 10));
       }
 
-      const response = await fetch(`http://localhost:8080/api/profilepage/create/${isdecryptedUuid}`, {
+      const response = await fetch(`${config.apiUrl}/api/profilepage/create/${isdecryptedUuid}`, {
         method: 'POST',
         credentials: 'include',
         headers: {

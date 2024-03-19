@@ -50,16 +50,12 @@ function Merger() {
     return (
         <div className='container'>
             <div className='row'>
-                <div className='col-lg-6 d-flex align-items-center justify-content-center'>
-                    <div className='col-lg-8 mx-auto'>
-                        <SuggestedFriends colors={colors} />
-                    </div>
+                <div class='col-lg-6 col-md-12 d-flex align-items-center justify-content-center'>
+                    <SuggestedFriends colors={colors} />
                 </div>
 
-                <div className='col-lg-6 d-flex align-items-center justify-content-center'>
-                    <div className='col-lg-6 mx-auto'>
-                        <ReceiverComponent colors={colors} />
-                    </div>
+                <div class='col-lg-6 col-md-12 d-flex align-items-center justify-content-center'>
+                    <ReceiverComponent colors={colors} />
                 </div>
             </div>
         </div>

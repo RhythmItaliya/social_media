@@ -39,7 +39,7 @@
 //     const handleDelete = async (file) => {
 //         try {
 //             // Send a DELETE request to the server to delete the file
-//             await fetch(`http://localhost:8080/profilephotoes/delete/${uuid}`, {
+//             await fetch(`${config.apiUrl}/profilephotoes/delete/${uuid}`, {
 //                 method: 'DELETE',
 //                 credentials: 'include',
 //             });
@@ -64,7 +64,7 @@
 //                 const base64Data = reader.result.split(',')[1];
 
 //                 // Check if a profile photo already exists for the user
-//                 const response = await fetch(`http://localhost:8080/profilephotoes/${uuid}`, {
+//                 const response = await fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
 //                     method: 'GET',
 //                     credentials: 'include',
 //                 });
@@ -73,7 +73,7 @@
 
 //                 if (data.found) {
 //                     // If a profile photo exists, update it
-//                     fetch(`http://localhost:8080/profilephotoes/update/${uuid}`, {
+//                     fetch(`${config.apiUrl}/profilephotoes/update/${uuid}`, {
 //                         method: 'PUT',
 //                         credentials: 'include',
 //                         headers: {
@@ -97,7 +97,7 @@
 //                         });
 //                 } else {
 //                     // If no profile photo exists, add a new one
-//                     fetch(`http://localhost:8080/profilephotoes/${uuid}`, {
+//                     fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
 //                         method: 'POST',
 //                         headers: {
 //                             'Content-Type': 'application/json',

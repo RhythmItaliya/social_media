@@ -10,6 +10,7 @@ import LoadingBar from 'react-top-loading-bar';
 // import LinearProgress from '@mui/material/LinearProgress';
 import '../App.css';
 import { LinearProgress } from '@material-ui/core';
+import config from '../configuration';
 
 const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +58,7 @@ const Dashboard = () => {
 
         const fetchProfileCreatedStatus = async (uuid) => {
             try {
-                const response = await fetch(`http://localhost:8080/api/users/profileCreated/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/api/users/profileCreated/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -98,7 +99,7 @@ const Dashboard = () => {
 
     const fetchUserData = async (uuid) => {
         try {
-            const response = await fetch(`http://localhost:8080/users/${uuid}`, {
+            const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -125,7 +126,7 @@ const Dashboard = () => {
 
     const fetchUserPhoto = async (profileUuid) => {
         try {
-            const response = await fetch(`http://localhost:8080/profile/profilePhoto/${profileUuid}`, {
+            const response = await fetch(`${config.apiUrl}/profile/profilePhoto/${profileUuid}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

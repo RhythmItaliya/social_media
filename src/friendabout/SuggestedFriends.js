@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
-import { PersonAdd, CheckCircleOutline } from "@mui/icons-material";
+import { PersonAdd, CheckCircleOutline, RefreshSharp } from "@mui/icons-material";
 import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import { IconButton } from '@mui/material';
+import config from '../configuration';
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -23,40 +24,41 @@ const SuggestedFriends = ({ colors }) => {
     const [friendRequestStatus, setFriendRequestStatus] = useState({});
 
     useEffect(() => {
-        const fetchUserProfiles = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/api/userProfiles/${profileUUID}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.userProfiles && data.userProfiles.length > 0) {
-                        setUserProfiles(data.userProfiles.map(profile => ({
-                            uuid: profile.uuid,
-                            username: profile.username,
-                            photoURL: profile.photoURL,
-                            firstName: profile.firstName,
-                            lastName: profile.lastName,
-                        })));
-                    }
-                } else {
-                    console.error('Failed to fetch user profiles');
-                }
-            } catch (error) {
-                console.error('Error fetching user profiles:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUserProfiles();
     }, [profileUUID]);
 
+    const fetchUserProfiles = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${config.apiUrl}/api/userProfiles/${profileUUID}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.userProfiles && data.userProfiles.length > 0) {
+                    setUserProfiles(data.userProfiles.map(profile => ({
+                        uuid: profile.uuid,
+                        username: profile.username,
+                        photoURL: profile.photoURL,
+                        firstName: profile.firstName,
+                        lastName: profile.lastName,
+                    })));
+                }
+            } else {
+                console.error('Failed to fetch user profiles');
+            }
+        } catch (error) {
+            console.error('Error fetching user profiles:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const sendFriendRequest = async (receiverId) => {
         try {
-            const response = await fetch('http://localhost:8080/friendRequests', {
+            const response = await fetch(`${config.apiUrl}/friendRequests`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -88,18 +90,27 @@ const SuggestedFriends = ({ colors }) => {
 
     return (
         <div
+            className='mt-5 p-1 overflow-y-scroll w-100'
             style={{
-                width: '100%',
-                height: '100vh',
+                height: '700px',
                 border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                overflowY: 'scroll',
-                padding: '0'
-            }
-            }>
-            <p className='mt-3 mb-4' style={{ color: colors.textColor, textAlign: 'center' }}>Suggested Friends</p>
+            }}>
+
+            <div className='py-3 d-flex justify-content-between align-items-center' style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, }}>
+                <div className='d-flex align-items-center justify-content-center'>
+                    <p className='m-2' style={{ color: colors.textColor }}>Suggested Friends</p>
+                </div>
+                <div>
+                    <IconButton style={{ color: colors.iconColor }} onClick={fetchUserProfiles}>
+                        <RefreshSharp />
+                    </IconButton>
+                </div>
+            </div>
+
+
             {loading && (
                 <div className="loading-spinner">
-                    <ScaleLoader color={colors.spinnerColor} loading={loading} height={15} />
+                    <p style={{ color: colors.textColor }}>Loading...</p>
                 </div>
             )}
             {!loading && userProfiles.length === 0 && (
@@ -111,7 +122,7 @@ const SuggestedFriends = ({ colors }) => {
                 userProfiles.map((data, index) => (
                     <div
                         key={index}
-                        className='d-flex m-2 p-2 gap-3 justify-content-around align-items-center'
+                        className='d-flex mx-auto m-2 p-2 justify-content-around align-items-center'
                         style={{
                             borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
                         }}>

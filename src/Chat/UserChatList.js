@@ -6,6 +6,7 @@ import { joinRoom, leaveRoom, sendMessage } from './chatInfo';
 import { Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import './chat.css';
+import config from '../configuration';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -70,7 +71,7 @@ const UserChatList = ({ onSelectUser }) => {
   useEffect(() => {
     async function fetchFriendsList() {
       try {
-        const response = await fetch(`http://localhost:8080/api/friendships/users/${profileUuid}`);
+        const response = await fetch(`${config.apiUrl}/api/friendships/users/${profileUuid}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -79,7 +80,7 @@ const UserChatList = ({ onSelectUser }) => {
           // Fetch last message for each friend
           const friendsWithLastMessage = await Promise.all(
             fetchedFriendsList.map(async (friend) => {
-              const lastMessageResponse = await fetch(`http://localhost:8080/get-last-message/${friend.uuid}`);
+              const lastMessageResponse = await fetch(`${config.apiUrl}/get-last-message/${friend.uuid}`);
               const lastMessageData = await lastMessageResponse.json();
               const lastMessage = lastMessageData.lastMessage;
 

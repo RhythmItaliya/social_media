@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import '../dashboard/Profile/ProfileSet.css';
 import { CloseOutlined } from '@material-ui/icons';
+import config from '../configuration';
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -109,7 +110,7 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
     useEffect(() => {
         const fetchFriendCount = async () => {
             try {
-                const friendCountResponse = await fetch(`http://localhost:8080/api/friendships/count/${profileUUID}`, {
+                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships/count/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -137,7 +138,7 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
         const fetchData = async () => {
             try {
                 // Fetch friend count
-                const friendCountResponse = await fetch(`http://localhost:8080/api/friendships/count/${profileUUID}`, {
+                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships/count/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -154,7 +155,7 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
                 setFriendPostCount(friendCountData.friendshipCount);
 
                 // Fetch friends list
-                const friendsListResponse = await fetch(`http://localhost:8080/api/friendships/users/${profileUUID}`);
+                const friendsListResponse = await fetch(`${config.apiUrl}/api/friendships/users/${profileUUID}`);
                 const friendsListData = await friendsListResponse.json();
 
                 if (friendsListResponse.ok) {
