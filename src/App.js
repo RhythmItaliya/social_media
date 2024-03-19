@@ -1,6 +1,6 @@
 // App.js
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useParams } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './dashboard/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,13 +16,9 @@ import { DarkModeProvider } from './theme/Darkmode';
 import ProfilePage from './dashboard/LoginProfile/ProfilePage';
 
 import VerticalTabs from './dashboard/Tab/VerticalTabs';
-
-import Homemix from './mixComponet/Homemix';
-import ProfileSet from './dashboard/Profile/ProfileSet';
-import Settings from './Settings/Setting';
-import Searchmix from './mixComponet/Searchmix';
-import CreatePost from './Post/CreatePost';
-import Chat from './Chat/Chat';
+import Terms from './pages/Terms';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
 
 const App = () => {
   const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
@@ -65,8 +61,12 @@ const App = () => {
           <Route path="/:username" element={<ProfileRoute />} />
 
           <Route path="/friend/:username" element={<ProfileRoute />} />
-          
+
           <Route path="*" element={<NotFound />} />
+
+          <Route path="/terms-and-conditions" element={<Terms />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/contact-us" element={<ContactUs />} />
 
         </Routes>
       </DarkModeProvider>

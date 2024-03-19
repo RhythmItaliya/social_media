@@ -4,6 +4,8 @@ import { useDarkMode } from '../theme/Darkmode';
 import config from "../configuration";
 import LoadingBar from 'react-top-loading-bar';
 
+import logoImage from '../assets/orkut-logo.png';
+
 const lightModeColors = {
     backgroundColor: '#ffffff',
     iconColor: 'rgb(0,0,0)',
@@ -113,10 +115,16 @@ const VerifyLogin = () => {
     };
 
     return (
-        <div className="text-center">
+        <>
+            <div className="d-flex justify-content-center align-content-center">
+                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
+                <p className="mb-3 mt-3 text-center" style={{ fontSize: '26px', letterSpacing: '1px' }}>
+                    {getMessage()}
+                </p>
+            </div>
+
             {loading && <LoadingBar progress={progress} color='#f11946' height={3} />}
-            {getMessage()}
-        </div>
+        </>
     );
 };
 

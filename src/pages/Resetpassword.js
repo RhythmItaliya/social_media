@@ -7,6 +7,7 @@ import { useDarkMode } from '../theme/Darkmode';
 import './Form.css';
 import config from '../configuration';
 
+import logoImage from '../assets/orkut-logo.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -66,6 +67,8 @@ const ResetPassword = () => {
         outline: 'none',
         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
         boxShadow: `0 2px 8px rgba(${hexToRgb(colors.border)}, 0.05), 0 2px 4px rgba(${hexToRgb(colors.border)}, 0.05) inset`,
+        backgroundColor: '#238636',
+        color: '#ffffff',
     };
 
     useEffect(() => {
@@ -137,7 +140,6 @@ const ResetPassword = () => {
     }
 
 
-
     if (isValid === false) {
         return (
             <div className="text-center mt-3">
@@ -145,7 +147,7 @@ const ResetPassword = () => {
                     Link is invalid...
                 </h2>
                 <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                    Log in for Name
+                    Log in for Orcut
                 </Link>
             </div>
         );
@@ -156,14 +158,18 @@ const ResetPassword = () => {
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-12 col-md-8 col-lg-6 col-xl-4">
+
+                            <div>
+                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
+                                <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '16px' }}>
+                                    Reset your password
+                                </p>
+                            </div>
+
                             <div className='m-2 ' style={{ boxShadow: 'none', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
                                 <div className="card-body p-4" style={{ backgroundColor: colors.backgroundColor }}>
-                                    <h4 className="mb-2 text-center" style={{ color: colors.textColor }}>
-                                        Reset your password
-                                    </h4>
-                                    <img src="" alt="" className="img-fluid" />
-                                    <div>
 
+                                    <div>
                                         <div>
                                             <div className="form-group">
                                                 <label htmlFor="password1" className="p-1">Enter new password</label>
@@ -220,11 +226,11 @@ const ResetPassword = () => {
 
                                     <div className="text-center">
                                         <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Log in for Name
+                                            Log in for Orcut
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
                                         <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Sign up for Name
+                                            Sign up for Orcut
                                         </Link>
                                     </div>
                                 </div>

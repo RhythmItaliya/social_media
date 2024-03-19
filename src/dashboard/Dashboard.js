@@ -12,6 +12,9 @@ import '../App.css';
 import { LinearProgress } from '@material-ui/core';
 import config from '../configuration';
 
+
+import logoImage from '../assets/orkut-logo.png';
+
 const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [loadingBarProgress, setLoadingBarProgress] = useState(0);
@@ -159,13 +162,41 @@ const Dashboard = () => {
     };
 
     return (
-        <div className='container-fluid p-0 m-0 overflow-hidden '>
+        // <div className='container-fluid p-0 m-0 overflow-hidden' style={{ backgroundColor: "rgb(0,0,0)" }}>
+        //     <div className='row'>
+        //         <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
+        //         {isLoading ? (
+        //             <div className="d-flex overflow-hidden justify-content-center align-content-center">
+        //                 <img src={logoImage} alt="Logo" className="user-select-none" style={{ width: '150px' }} />
+        //             </div>
+
+        //         ) : error ? (
+        //             <p style={{ color: 'red' }}>{error}</p>
+        //         ) : (
+        //             <VerticalTabs />
+        //         )}
+        //     </div>
+        // </div>
+        <div className='container-fluid p-0 m-0 overflow-hidden' style={{ backgroundColor: "rgb(0,0,0)" }}>
             <div className='row'>
-                <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
+                <LoadingBar progress={loadingBarProgress} height={3} color="#ec1b90" onLoaderFinished={() => setLoadingBarProgress(0)} />
                 {isLoading ? (
-                    <div className="d-flex vh-100 overflow-hidden justify-content-center align-content-center">
-                        <LinearProgress />
-                        <p>Loading...</p>
+                    <div className="d-flex overflow-hidden justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+                        
+                        <div className="m-2 loading-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        
+                        <img src={logoImage} alt="Logo" className="user-select-none" style={{ width: '250px', height: 'auto' }} />
+
+                        <div className="m-2 loading-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+
                     </div>
                 ) : error ? (
                     <p style={{ color: 'red' }}>{error}</p>
@@ -174,6 +205,7 @@ const Dashboard = () => {
                 )}
             </div>
         </div>
+
     );
 }
 

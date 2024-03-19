@@ -1,10 +1,9 @@
-
 // authReducerRegister.js
 import * as types from '../actions/types';
 
 const initialState = {
     registering: false,
-    loading: false, // Add loading property
+    loading: false,
     error: null,
 };
 
@@ -20,20 +19,20 @@ const authReducerRegister = (state = initialState, action) => {
                 ...state,
                 registering: true,
                 error: null,
-                loading: true, // Set loading to true when registration request is initiated
+                loading: true, 
             };
         case types.REGISTER_SUCCESS:
             return {
                 ...state,
                 registering: false,
-                loading: false, // Set loading to false when registration is successful
+                loading: false,
             };
         case types.REGISTER_FAILURE:
             return {
                 ...state,
                 registering: false,
                 error: action.payload,
-                loading: false, // Set loading to false when registration fails
+                loading: false,
             };
         default:
             return state;

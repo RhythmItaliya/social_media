@@ -2,17 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useDarkMode } from "../../theme/Darkmode";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PostProfile from './PostProfile';
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import MessageIcon from "@mui/icons-material/Message";
-import { GiHeartKey } from 'react-icons/gi';
-import { GiBrokenSkull } from 'react-icons/gi';
 import { useSelector } from 'react-redux';
 import CustomButton from './CustomButton';
 import { CloseOutlined } from '@material-ui/icons';
 
 import {
     IconButton,
-    Tooltip,
     Grid,
     Container,
     Typography,
@@ -133,23 +128,6 @@ const ProfileSet = () => {
         fetchUserPostCount();
     }, [profileUUID]);
 
-
-    const handleAddToFriend = () => {
-        console.log("Add to Friend clicked");
-    };
-
-    const handleMessage = () => {
-        console.log("Message clicked");
-    };
-
-    const handleAddToCrush = () => {
-        console.log("Add to Crush clicked");
-    };
-
-    const handleAddToIgnore = () => {
-        console.log("Add to Ignore clicked");
-    };
-
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
@@ -267,32 +245,6 @@ const ProfileSet = () => {
             <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
                 <CustomButton />
             </div>
-
-            {/* Button div */}
-            {/* <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px' }}>
-                <Grid container justifyContent="space-around">
-                    <Tooltip style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} title="Add to Friend" arrow>
-                        <IconButton style={{ color: colors.iconColor }} onClick={handleAddToFriend}>
-                            <PersonAddIcon style={{ color: colors.iconColor }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} title="Message" arrow>
-                        <IconButton style={{ color: colors.iconColor }} onClick={handleMessage}>
-                            <MessageIcon style={{ color: colors.iconColor }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} title="Crush" arrow>
-                        <IconButton style={{ color: colors.iconColor }} onClick={handleAddToCrush}>
-                            <GiHeartKey style={{ color: colors.iconColor }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} title="Ignore" arrow>
-                        <IconButton style={{ color: colors.iconColor }} onClick={handleAddToIgnore}>
-                            <GiBrokenSkull style={{ color: colors.iconColor }} />
-                        </IconButton>
-                    </Tooltip>
-                </Grid>
-            </div> */}
 
             {/* Bio div */}
             <div style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px' }}>

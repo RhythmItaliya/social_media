@@ -20,6 +20,10 @@ import Homemix from '../../mixComponet/Homemix';
 import Searchmix from '../../mixComponet/Searchmix';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
+
+import logoImage from '../../assets/orkut-logo.png';
+
+
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 

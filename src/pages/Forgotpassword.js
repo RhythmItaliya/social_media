@@ -1,13 +1,18 @@
 // Login.js
 import { Form, Input, Button, Divider, message } from 'antd';
 import { useDarkMode } from '../theme/Darkmode';
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { noop } from "antd/es/_util/warning";
 import { MailOutlineOutlined } from '@material-ui/icons';
 
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+
 import './Form.css';
 import config from '../configuration';
+
+import logoImage from '../assets/orkut-logo.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -46,8 +51,23 @@ const hexToRgb = (hex) => {
 
 const ForgotPassword = () => {
 
-    const { isDarkMode } = useDarkMode();
+    const [isDarkMode, setIsDarkMode] = useState(true);
+
+    const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+    };
+
+    useEffect(() => {
+        const savedMode = localStorage.getItem('mode');
+        setIsDarkMode(savedMode === 'dark');
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('mode', isDarkMode ? 'dark' : 'light');
+    }, [isDarkMode]);
+
     const colors = isDarkMode ? darkModeColors : lightModeColors;
+
     const [loading, setLoading] = useState(false);
 
     const labelStyle = {
@@ -66,9 +86,12 @@ const ForgotPassword = () => {
         outline: 'none',
         border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
         boxShadow: `0 2px 8px rgba(${hexToRgb(colors.border)}, 0.05), 0 2px 4px rgba(${hexToRgb(colors.border)}, 0.05) inset`,
+        backgroundColor: '#238636',
+        color: '#ffffff',
     };
 
     const forgotPasswordbtn = (evt) => {
+
         const mail = email.current.input.value;
 
         if (!mail) {
@@ -103,15 +126,18 @@ const ForgotPassword = () => {
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-12 col-md-8 col-lg-6 col-xl-4">
+
+                            <div>
+                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
+                                <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '16px' }}>
+                                    ForgotPassword Password ?
+                                </p>
+                            </div>
+
                             <div className='m-2 ' style={{ boxShadow: 'none', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
                                 <div className="card-body p-4" style={{ backgroundColor: colors.backgroundColor }}>
-                                    <h4 className="mb-2 text-center" style={{ color: colors.textColor }}>
-                                        Forgot Password to Name
-                                    </h4>
-                                    <img src="" alt="" className="img-fluid" />
+
                                     <div>
-
-
                                         <div className="form-group">
                                             <label htmlFor="email" className="p-1">Email</label>
                                             <Form.Item name={'email'} rules={[
@@ -147,18 +173,35 @@ const ForgotPassword = () => {
 
                                     <div className="text-center">
                                         <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Log in for Name
+                                            Log in for Orcut
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
                                         <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Sign up for Name
+                                            Sign up for Orcut
                                         </Link>
                                     </div>
                                 </div>
-                                {/* <Button onClick={toggleDarkMode} type="link" style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }}>
-                                    {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                                </Button> */}
                             </div>
+
+                            <div className='d-flex justify-content-center align-content-center mt-5' style={{ cursor: 'pointer', marginTop: '20px' }}>
+                                <div>
+                                    <span onClick={toggleDarkMode} style={{ color: colors.textColor, fontSize: '12px', marginRight: '20px' }}>
+                                        {isDarkMode ? <Brightness4Icon /> : <Brightness7Icon />}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span style={{ color: colors.textColor, fontSize: '12px', marginRight: '20px' }}>
+                                        <Link to="/terms-and-conditions">Terms and Conditions</Link>
+                                    </span>
+                                    <span style={{ color: colors.textColor, fontSize: '12px', marginRight: '20px' }}>
+                                        <Link to="/about-us">About Us</Link>
+                                    </span>
+                                    <span style={{ color: colors.textColor, fontSize: '12px' }}>
+                                        <Link to="/contact-us">Contact Us</Link>
+                                    </span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

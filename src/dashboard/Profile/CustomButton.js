@@ -36,7 +36,7 @@ const darkModeColors = {
   backgroundColor: 'rgb(0,0,0)',
   iconColor: '#ffffff',
   textColor: '#ffffff',
-  focusColor: '#ffffff',
+  focusColor: '#ffffff',      
   border: '#333333',
   boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
   spinnerColor: '#ffffff',
