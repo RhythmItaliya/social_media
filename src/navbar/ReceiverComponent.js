@@ -34,6 +34,61 @@ const ReceiverComponent = ({ colors }) => {
         setRenderIndex((prevIndex) => prevIndex + 1);
     }, [receiverUUID]);
 
+    const handleRefresh = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${config.apiUrl}/friendRequests/${receiverUUID}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.status === 404) {
+                setReceiverData([]);
+                setLoading(false);
+                return;
+            }
+
+            if (!response.ok) {
+                console.error('Friend Requests Request failed');
+                throw new Error('Friend Requests Request failed');
+            }
+
+            const data = await response.json();
+
+            const processedData = data.map((friendRequestInfo, index) => {
+                const friendRequestUuid = friendRequestInfo.friendRequest.uuid;
+                const senderUuid = friendRequestInfo.friendRequest.sender.uuid;
+                const receiverUuid = friendRequestInfo.friendRequest.receiver.uuid;
+                const firstName = friendRequestInfo.senderProfile.firstName;
+                const lastName = friendRequestInfo.senderProfile.lastName;
+                const imageUrl = friendRequestInfo.senderProfile.completeImageUrl;
+                const username = friendRequestInfo.senderProfile.username;
+
+                return {
+                    friendRequestUuid,
+                    senderUuid,
+                    receiverUuid,
+                    firstName,
+                    lastName,
+                    selectedImageUrl: imageUrl !== null ? imageUrl : defaultImageUrl,
+                    username
+                };
+            });
+
+            const initialVisibility = processedData.reduce((acc, data) => {
+                acc[data.friendRequestUuid] = false;
+                return acc;
+            }, {});
+            setFriendRequestVisibility(initialVisibility);
+
+            setReceiverData(processedData);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
+    };
+
 
     const fetchReceiverData = async () => {
         try {
@@ -155,10 +210,6 @@ const ReceiverComponent = ({ colors }) => {
         }
         return '';
     }
-
-    const handleRefresh = () => {
-        fetchReceiverData();
-    };
 
     return (
         <div

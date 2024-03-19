@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -124,7 +124,6 @@ const SearchAppBar = () => {
 
             return;
         }
-
         try {
             const response = await fetch(`${config.apiUrl}/search/search/${searchTerm}`);
             const data = await response.json();

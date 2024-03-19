@@ -1,7 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Grid, IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { message } from "antd";
 import config from "../configuration";
+import { useDarkMode } from '../theme/Darkmode';
+import { useNavigate } from "react-router-dom";
+import { setProfileUuid } from "../actions/authActions";
+
+
+const lightModeColors = {
+    backgroundColor: '#ffffff',
+    iconColor: 'rgb(0,0,0)',
+    textColor: 'rgb(0,0,0)',
+    focusColor: 'rgb(0,0,0)',
+    border: '#CCCCCC',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
+    spinnerColor: 'rgb(0,0,0)',
+    labelColor: '#8e8e8e',
+    valueTextColor: 'rgb(0,0,0)',
+};
+
+const darkModeColors = {
+    backgroundColor: 'rgb(0,0,0)',
+    iconColor: '#ffffff',
+    textColor: '#ffffff',
+    focusColor: '#ffffff',
+    border: '#333333',
+    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
+    spinnerColor: '#ffffff',
+    labelColor: '#CCC',
+    valueTextColor: '#ffffff'
+};
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -11,13 +39,18 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
+const PublicFriendHandling = ({ profileUUID, userUUID, username }) => {
 
     const [loading, setLoading] = useState(true);
     const [friendRequestStatus, setFriendRequestStatus] = useState(null);
     const [isCrushAdded, setCrushAdded] = useState(false);
     const [isIgnored, setIgnored] = useState(false);
     const [error, setError] = useState(null);
+
+    const { isDarkMode } = useDarkMode();
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = () => {
@@ -257,8 +290,9 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
     };
 
     const handleMessage = () => {
-        console.log("Message clicked");
+        navigate('/chat');
     };
+
 
     const buttonStyle = {
         fontSize: '14px',
@@ -272,7 +306,7 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
     const getTextForFriendButton = (status) => {
         switch (status) {
             case "1":
-                return `Friend Request Sent to ${username}`;
+                return `Friend Request Sent`;
             case "2":
                 return 'You are now Friends';
             default:
@@ -324,15 +358,15 @@ const PublicFriendHandling = ({ colors, profileUUID, userUUID, username }) => {
                             </Tooltip>
 
                             {/* Send Message Button */}
-                            <Tooltip title={`Send Message to ${username}`} arrow>
+                            {friendRequestStatus === "2" && (
                                 <IconButton
                                     className='rounded-1'
                                     style={buttonStyle}
-                                    onClick={handleMessage}
+                                    onClick={() => handleMessage()}
                                 >
                                     Message
                                 </IconButton>
-                            </Tooltip>
+                            )}
 
                             {/* Set Crush Button */}
                             <Tooltip title={`Add ${username} as Crush`} arrow>

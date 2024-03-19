@@ -85,7 +85,6 @@ const ChatWindow = ({ selectedUser }) => {
         const response = await fetch(`${config.apiUrl}/get-messages/${receiverUUID}`);
         const data = await response.json();
 
-
         if (response.ok) {
           const allMessages = [...data.messages];
           allMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

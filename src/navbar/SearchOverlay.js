@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircleOutlineOutlined, PersonAdd } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import config from '../configuration';
+import { useNavigate } from 'react-router-dom';
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -18,8 +19,15 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
 
     const [friendRequestSent, setFriendRequestSent] = useState(false);
 
+    const navigate = useNavigate();
+
     const handleUserClick = (user) => {
-        console.log('User Profile UUID:', user.userProfile.uuid);
+        const username = user.username;
+        if (profileUUID === user.userProfile.uuid) {
+            navigate(`/account`);
+        } else {
+            navigate(`/friend/${username}`);
+        }
     };
 
     const profileUUID = useSelector((state) => state.profileuuid.uuid);
@@ -107,11 +115,13 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
                             style={{
                                 borderBottom: `1px solid rgba(${hexToRgb(colors.border)},0.7)`,
                             }}
-                            onClick={() => handleUserClick(user)}
                         >
 
                             <div className='d-flex p-2 justify-content-around'>
-                                <div className="d-flex justify-content-around">
+                                <div
+                                    className="d-flex justify-content-around"
+                                    onClick={() => handleUserClick(user)}
+                                >
                                     <div className="d-flex justify-content-center align-content-center">
                                         {(user.userProfile && user.userProfile.profilePhote) ? (
                                             <Avatar
@@ -135,7 +145,7 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
                                         )}
                                     </div>
 
-                                    <div className="flex-column justify-content-start align-items-center ms-3" style={{
+                                    <div className="flex-column justify-content-start align-items-center ms-3 user-select-none" style={{
                                         cursor: 'pointer',
                                     }}>
                                         <Typography variant="body1" style={{ color: colors.textColor, fontWeight: '500' }}>
