@@ -13,9 +13,21 @@ body {
     .css-1aj9me-MuiPickersLayout-root {
         display: block !important;
     }
+
 }
 
 .MuiDialogActions-root {
     display: none !important;
-  }
-  
+}
+
+
+.country-selector {
+    width: 100%;
+}
+
+
+@media (max-width: 991.98px) {
+    .country-selector {
+        width: 300px;
+    }
+}

@@ -30,7 +30,6 @@
 // index.js or wherever you render your app
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './auth/AuthContext';
@@ -38,6 +37,11 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store/store';
 import { DarkModeProvider } from './theme/Darkmode';
+
+import './index.css';
+import './App.css';
+import './loading.css';
+import './dashboard/Tab/vertical.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

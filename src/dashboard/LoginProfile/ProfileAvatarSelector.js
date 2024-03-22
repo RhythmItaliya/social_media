@@ -8,32 +8,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Slider from '@mui/material/Slider';
 import AvatarEditor from 'react-avatar-editor';
-import { useDarkMode } from '../../theme/Darkmode';
+import Tooltip from '@mui/material/Tooltip';
 
-
-const lightModeColors = {
-    backgroundColor: '#ffffff',
-    iconColor: 'rgb(0,0,0)',
-    textColor: 'rgb(0,0,0)',
-    focusColor: 'rgb(0,0,0)',
-    border: '#CCCCCC',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1) inset',
-    spinnerColor: 'rgb(0,0,0)',
-    labelColor: '#8e8e8e',
-    valueTextColor: 'rgb(0,0,0)',
-};
-
-const darkModeColors = {
-    backgroundColor: 'rgb(0,0,0)',
-    iconColor: '#ffffff',
-    textColor: '#ffffff',
-    focusColor: '#ffffff',
-    border: '#333333',
-    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
-    spinnerColor: '#ffffff',
-    labelColor: '#CCC',
-    valueTextColor: '#ffffff'
-};
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -44,16 +20,13 @@ const hexToRgb = (hex) => {
 };
 
 
-const ProfileAvatarSelector = ({ onCroppedImage }) => {
+const ProfileAvatarSelector = ({ colors, onCroppedImage }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
     const [cropUrl, setCropUrl] = useState('');
     const [zoom, setZoom] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const editorRef = useRef(null);
-
-    const { isDarkMode } = useDarkMode();
-    const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     const handleAvatarChange = (event) => {
         const file = event.target.files[0];
@@ -115,13 +88,15 @@ const ProfileAvatarSelector = ({ onCroppedImage }) => {
 
 
     const handleReset = () => {
-        setZoom(1);
+        setAvatarUrl('');
         setCropUrl('');
-        updatePreview(1);
+        setZoom(1);
+        setLoading(false);
+        setError(null);
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '16px', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }} className='rounded-2'>
             {loading && <p>
                 <div className="loading-dots">
                     <div></div>
@@ -139,11 +114,21 @@ const ProfileAvatarSelector = ({ onCroppedImage }) => {
                     onChange={handleAvatarChange}
                     style={{ display: 'none' }}
                 />
-                <label htmlFor="avatar-file" style={{ cursor: 'pointer', textAlign: 'center' }}>
-                    <IconButton color="primary" component="span">
-                        <PhotoCameraIcon />
-                    </IconButton>
-                </label>
+
+                {!avatarUrl && (
+                    <label htmlFor="avatar-file" style={{ cursor: 'pointer', textAlign: 'center', margin: '20px' }}>
+                        <Tooltip title="Select Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                component="span">
+                                <PhotoCameraIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </label>
+                )}
+
             </FormControl>
 
             {avatarUrl && (
@@ -165,32 +150,52 @@ const ProfileAvatarSelector = ({ onCroppedImage }) => {
                             max={2}
                             step={0.1}
                             onChange={handleZoomChange}
+                            style={{
+                                color: colors.iconColor
+                            }}
                         />
                     </div>
                 </div>
             )}
 
-            <p className='mt-1'>Preview</p>
             {cropUrl && (
-                <Avatar
-                    alt="Avatar"
-                    src={cropUrl}
-                    style={{ width: 100, height: 100 }}
-                />
+                <>
+                    <p className='mb-2'>Preview</p>
+                    <Avatar
+                        alt="Avatar"
+                        src={cropUrl}
+                        style={{ width: 100, height: 100 }}
+                    />
+                </>
             )}
 
-            <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
-                <div style={{ margin: '0 8px' }}>
-                    <IconButton color="primary" onClick={handleSaveAvatar}>
-                        <SaveIcon />
-                    </IconButton>
+            {avatarUrl && (
+                <div className='m-2' style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ margin: '0 8px' }}>
+                        <Tooltip title="Save Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                onClick={handleSaveAvatar}>
+                                <SaveIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <div style={{ margin: '0 8px' }}>
+                        <Tooltip title="Reset Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                onClick={handleReset}>
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
                 </div>
-                <div style={{ margin: '0 8px' }}>
-                    <IconButton color="secondary" onClick={handleReset}>
-                        <RefreshIcon />
-                    </IconButton>
-                </div>
-            </div>
+            )}
+
         </div>
     );
 };

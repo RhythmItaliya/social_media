@@ -10,7 +10,6 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import { useDarkMode } from '../../theme/Darkmode';
 import { LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,12 +18,14 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import ProfileAvatarSelector from './ProfileAvatarSelector';
 import ProfilePageSubmit from './ProfilePageSubmit';
 import CryptoJS from 'crypto-js';
-import './profilepage.css';
 import { useNavigate } from 'react-router-dom';
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import LoadingBar from 'react-top-loading-bar';
-import { ArrowForward, ArrowOutwardSharp, LocationOnOutlined } from '@mui/icons-material';
+import { ArrowForward } from '@mui/icons-material';
 import config from '../../configuration';
+import './profilepage.css';
+
+import ProfilePageNav from './ProfilePageNav';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -64,9 +65,9 @@ const hexToRgb = (hex) => {
 
 const ProfilePage = () => {
   const [steps, setSteps] = useState([
-    'Make Your Profile',
-    'First and Last Name',
-    'Birth Date',
+    '',
+    'First & Last Name',
+    'Birthdate',
     'Gender',
     'Location',
     'Bio',
@@ -241,181 +242,284 @@ const ProfilePage = () => {
   };
 
 
+  const handleStepClick = (stepIndex) => {
+    setValidationError('');
+    if (stepIndex < currentStep) {
+      setCurrentStep(stepIndex);
+      return;
+    }
 
+    switch (currentStep) {
+      case 1:
+        if (!firstName || !lastName) {
+          setValidationError('Please fill in both First Name and Last Name');
+          return;
+        }
+        break;
+      case 2:
+        if (!dateSelected) {
+          setValidationError('Please select a birth date');
+          return;
+        }
+        break;
+      case 3:
+        if (!gender) {
+          setValidationError('Please select a gender');
+          return;
+        }
+        break;
+      case 4:
+        if (!selectedCountry || !selectedState || !selectedCity) {
+          setValidationError('Please select a Country and State');
+          return;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setCurrentStep(stepIndex);
+  };
 
   return (
-    <Container
-      component="main"
-      maxWidth="sm"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-      }}
-    >
-      <animated.div style={{ ...springProps }}>
-        <Card
-          style={{
-            boxShadow: colors.boxShadow,
-            minHeight: 'auto',
-            minWidth: 'auto',
-            width: '100%',
-            position: 'relative',
-            backgroundColor: colors.backgroundColor,
-            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-          }}
-        >
-          <CardContent>
-            {validationError && (
-              <Typography variant="body2" color="error" style={{ marginBottom: '16px' }}>
-                {validationError}
-              </Typography>
-            )}
+    <div>
+      <ProfilePageNav colors={colors} />
+      <div
+        className='vh-100'
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.backgroundColor
+        }}>
 
-            <Typography variant="h5" gutterBottom style={{ marginBottom: '16px', color: colors.textColor }}>
-              {steps[currentStep]}
-            </Typography>
-
-            {/* fristlast name */}
-            {currentStep === 1 && (
-              <>
-                <TextField
-                  label="First Name"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  value={firstName}
-                  onChange={handleFirstNameChange}
-                  style={{
-                    color: colors.textColor,
-                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-                    marginTop: '16px',
-                  }}
-                />
-                <TextField
-                  label="Last Name"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  value={lastName}
-                  onChange={handleLastNameChange}
-                  style={{
-                    color: colors.textColor,
-                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-                    marginTop: '16px',
-                  }}
-                />
-              </>
-            )}
-
-            {/* birthdate */}
-            {currentStep === 2 && (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <div style={{ marginTop: '16px' }}>
-                  <StaticDatePicker
-                    orientation="landscape"
-                    value={birthDate}
-                    onChange={handleBirthDateChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        margin="normal"
-                        fullWidth
-                        label="Birth Date"
-                        style={{
-                          color: colors.textColor,
-                          border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-              </LocalizationProvider>
-            )}
-
-            {/* gender */}
-            {currentStep === 3 && (
-              <div style={{ marginTop: '16px' }}>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend" style={{ color: colors.textColor }}>Gender</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-label="gender"
-                    name="gender"
-                    value={gender}
-                    onChange={handleGenderChange}
-                  >
-                    <FormControlLabel value="male" control={<Radio />} label="Male" style={{ color: colors.textColor }} />
-                    <FormControlLabel value="female" control={<Radio />} label="Female" style={{ color: colors.textColor }} />
-                    <FormControlLabel value="other" control={<Radio />} label="Other" style={{ color: colors.textColor }} />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-            )}
-
-            {currentStep === 4 && (
-                <CountrySelector
-                  onSelectCountry={handleCountrySelect}
-                  onSelectState={handleStateSelect}
-                  onSelectCity={handleCitySelect}
-                />
-            )}
-
-            {currentStep === 5 && (
-              <div style={{ marginTop: '16px' }}>
-                <TextareaAutosize
-                  minRows={3}
-                  maxRows={5}
-                  aria-label="Bio"
-                  placeholder="Write your bio here..."
-                  value={bio}
-                  onChange={handleBioChange}
-                  style={{
-                    width: '100%',
-                    color: colors.textColor,
-                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
-                  }}
-                />
-              </div>
-            )}
-
-            {currentStep === 6 && (
-              <ProfileAvatarSelector onCroppedImage={handleAvatarSelect} />
-            )}
-
-            <div className='d-flex justify-content-around align-content-center mt-3'>
-              {currentStep !== 0 && (
+        {currentStep !== 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', textAlign: 'center', marginBottom: '20px', marginTop: '10px' }}>
+            {steps.map((step, index) => (
+              index !== 0 &&
+              <div key={index} className='w-100' style={{ margin: '0 5px' }}>
                 <IconButton
-                  type="button"
-                  variant="text"
-                  onClick={handleBackClick}
-                  startIcon={<ArrowBackIcon style={{ color: colors.iconColor }} />}
-                  style={{ color: colors.textColor }}
+                  style={{
+                    borderRadius: '50%',
+                    width: '35px',
+                    height: '35px',
+                    backgroundColor: currentStep === index ? '#ec1b90' : 'transparent',
+                    color: currentStep === index ? '#ffffff' : 'rgb(0,0,0)',
+                    fontSize: '16px'
+                  }}
+                  onClick={() => handleStepClick(index)}
                 >
-                  <ArrowBackIcon />
+                  {index}
                 </IconButton>
-              )}
+              </div>
+            ))}
+          </div>
+        )}
 
-              {currentStep < steps.length - 1 && (
-                <IconButton type="button" variant="contained" color="primary" onClick={handleNextClick}>
-                  {currentStep === 0 ? "Let's Start" : <ArrowForward />}
-                </IconButton>
-              )}
+        <Container
+          component="main"
+          maxWidth="sm"
+        >
+          <animated.div style={{ ...springProps }}>
+            <Card
+              style={{
+                minHeight: 'auto',
+                minWidth: 'auto',
+                width: '100%',
+                position: 'relative',
+                backgroundColor: colors.backgroundColor,
+                padding: '10px',
+                boxShadow: 'none',
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+                borderRadius: 0
+              }}
+              className='rounded-1'
+            >
+              <CardContent>
 
-              {currentStep === steps.length - 1 && (
-                <ProfilePageSubmit onClick={handleSubmit} isDisabled={isSubmitDisabled || loading} />
-              )}
-            </div>
+                <Typography style={{ color: '#ec1b90', fontSize: '22px', textAlign: 'center' }}>
+                  {steps[currentStep]}
+                </Typography>
 
-          </CardContent>
-        </Card>
+                {/* Frist & Last name */}
+                {currentStep === 1 && (
+                  <>
+                    <TextField
+                      label="First Name"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      value={firstName}
+                      onChange={handleFirstNameChange}
+                      style={{
+                        color: colors.textColor,
+                        marginTop: '16px',
+                      }}
+                    />
+                    <TextField
+                      label="Last Name"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      value={lastName}
+                      onChange={handleLastNameChange}
+                      style={{
+                        color: colors.textColor,
+                        marginTop: '16px',
+                      }}
+                    />
+                  </>
+                )}
 
-        <LoadingBar progress={loadingBarProgress} height={3} color="#ec1b90" onLoaderFinished={() => setLoadingBarProgress(0)} />
+                {/* Birthdate */}
+                {currentStep === 2 && (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div style={{ marginTop: '16px', padding: 0 }}>
+                      <StaticDatePicker
+                        orientation="landscape"
+                        value={birthDate}
+                        onChange={handleBirthDateChange}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            margin="normal"
+                            fullWidth
+                            label="Birth Date"
+                            style={{
+                              color: colors.textColor,
+                              border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  </LocalizationProvider>
+                )}
 
-      </animated.div>
-    </Container>
+                {/* Gender */}
+                {currentStep === 3 && (
+                  <div style={{ marginTop: '16px', textAlign: 'center', padding: 0 }}>
+                    <FormControl component="fieldset">
+                      <RadioGroup
+                        row
+                        aria-label="gender"
+                        name="gender"
+                        value={gender}
+                        onChange={handleGenderChange}
+                      >
+                        <FormControlLabel value="male" control={<Radio />} label="Male" style={{ color: colors.textColor }} />
+                        <FormControlLabel value="female" control={<Radio />} label="Female" style={{ color: colors.textColor }} />
+                        <FormControlLabel value="other" control={<Radio />} label="Other" style={{ color: colors.textColor }} />
+                      </RadioGroup>
+                    </FormControl>
+                  </div>
+                )}
+
+                {/* Location */}
+                {currentStep === 4 && (
+                  <CountrySelector
+                    onSelectCountry={handleCountrySelect}
+                    onSelectState={handleStateSelect}
+                    onSelectCity={handleCitySelect}
+                    colors={colors}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  />
+                )}
+
+                {/* Bio */}
+                {currentStep === 5 && (
+                  <div style={{ marginTop: '16px', padding: 0 }}>
+                    <TextareaAutosize
+                      minRows={3}
+                      maxRows={5}
+                      aria-label="Bio"
+                      placeholder="Write your bio here..."
+                      value={bio}
+                      onChange={handleBioChange}
+                      style={{
+                        width: '100%',
+                        color: colors.textColor,
+                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+                        padding: '10px'
+                      }}
+                      className='rounded-2'
+                    />
+                  </div>
+                )}
+
+                {/* Avatar */}
+                {currentStep === 6 && (
+                  <ProfileAvatarSelector colors={colors} onCroppedImage={handleAvatarSelect} />
+                )}
+
+                {/* Error */}
+                {validationError && (
+                  <Typography variant="body2" color="error" style={{ marginTop: '16px', textAlign: 'center' }}>
+                    {validationError}
+                  </Typography>
+                )}
+
+                {/* Back */}
+                <div className='d-flex justify-content-around align-content-center mt-3 mb-0'>
+                  {currentStep !== 0 && (
+                    <Tooltip title="Back" placement="left">
+                      <IconButton
+                        type="button"
+                        variant="text"
+                        onClick={handleBackClick}
+                        startIcon={<ArrowBackIcon style={{ color: colors.iconColor }} />}
+                        style={{ color: colors.textColor }}
+                      >
+                        <ArrowBackIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+
+                  {/* Next */}
+                  {currentStep < steps.length - 1 && (
+                    <span
+                      style={{
+                        cursor: 'pointer',
+                        color: '#ec1b90',
+                        fontSize: '26px',
+                        fontWeight: currentStep === 0 ? 500 : 400,
+                        marginLeft: currentStep === 0 ? '5px' : '0',
+                        transition: 'font-weight 0.3s ease',
+                        textDecoration: 'underline'
+                      }}
+                      onClick={handleNextClick}
+                      className='mb-0'
+                    >
+                      {currentStep === 0 ? "Let's Start" :
+                        <Tooltip title="Next" placement="right">
+                          <IconButton style={{ color: colors.iconColor }}>
+                            <ArrowForward />
+                          </IconButton>
+                        </Tooltip>
+
+                      }
+                    </span>
+                  )}
+
+
+                  {/* Submit */}
+                  {currentStep === steps.length - 1 && (
+                    <ProfilePageSubmit colors={colors} onClick={handleSubmit} isDisabled={isSubmitDisabled || loading} />
+                  )}
+                </div>
+
+              </CardContent>
+            </Card>
+
+            <LoadingBar progress={loadingBarProgress} height={3} color="#ec1b90" onLoaderFinished={() => setLoadingBarProgress(0)} />
+
+          </animated.div>
+        </Container>
+      </div>
+    </div>
   );
 };
 

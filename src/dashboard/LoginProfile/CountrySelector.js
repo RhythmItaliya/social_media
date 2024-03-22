@@ -3,10 +3,19 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import axios from 'axios';
+import './profilepage.css';
 
-const CountrySelector = ({ onSelectCountry, onSelectState, onSelectCity }) => {
+
+const hexToRgb = (hex) => {
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
+};
+
+const CountrySelector = ({ colors, onSelectCountry, onSelectState, onSelectCity }) => {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
@@ -103,7 +112,7 @@ const CountrySelector = ({ onSelectCountry, onSelectState, onSelectCity }) => {
   };
 
   return (
-    <div style={{ width: '300px' }}>
+    <div className="country-selector" style={{ marginTop: '16px' }}>
       <FormControl fullWidth>
         <InputLabel className='mb-3' id="country-label">Country</InputLabel>
         <Select
