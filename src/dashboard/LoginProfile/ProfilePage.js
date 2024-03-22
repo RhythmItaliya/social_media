@@ -23,7 +23,7 @@ import './profilepage.css';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import LoadingBar from 'react-top-loading-bar';
-import { ArrowForward, ArrowOutwardSharp } from '@mui/icons-material';
+import { ArrowForward, ArrowOutwardSharp, LocationOnOutlined } from '@mui/icons-material';
 import config from '../../configuration';
 
 const lightModeColors = {
@@ -85,6 +85,8 @@ const ProfilePage = () => {
 
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+
   const [bio, setBio] = useState('');
 
   const [avatar, setAvatar] = useState('');
@@ -120,7 +122,7 @@ const ProfilePage = () => {
     }
 
     if (currentStep === 4) {
-      if (!selectedCountry || !selectedState) {
+      if (!selectedCountry || !selectedState || !selectedCity) {
         setValidationError('Please select a Country and State');
         return;
       }
@@ -162,6 +164,11 @@ const ProfilePage = () => {
   const handleStateSelect = (selectedState) => {
     setSelectedState(selectedState)
     console.log('Selected State:', selectedState);
+  };
+
+  const handleCitySelect = (selectedCity) => {
+    setSelectedCity(selectedCity);
+    console.log('Selected City:', selectedCity);
   };
 
   const handleBioChange = (e) => {
@@ -208,7 +215,11 @@ const ProfilePage = () => {
         body: JSON.stringify({
           firstName: firstName,
           lastName: lastName,
-          location: selectedCountry,
+          location: JSON.stringify({
+            country: selectedCountry,
+            state: selectedState,
+            city: selectedCity
+          }),
           birthdate: birthDate,
           gender: gender,
           bio: bio,
@@ -345,10 +356,11 @@ const ProfilePage = () => {
             )}
 
             {currentStep === 4 && (
-              <CountrySelector
-                onSelectCountry={handleCountrySelect}
-                onSelectState={handleStateSelect}
-              />
+                <CountrySelector
+                  onSelectCountry={handleCountrySelect}
+                  onSelectState={handleStateSelect}
+                  onSelectCity={handleCitySelect}
+                />
             )}
 
             {currentStep === 5 && (

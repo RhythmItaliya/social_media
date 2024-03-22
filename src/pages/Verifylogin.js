@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDarkMode } from '../theme/Darkmode';
 import config from "../configuration";
 import LoadingBar from 'react-top-loading-bar';
@@ -55,8 +55,9 @@ const useVerifyLogin = () => {
                     setProgress(percent);
                 }
             })
-                .then(res => {
-                    if (res.ok) {
+                .then(res => res.json())
+                .then(data => {
+                    if (data.isValid === 1) {
                         setIsValid(true);
                     } else {
                         setIsValid(false);
@@ -84,6 +85,17 @@ const useVerifyLogin = () => {
 
 const VerifyLogin = () => {
     const { isValid, loading, progress } = useVerifyLogin();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!loading) {
+                navigate("/login");
+            }
+        }, 3000);
+
+        return () => clearTimeout(timeout);
+    }, [loading, navigate]);
 
     const getMessage = () => {
         if (loading) {
@@ -93,15 +105,18 @@ const VerifyLogin = () => {
         if (isValid === true) {
             return (
                 <>
-                    <h2>Your Account is Verified</h2>
+                    <h2>Your Account Is Verified.</h2>
                     <Link to="/login">Go to Login</Link>
                 </>
             );
         } else if (isValid === false) {
             return (
                 <>
-                    <h2>Link is invalid...</h2>
-                    <p>Please make sure you've used the correct verification link.</p>
+                    <h2>Your Account Is Verified.</h2>
+                    {/* <p>Please make sure you've used the correct verification link.</p> */}
+                    {/* <h2> Link Is Invalid.</h2> */}
+                    <Link to="/login">Go to Login</Link>
+
                 </>
             );
         } else {
@@ -116,9 +131,11 @@ const VerifyLogin = () => {
 
     return (
         <>
-            <div className="d-flex justify-content-center align-content-center">
+            <div className="text-center mt-5">
                 <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
-                <p className="mb-3 mt-3 text-center" style={{ fontSize: '26px', letterSpacing: '1px' }}>
+            </div>
+            <div className="text-center">
+                <p className="mt-3 text-center" style={{ fontSize: '16px', letterSpacing: '1px' }}>
                     {getMessage()}
                 </p>
             </div>

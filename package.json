@@ -28,6 +28,7 @@
     "blob-to-base64": "^1.0.2",
     "blob-util": "^2.0.2",
     "countries-states-cities": "^1.0.6",
+    "country-state-city": "^3.2.1",
     "cropperjs": "^1.6.1",
     "crypto-js": "^4.2.0",
     "date-fns": "^3.3.1",

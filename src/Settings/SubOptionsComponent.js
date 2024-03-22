@@ -358,9 +358,9 @@ const SubOptionsComponent = ({ subOptions, colors }) => {
               <TableRow>
 
                 <TableCell align="center" style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
-                  <div>
+                  <div style={{ color: colors.textColor }}>
                     <IconButton style={{ color: colors.iconColor }}>
-                      <Link to="/tab/setting"><ArrowBackIos /></Link>
+                      <Link to="/settings"><ArrowBackIos /></Link>
                     </IconButton>
                     Set Your Account
                   </div>
