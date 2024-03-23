@@ -241,7 +241,6 @@ const ChatWindow = ({ selectedUser }) => {
           <div style={{ flex: 1, overflowY: 'auto', borderLeft: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderRight: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '10px' }}>
             {allMessages.slice().reverse().map((message, index) => (
               <div key={`message-${index}`} className={`d-flex flex-row justify-content-${message.sender === senderUuid ? 'end' : 'start'} mb-4`}>
-                {console.log()}
                 {message.sender !== senderUuid && (
                   <Avatar src={selectedUser?.photoURL || ''} alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} style={{ width: '30px', height: '30px', marginRight: '5px' }} />
                 )}
