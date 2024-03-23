@@ -68,6 +68,44 @@ const ChatWindow = ({ selectedUser }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
 
+  const inputRef = useRef(null);
+  const emojiButtonRef = useRef(null);
+  const emojiPickerRef = useRef(null);
+  const [emojiButtonPosition, setEmojiButtonPosition] = useState(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [selectedUser, senderUuid, receiverUUID]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        emojiButtonRef.current &&
+        emojiButtonRef.current.contains(event.target)
+      ) {
+        return;
+      }
+
+      if (
+        emojiPickerRef.current &&
+        emojiPickerRef.current.contains(event.target)
+      ) {
+        return;
+      }
+      setShowEmojiPicker(false);
+    };
+
+    if (showEmojiPicker) {
+      document.body.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.body.removeEventListener('click', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
 
   const handleEmojiSelect = (emojiObject) => {
     // const emojiUnicode = emoji.unified.split('-').map((code) => String.fromCodePoint(`0x${code}`)).join('');
@@ -82,7 +120,7 @@ const ChatWindow = ({ selectedUser }) => {
   const fetchMessages = async () => {
     try {
       if (selectedUser && receiverUUID) {
-        const response = await fetch(`${config.apiUrl}/get-messages/${receiverUUID}`);
+        const response = await fetch(`${config.apiUrl}/chat/get-messages/${receiverUUID}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -174,7 +212,7 @@ const ChatWindow = ({ selectedUser }) => {
     return formattedTime;
   };
 
-  console.log("all messeges123", allMessages)
+  // console.log("all messeges123", allMessages)
 
 
   return (
@@ -225,22 +263,8 @@ const ChatWindow = ({ selectedUser }) => {
 
       {
         selectedUser && (
-          <div className='col-12 d-flex' style={{ width: '100%', boxSizing: 'border-box' }}>
-            <input
-              id="chatInput"
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              style={{
-                flex: '1',
-                borderRadius: '0 0 0 10px',
-                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-                backgroundColor: colors.backgroundColor,
-                color: colors.textColor,
-                padding: '10px 10px',
-                outline: 'none',
-              }}
-            />
+          <div className='col-12 d-flex chatmobile' style={{ width: '100%', boxSizing: 'border-box' }}>
+
             <IconButton
               variant="contained"
               style={{
@@ -248,23 +272,65 @@ const ChatWindow = ({ selectedUser }) => {
                 borderRight: 'none',
                 padding: '10px',
                 color: colors.textColor,
-                borderRadius: '0',
+                borderRadius: '0 0 0 10px',
                 backgroundColor: colors.backgroundColor,
                 border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
               }}
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              ref={emojiButtonRef}
             >
               <EmojiEmotions />
             </IconButton>
 
             {showEmojiPicker && (
-              <div style={{ position: 'fixed', bottom: '70px', right: '10px', zIndex: '1', overflow: 'auto' }}>
+              <div
+                ref={emojiPickerRef}
+                style={{
+                  position: 'absolute',
+                  zIndex: '9999',
+                  overflow: 'auto',
+                  left: emojiButtonPosition ? `${emojiButtonPosition.left}px` : 'auto',
+                  bottom: emojiButtonPosition ? `calc(100vh - ${emojiButtonPosition.bottom}px)` : 'auto',
+                  top: emojiButtonPosition ? `calc(${emojiButtonPosition.top}px - ${emojiPickerRef.current.clientHeight}px - 50%)` : 'auto',
+                  transform: 'translateY(-450px)',
+                }}
+              >
                 <EmojiPicker set='emojione' onEmojiClick={handleEmojiSelect} />
               </div>
             )}
 
+            <input
+              id="chatInput"
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              ref={inputRef}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && newMessage.trim() !== '') {
+                  handleSendMessage();
+                }
+              }}
+              style={{
+                flex: '1',
+                borderRadius: '0',
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`,
+                backgroundColor: colors.backgroundColor,
+                color: colors.textColor,
+                padding: '10px 10px',
+                outline: 'none',
+                borderRight: 'none',
+                borderLeft: 'none',
+              }}
+              autoComplete="off"
+            />
+
             <IconButton
-              onClick={handleSendMessage}
+              onClick={() => {
+                const trimmedMessage = newMessage.trim();
+                if (trimmedMessage !== '') {
+                  handleSendMessage();
+                }
+              }}
               variant="contained"
               style={{
                 borderLeft: 'none',

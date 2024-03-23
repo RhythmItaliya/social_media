@@ -313,10 +313,28 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                 >
                   <Close />
                 </IconButton>
-                <h2 style={{ color: colors.textColor }}>Upload Your Story</h2>
+                <h2 style={{ color: colors.textColor, fontSize: '20px' }}>Upload Your Story</h2>
+
+                <div style={{ marginTop: '10px' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                    id="mediaInput"
+                  />
+                  <label htmlFor="mediaInput">
+                    <Tooltip title="Select Media" placement="bottom">
+                      <IconButton style={{ color: colors.iconColor }} component="span">
+                        <Upload />
+                      </IconButton>
+                    </Tooltip>
+                  </label>
+                </div>
 
                 <TextareaAutosize
-                  minRows={3}
+                  minRows={2}
+                  maxRows={3}
                   placeholder="Story Text"
                   value={newStoryText}
                   onChange={(e) => setNewStoryText(e.target.value)}
@@ -356,23 +374,6 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                     </div>
                   </div>
                 )}
-
-                <div style={{ marginTop: '8px' }}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: 'none' }}
-                    id="mediaInput"
-                  />
-                  <label htmlFor="mediaInput">
-                    <Tooltip title="Select Media" placement="bottom">
-                      <IconButton style={{ color: colors.iconColor }} component="span">
-                        <Upload />
-                      </IconButton>
-                    </Tooltip>
-                  </label>
-                </div>
 
                 {newStoryImage && (
                   <>
@@ -588,22 +589,31 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
           </Modal>
 
           {uploadingStory ? null : (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: colors.backgroundColor, borderRadius: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} className='gap-5'>
               <IconButton style={{ position: 'absolute', top: 0, right: 0, color: colors.iconColor }} onClick={handleClose}>
                 <Close style={{ color: colors.iconColor }} />
               </IconButton>
 
-              <Tooltip title="View Story" placement="bottom">
-                <IconButton style={{ color: colors.iconColor, marginRight: '10px' }} onClick={handleViewStory}>
-                  <Visibility />
-                </IconButton>
+              <Tooltip title="View Your Story" placement="bottom">
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <IconButton style={{ color: colors.iconColor, marginBottom: '5px' }} onClick={handleViewStory}>
+                    <Visibility />
+                  </IconButton>
+                  <p style={{ color: colors.textColor, margin: '0', fontSize: '12px' }}>View Your Story</p>
+                </div>
               </Tooltip>
 
-              <Tooltip title="Upload Story" placement="bottom">
-                <IconButton style={{ color: colors.iconColor, marginRight: '10px' }} onClick={handleUploadStory}>
-                  <Add />
-                </IconButton>
+
+              <Tooltip title="Upload Your Story" placement="bottom">
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <IconButton style={{ color: colors.iconColor, marginBottom: '5px' }} onClick={handleUploadStory}>
+                    <Add />
+                  </IconButton>
+                  <p style={{ color: colors.textColor, margin: '0', fontSize: '12px' }}>Upload Your Story</p>
+                </div>
               </Tooltip>
+
+
             </div>
           )}
         </div>

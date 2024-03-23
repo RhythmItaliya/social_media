@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { Grid, Tabs, Tab } from '@mui/material';
 import Profilebar from "../navbar/ProfileBar";
 import Post from '../Post/Post';
 import FriendPost from '../Post/FriendPost';
 import StoryList from '../Story/StoryList';
 import './mix.css';
 import { useDarkMode } from '../theme/Darkmode';
+import { Tabs, Tab, Drawer, IconButton } from '@mui/material';
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
+import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
+
+
+import UserChatList from '../Chat/UserChatList';
+import DrawerWindow from '../Chat/DrawerWindow';
 
 
 const lightModeColors = {
@@ -48,14 +54,13 @@ const hexToRgb = (hex) => {
 // border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` 
 
 const Homemix = () => {
-
     // Dark mode
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     const [value2, setValue2] = useState(0);
     const [isStoryVisible, setIsStoryVisible] = useState(false);
-
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const handleChange2 = (event, newValue2) => {
         setValue2(newValue2);
     };
@@ -64,56 +69,95 @@ const Homemix = () => {
         setIsStoryVisible(!isStoryVisible);
     };
 
+    const toggleDrawer = (open) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        setIsDrawerOpen(open);
+    };
+
+    const toggleCloseDrawer = () => {
+        setIsDrawerOpen(!isDrawerOpen);
+    };
+
+
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
+
+    const handleUserSelect = (user) => {
+        setSelectedUser(user);
+        setIsChatWindowOpen(true);
+    };
 
     return (
-
         <>
             <div className="overflow-hidden" style={{ height: '100vh' }}>
+
+                <Drawer
+                    anchor="right"
+                    open={isDrawerOpen}
+                    onClose={toggleDrawer(false)}
+                    className="custom-drawer"
+                >
+                    <IconButton onClick={toggleCloseDrawer} style={{ position: 'absolute', top: '50%', right: '0', transform: 'translateY(-50%)', zIndex: '1000', backgroundColor: colors.backgroundColor, color: colors.iconColor }}>
+                        <ArrowForwardIosOutlinedIcon />
+                    </IconButton>
+                    <div style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }}>
+                        <UserChatList onSelectUser={handleUserSelect} />
+                        {isChatWindowOpen && selectedUser && (
+                            <DrawerWindow selectedUser={selectedUser} />
+                        )}
+                    </div>
+                </Drawer>
+
                 {/* Render Profilebar only once */}
                 <Profilebar toggleStoryVisibility={toggleStoryVisibility} />
 
-                {/* Conditionally render Story */}
+                {/*  Story */}
                 {isStoryVisible && (
                     <div className={`story-container w-50 mx-auto visible smooth-visible-transition smooth-width-transition`}>
                         <StoryList colors={colors} />
                     </div>
                 )}
 
-                <div className="grid-container">
-                    <Grid item xs={12} lg={6} className='mx-auto justify-content-center d-flex'>
-                        <div>
-                            <div className='justify-content-center align-content-center d-flex'>
-                                <Tabs
-                                    value={value2}
-                                    onChange={handleChange2}
-                                >
-                                    <Tab
-                                        label="Show Friend Post"
-                                        style={{
-                                            fontSize: '12px',
-                                        }}
-                                    />
-                                    <Tab
-                                        label="Show Your Post"
-                                        style={{
-                                            fontSize: '12px',
-                                        }}
-                                    />
-                                </Tabs>
-                            </div>
-                            <div className="tab-content">
-                                {value2 === 0 && <FriendPost />}
-                                {value2 === 1 && <Post />}
-                            </div>
-                        </div>
-                    </Grid>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-12 col-lg-6 mx-auto justify-content-center d-flex">
+                            <div>
+                                {/* Messeges */}
+                                <IconButton onClick={toggleDrawer(true)} style={{ position: 'fixed', top: '50%', right: '0', transform: 'translateY(-50%)', zIndex: '1000', color: colors.iconColor }}>
+                                    <ArrowBackIosNewOutlinedIcon />
+                                </IconButton>
 
-                    <Grid item xs={12} lg={3} className='mx-auto justify-content-center d-flex'>
-                        <div className="sender-component">
-                            {/* <SenderComponent /> */}
+                                {/* Main Post */}
+                                <div className="justify-content-center align-content-center d-flex">
+                                    <Tabs
+                                        value={value2}
+                                        onChange={handleChange2}
+                                    >
+                                        <Tab
+                                            label="Show Friend Post"
+                                            style={{
+                                                fontSize: '12px',
+                                            }}
+                                        />
+                                        <Tab
+                                            label="Show Your Post"
+                                            style={{
+                                                fontSize: '12px',
+                                            }}
+                                        />
+                                    </Tabs>
+                                </div>
+                                <div className="tab-content">
+                                    {value2 === 0 && <FriendPost />}
+                                    {value2 === 1 && <Post />}
+                                </div>
+                            </div>
                         </div>
-                    </Grid>
+                    </div>
                 </div>
+
             </div>
         </>
     );

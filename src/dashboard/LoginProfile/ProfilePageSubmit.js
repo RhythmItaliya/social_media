@@ -8,7 +8,7 @@ const ProfilePageSubmit = ({ colors, onClick, isDisabled }) => {
       variant="contained"
       onClick={onClick}
       disabled={isDisabled}
-      style={{ marginTop: '16px', backgroundColor: colors.backgroundColor, color: '#ec1b90' }}
+      style={{ marginTop: '16px', backgroundColor: "#ec1b90", color: colors.textColor }}
     >
       Submit
     </Button>

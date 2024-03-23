@@ -44,3 +44,24 @@
   /* Enable smooth transitions for width changes */
   transition: width 0.3s ease;
 }
+
+
+/* Adjusting styles for the drawer paper */
+.css-1160xiw-MuiPaper-root-MuiDrawer-paper {
+  width: 500px !important;
+  height: 500px !important;
+  position: fixed !important;
+  top: 23% !important;
+}
+
+.custom-drawer .MuiDrawer-paper {
+  background-color: var(--background-color-dark) !important;
+  background-color: var(--background-color-light) !important;
+
+}
+
+
+:root {
+  --background-color-light: #ffffff;
+  --background-color-dark: rgb(0, 0, 0);
+}

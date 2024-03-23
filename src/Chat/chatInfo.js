@@ -1,3 +1,4 @@
+// chatInfo.js
 import io from 'socket.io-client';
 import config from '../configuration';
 
@@ -22,7 +23,7 @@ export const joinRoom = (senderUuid, receiverUuid, updateMessages) => {
   const fetchMessages = async () => {
     try {
       if (receiverUuid) {
-        const response = await fetch(`${config.apiUrl}/get-messages/${receiverUuid}`);
+        const response = await fetch(`${config.apiUrl}/chat/get-messages/${receiverUuid}`);
         const data = await response.json();
 
 
@@ -65,9 +66,7 @@ export const sendMessage = (senderUuid, receiverUuid, content, room) => {
   });
 };
 
-// Function to generate a unique room ID based on two user UUIDs
 export const generateRoomId = (uuid1, uuid2) => {
-  // Sort UUIDs to ensure consistent room ID regardless of order
   const sortedUUIDs = [uuid1, uuid2].sort();
   return `${sortedUUIDs[0]}-${sortedUUIDs[1]}`;
 };

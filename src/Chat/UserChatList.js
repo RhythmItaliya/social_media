@@ -80,7 +80,7 @@ const UserChatList = ({ onSelectUser }) => {
           // Fetch last message for each friend
           const friendsWithLastMessage = await Promise.all(
             fetchedFriendsList.map(async (friend) => {
-              const lastMessageResponse = await fetch(`${config.apiUrl}/get-last-message/${friend.uuid}`);
+              const lastMessageResponse = await fetch(`${config.apiUrl}/chat/get-last-message/${friend.uuid}`);
               const lastMessageData = await lastMessageResponse.json();
               const lastMessage = lastMessageData.lastMessage;
 
