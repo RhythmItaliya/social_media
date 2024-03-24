@@ -47,7 +47,7 @@
 
 
 /* Adjusting styles for the drawer paper */
-.css-1160xiw-MuiPaper-root-MuiDrawer-paper {
+.custom-drawer .css-1160xiw-MuiPaper-root-MuiDrawer-paper {
   width: 500px !important;
   height: 500px !important;
   position: fixed !important;

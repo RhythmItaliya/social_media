@@ -26,7 +26,7 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
         if (profileUUID === user.userProfile.uuid) {
             navigate(`/account`);
         } else {
-            navigate(`/friend/${username}`);
+            navigate(`/${username}`);
         }
     };
 
@@ -64,16 +64,14 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
         <div
             className='searchOverlay d-flex justify-content-center align-content-center'
             style={{
-                borderLeft: showBorder ? `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` : 'none',
-                borderRight: showBorder ? `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` : 'none',
+                border: showBorder ? `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` : 'none',
+                border: showBorder ? `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` : 'none',
                 width: '100%',
                 height: '100%',
                 position: 'fixed',
                 zIndex: 9999,
-                // backgroundColor: colors.transparentColor,
-                // backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 backgroundColor: colors.backgroundColor,
-                top: '57%',
+                top: '59%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 overflowY: 'auto',

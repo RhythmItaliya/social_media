@@ -139,7 +139,15 @@ export default function Profilebar({ toggleStoryVisibility }) {
                         <Typography variant="subtitle1" sx={{ color: colors.textColor }}>
                             {user.username}
                         </Typography>
-                        <Avatar alt="User Avatar" src={user.avatar} />
+
+                        <Avatar
+                            alt={`${user.username}`}
+                            src={user.avatar}
+                            style={{
+                                width: '40px',
+                                height: '40px'
+                            }}
+                        />
                     </UserInfo>
                 </Toolbar>
             </AppBar>

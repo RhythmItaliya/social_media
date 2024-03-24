@@ -11,11 +11,15 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Modal,
+    Button,
 } from '@mui/material';
 import { CloseOutlined } from '@material-ui/icons';
 import { Close } from '@mui/icons-material';
 import config from '../configuration';
-
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { useSelector } from 'react-redux';
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -26,6 +30,8 @@ const hexToRgb = (hex) => {
 };
 
 const PublicCustomButton = ({ colors, profileUUID }) => {
+
+    const loginUserProfileUUID = useSelector((state) => state.profileuuid.uuid);
 
     const [friend, setFriend] = useState([]);
     const [friendCount, setFriendCount] = useState(0);
@@ -45,13 +51,147 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
     const [selectedIgnore, setSelectedIgnore] = useState(null);
     const [isIgnoreAvatarModalOpen, setIsIgnoreAvatarModalOpen] = useState(false);
 
-
     const [messageDrawerOpen, setMessageDrawerOpen] = useState(false);
 
 
+    // ========================== TOTAL COUNT ========================== //
+    useEffect(() => {
+        const fetchFriendCount = async () => {
+            try {
+                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships-crushes-ignores/count/${profileUUID}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!friendCountResponse.ok) {
+                    console.error('Failed to fetch friend count');
+                    throw new Error('Failed to fetch friend count');
+                }
+
+                const postfriendData = await friendCountResponse.json();
+                setFriendCount(postfriendData.friendshipCount);
+                setCrushCount(postfriendData.crushCount);
+                setIgnoreCount(postfriendData.ignoreCount)
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchFriendCount();
+    }, [profileUUID]);
 
 
+    // ========================== RATTING START ========================== //
+    const [rateOpen, setRateOpen] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [totalRatings, setTotalRatings] = useState(0);
+    const [averageRating, setAverageRating] = useState(0);
+    const [fieldRating, setFieldRating] = useState(0);
+    const [dummyState, setDummyState] = useState(false);
 
+    const handleRateOpen = () => {
+        setRateOpen(true);
+        fetchFieldRating();
+    };
+
+    const handleRateClose = () => {
+        setRateOpen(false);
+    };
+
+    const handleRating = (value) => {
+        setRating(value);
+        setFieldRating(value);
+    };
+
+    const fetchTotalRating = async () => {
+        try {
+            const response = await fetch(`${config.apiUrl}/ratings/rating/total/${profileUUID}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setTotalRatings(data.totalRating);
+            } else {
+                console.error('Failed to fetch total rating');
+            }
+        } catch (error) {
+            console.error('Error fetching total rating:', error);
+        }
+    };
+
+    const fetchFieldRating = async () => {
+        try {
+            const response = await fetch(`${config.apiUrl}/ratings/rating/users?profileUUID1=${loginUserProfileUUID}&profileUUID2=${profileUUID}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setFieldRating(data.fieldRating);
+                setDummyState(prevState => !prevState);
+            } else {
+                console.error('Failed to fetch field rating');
+            }
+        } catch (error) {
+            console.error('Error fetching field rating:', error);
+        }
+    };
+
+    const handleRatingSubmit = async () => {
+        try {
+            const response = await fetch(`${config.apiUrl}/ratings/rating`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rateUserProfile1Uuid: loginUserProfileUUID,
+                    rateUserProfile2Uuid: profileUUID,
+                    rating: rating,
+                }),
+            });
+            if (response.ok) {
+                console.log('Rating submitted successfully');
+                fetchTotalRating();
+                fetchFieldRating();
+            } else {
+                console.error('Failed to submit rating');
+            }
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+        handleRateClose();
+    };
+
+    useEffect(() => {
+        fetchTotalRating();
+        fetchFieldRating();
+    }, [profileUUID, loginUserProfileUUID]);
+
+    useEffect(() => {
+        const totalPossibleRating = (friendCount + crushCount - ignoreCount) * 5;
+        if (totalRatings > 0 && totalPossibleRating > 0) {
+            const average = (totalRatings / totalPossibleRating) * 10;
+            setAverageRating(average);
+        } else {
+            setAverageRating(0);
+        }
+    }, [totalRatings, friendCount, crushCount, ignoreCount]);
+
+    // ========================== RATTING END ========================== //
+
+    // ========================== DRAWER START ========================== //
     const handleDrawerOpen = async (drawerType) => {
         setFriendDrawerOpen(false);
         setMessageDrawerOpen(false);
@@ -100,8 +240,6 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
                         if (crushResponse.ok) {
                             const crushData = await crushResponse.json();
                             setCrushes(crushData.crushesInfo);
-                            // Inside the useEffect for crushes
-                            console.log("Crushes:", crushData.crushesInfo);
                         } else {
                             console.error('Failed to fetch crushes data');
                         }
@@ -124,7 +262,6 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
                         if (ignoreResponse.ok) {
                             const ignoreData = await ignoreResponse.json();
                             setIgnores(ignoreData.ignoreInfo);
-
                         } else {
                             console.error('Failed to fetch ignores data');
                         }
@@ -175,48 +312,42 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
         </Tooltip>
     );
 
-    // About Friend
-    useEffect(() => {
-        const fetchFriendCount = async () => {
-            try {
-                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships-crushes-ignores/count/${profileUUID}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!friendCountResponse.ok) {
-                    console.error('Failed to fetch friend count');
-                    throw new Error('Failed to fetch friend count');
-                }
-
-                const postfriendData = await friendCountResponse.json();
-                setFriendCount(postfriendData.friendshipCount);
-                setCrushCount(postfriendData.crushCount);
-                setIgnoreCount(postfriendData.ignoreCount)
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchFriendCount();
-    }, [profileUUID]);
-
+    // ========================== DRAWER END ========================== //
 
     return (
         <>
             <div className='col-12'>
                 <Grid item className='d-flex gap-4 p-3 justify-content-around'>
+
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('ratting')}>
-                            <Typography style={{ fontSize: '30px', color: colors.textColor }}>50</Typography>
+                        <IconButton sx={{ color: colors.iconColor }} onClick={handleRateOpen}>
+                            <Typography style={{ fontSize: '30px', color: colors.textColor }}>
+                                {averageRating.toFixed(1)}
+                            </Typography>
                         </IconButton>
                         <Typography style={{ fontSize: "10px", color: colors.labelColor }}>
-                            Ratting
+                            {totalRatings} star
                         </Typography>
+                        <Modal
+                            open={rateOpen}
+                            onClose={handleRateClose}
+                            aria-labelledby="rating-modal"
+                            aria-describedby="modal-to-give-rating"
+                        >
+                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: colors.backgroundColor, textColor: colors.textColor, padding: '20px' }}>
+                                <Typography variant="h6">Give Rating</Typography>
+                                {[1, 2, 3, 4, 5].map((index) => (
+                                    <IconButton key={index} onClick={() => handleRating(index)} style={{ color: colors.iconColor }}>
+                                        {index <= fieldRating ? <StarIcon /> : <StarBorderIcon />}
+                                    </IconButton>
+                                ))}
+                                <Button variant="contained" onClick={handleRatingSubmit}>
+                                    Submit
+                                </Button>
+                            </div>
+                        </Modal>
                     </div>
+
 
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('friendCount')}>

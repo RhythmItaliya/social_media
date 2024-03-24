@@ -62,8 +62,6 @@ const App = () => {
 
           <Route path="/:username" element={<ProfileRoute />} />
 
-          <Route path="/friend/:username" element={<ProfileRoute />} />
-
           <Route path="*" element={<NotFound />} />
 
           <Route path="/terms-and-conditions" element={<Terms />} />
