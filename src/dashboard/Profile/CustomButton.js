@@ -36,7 +36,7 @@ const darkModeColors = {
   backgroundColor: 'rgb(0,0,0)',
   iconColor: '#ffffff',
   textColor: '#ffffff',
-  focusColor: '#ffffff',      
+  focusColor: '#ffffff',
   border: '#333333',
   boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.1) inset',
   spinnerColor: '#ffffff',
@@ -79,8 +79,42 @@ const CustomButton = () => {
 
   const [messageDrawerOpen, setMessageDrawerOpen] = useState(false);
 
+  const [totalRatings, setTotalRatings] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
 
+  const fetchTotalRating = async () => {
+    try {
+      const response = await fetch(`${config.apiUrl}/ratings/rating/total/${profileUUID}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTotalRatings(data.totalRating);
+      } else {
+        console.error('Failed to fetch total rating');
+      }
+    } catch (error) {
+      console.error('Error fetching total rating:', error);
+    }
+  };
 
+  useEffect(() => {
+    fetchTotalRating();
+  }, [profileUUID]);
+
+  useEffect(() => {
+    const totalPossibleRating = (friendCount + crushCount - ignoreCount) * 5;
+    if (totalRatings > 0 && totalPossibleRating > 0) {
+      const average = (totalRatings / totalPossibleRating) * 10;
+      setAverageRating(average);
+    } else {
+      setAverageRating(0);
+    }
+  }, [totalRatings, friendCount, crushCount, ignoreCount]);
 
 
   const handleDrawerOpen = async (drawerType) => {
@@ -241,11 +275,13 @@ const CustomButton = () => {
       <div className='col-12'>
         <Grid item className='d-flex gap-4 p-3 justify-content-around'>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('ratting')}>
-              <Typography style={{ fontSize: '30px', color: colors.textColor }}>50</Typography>
+            <IconButton sx={{ color: colors.iconColor }}>
+              <Typography style={{ fontSize: '30px', color: colors.textColor }}>
+                {averageRating.toFixed(1)}
+              </Typography>
             </IconButton>
             <Typography style={{ fontSize: "10px", color: colors.labelColor }}>
-              Ratting
+              {totalRatings} star
             </Typography>
           </div>
 
