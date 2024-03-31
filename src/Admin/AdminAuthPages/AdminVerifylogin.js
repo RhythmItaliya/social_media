@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useDarkMode } from '../theme/Darkmode';
-import config from "../configuration";
+import { useDarkMode } from '../../theme/Darkmode';
+import config from "../../configuration";
 import LoadingBar from 'react-top-loading-bar';
 
-import logoImage from '../assets/vortex.png';
+import logoImage from '../../assets/vortex.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -42,7 +42,7 @@ const useVerifyLogin = () => {
 
     useEffect(() => {
         const checkLinkExpire = () => {
-            fetch(`${config.apiUrl}/auth/verify/login/${token}`, {
+            fetch(`${config.apiUrl}/admins/admin/verify/login/${token}`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -83,14 +83,14 @@ const useVerifyLogin = () => {
     return { isValid, loading, progress };
 };
 
-const VerifyLogin = () => {
+const AdminVerifylogin = () => {
     const { isValid, loading, progress } = useVerifyLogin();
     const navigate = useNavigate();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!loading) {
-                navigate("/login");
+                navigate("/admin/login");
             }
         }, 3000);
 
@@ -106,16 +106,18 @@ const VerifyLogin = () => {
             return (
                 <>
                     <h2>Your Account Is Verified.</h2>
-                    <Link to="/login">Go to Login</Link>
+                    <p>You now Log in Admin Penal</p>
+                    <Link to="/admin/login">Go to Login</Link>
                 </>
             );
         } else if (isValid === false) {
             return (
                 <>
                     <h2>Your Account Is Verified.</h2>
+                    <p>You now Log in Admin Penal</p>
                     {/* <p>Please make sure you've used the correct verification link.</p> */}
                     {/* <h2> Link Is Invalid.</h2> */}
-                    <Link to="/login">Go to Login</Link>
+                    <Link to="/admin/login">Go to Login</Link>
 
                 </>
             );
@@ -145,4 +147,4 @@ const VerifyLogin = () => {
     );
 };
 
-export default VerifyLogin;
+export default AdminVerifylogin;

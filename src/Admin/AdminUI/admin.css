@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* AdminNav */
+.admin-nav {
+  background-color: #001529;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.admin-sidebar {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-right: 16px;
+}
+
+.ant-menu-item {
+  margin: 8px 0;
+  border-radius: 5px;
+}
+
+.ant-layout-content {
+  background-color: #f0f2f5;
+  padding: 20px;
+  margin: 16px;
+  border-radius: 5px;
+}
+
+.tab-content {
+  animation: fadeIn 0.5s ease;
+}
+
+.username {
+  color: #fff;
+}
+
+/* Text */
+.text {
+  color: #000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

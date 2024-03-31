@@ -12,7 +12,7 @@ import '../App.css';
 import config from '../configuration';
 
 
-import logoImage from '../assets/orkut-logo.png';
+import logoImage from '../assets/vortex.png';
 
 const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -144,7 +144,7 @@ const Dashboard = () => {
 
             const photoData = await response.json();
             dispatch(setUserPhoto(photoData.completeImageUrl));
-            console.log(photoData.completeImageUrl);
+
         } catch (error) {
             console.error(error);
             setError('An error occurred while fetching user photo. Please try again.');
@@ -154,40 +154,35 @@ const Dashboard = () => {
         }
     };
 
-    const setDefaultUserPhoto = () => {
-        const defaultImageUrl = 'https://placekitten.com/200/300';
-        dispatch(setUserPhoto(defaultImageUrl));
-        console.log(defaultImageUrl);
+    const setDefaultUserPhoto = async () => {
+        try {
+            const response = await fetch(`${config.apiUrl}/admins/get/defaultAvatar`);
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Failed to fetch default avatar URL');
+                return;
+            }
+            const defaultImageUrl = data.avatarURL;
+            dispatch(setUserPhoto(defaultImageUrl));
+        } catch (error) {
+            console.error('Error fetching default avatar URL:', error);
+        }
     };
 
     return (
-        // <div className='container-fluid p-0 m-0 overflow-hidden' style={{ backgroundColor: "rgb(0,0,0)" }}>
-        //     <div className='row'>
-        //         <LoadingBar progress={loadingBarProgress} height={3} color="#f11946" onLoaderFinished={() => setLoadingBarProgress(0)} />
-        //         {isLoading ? (
-        //             <div className="d-flex overflow-hidden justify-content-center align-content-center">
-        //                 <img src={logoImage} alt="Logo" className="user-select-none" style={{ width: '150px' }} />
-        //             </div>
-
-        //         ) : error ? (
-        //             <p style={{ color: 'red' }}>{error}</p>
-        //         ) : (
-        //             <VerticalTabs />
-        //         )}
-        //     </div>
-        // </div>
         <div className='container-fluid p-0 m-0 overflow-hidden' style={{ backgroundColor: "rgb(0,0,0)" }}>
             <div className='row'>
                 <LoadingBar progress={loadingBarProgress} height={3} color="#ec1b90" onLoaderFinished={() => setLoadingBarProgress(0)} />
                 {isLoading ? (
                     <div className="d-flex overflow-hidden justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-                        
+
                         <div className="m-2 loading-dots">
                             <div></div>
                             <div></div>
                             <div></div>
                         </div>
-                        
+
                         <img src={logoImage} alt="Logo" className="user-select-none" style={{ width: '250px', height: 'auto' }} />
 
                         <div className="m-2 loading-dots">

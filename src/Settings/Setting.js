@@ -59,11 +59,11 @@ const dataMapping = {
     { option: 'Birthdate', subOptions: 'birthDate' },
   ],
   'Post Info': [
-    { option: 'Post Option 1', subOptions: ['Post Sub Option 1-1', 'Post Sub Option 1-2', 'Post Sub Option 1-3'] },
-    { option: 'Post Option 2', subOptions: ['Post Sub Option 2-1', 'Post Sub Option 2-2', 'Post Sub Option 2-3'] },
-    { option: 'Post Option 3', subOptions: ['Post Sub Option 3-1', 'Post Sub Option 3-2', 'Post Sub Option 3-3'] },
+    { option: 'Delete All Posts', subOptions: 'deletePosts' },
+    { option: 'Private All Posts', subOptions: 'privatePosts' },
   ],
 };
+
 
 export default function Settings() {
   const { isDarkMode } = useDarkMode();

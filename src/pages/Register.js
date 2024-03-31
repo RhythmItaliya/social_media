@@ -15,7 +15,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Person4OutlinedIcon from '@mui/icons-material/Person4Outlined';
 import { MailOutlineOutlined } from '@material-ui/icons';
 
-import logoImage from '../assets/orkut-logo.png';
+import logoImage from '../assets/vortex.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -54,7 +54,7 @@ const hexToRgb = (hex) => {
 
 const Register = ({ registerUser, register, error, loading }) => {
 
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleDarkMode = () => {
         setIsDarkMode(!isDarkMode);
@@ -104,9 +104,9 @@ const Register = ({ registerUser, register, error, loading }) => {
                         <div className="col-12 col-md-8 col-lg-6 col-xl-4">
 
                             <div>
-                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
+                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '250px' }} />
                                 <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '26px', letterSpacing: '1px' }}>
-                                    Sign in to Orkut
+                                    Sign in to Vortex
                                 </p>
                             </div>
 
@@ -177,7 +177,7 @@ const Register = ({ registerUser, register, error, loading }) => {
                                             disabled={loading}
                                             style={buttonStyle}
                                         >
-                                            {loading ? 'Loading...' : 'Log in'}
+                                            {loading ? 'Loading...' : 'Sign in'}
                                         </Button>
 
                                     </div>
@@ -186,7 +186,7 @@ const Register = ({ registerUser, register, error, loading }) => {
 
                                     <div className="text-center">
                                         <Link to="/login" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Log in Orcut
+                                            Log in Vortex
                                         </Link>
                                     </div>
                                 </div>

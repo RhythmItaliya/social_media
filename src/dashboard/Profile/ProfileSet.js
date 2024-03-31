@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDarkMode } from "../../theme/Darkmode";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PostProfile from './PostProfile';
 import { useSelector } from 'react-redux';
 import CustomButton from './CustomButton';
-import { CloseOutlined } from '@material-ui/icons';
 
 import {
     IconButton,
@@ -17,7 +15,12 @@ import {
     DialogContent,
     DialogActions,
 } from '@mui/material';
-import LoadingBar from 'react-top-loading-bar';
+
+
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
+import { CloseOutlined } from '@material-ui/icons';
+
 import config from '../../configuration';
 
 const lightModeColors = {
@@ -60,7 +63,6 @@ const ProfileSet = () => {
     const [userBio, setUserBio] = useState('');
     const [loading, setLoading] = useState(true);
 
-    const defaultImageUrl = 'https://robohash.org/yourtext.png';
     const uuid = useSelector(state => state.useruuid.uuid);
     const profileUUID = useSelector(state => state.profileuuid.uuid);
     const userPhotoUrl = useSelector((state) => state.userPhoto.photoUrl);
@@ -72,6 +74,8 @@ const ProfileSet = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
+                setLoading(true);
+
                 const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
@@ -86,15 +90,23 @@ const ProfileSet = () => {
                 }
 
                 const data = await response.json();
+                const locationData = JSON.parse(data.userProfile.location);
+
+                const { country, state, city } = locationData;
+
                 setUserData({
                     firstName: data.userProfile.firstName,
                     lastName: data.userProfile.lastName,
-                    location: data.userProfile.location,
+                    location: {
+                        country: country,
+                        state: state,
+                        city: city
+                    },
                 });
                 setUserBio(data.userProfile.bio || '');
-                setLoading(false);
             } catch (error) {
                 console.error(error);
+            } finally {
                 setLoading(false);
             }
         };
@@ -105,6 +117,8 @@ const ProfileSet = () => {
     useEffect(() => {
         const fetchUserPostCount = async () => {
             try {
+                setLoading(true);
+
                 const postCountResponse = await fetch(`${config.apiUrl}/api/userPostsCount/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
@@ -122,11 +136,14 @@ const ProfileSet = () => {
                 setPostCount(postData.postCount);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchUserPostCount();
     }, [profileUUID]);
+
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -137,20 +154,35 @@ const ProfileSet = () => {
             {/* profile div */}
             <div className='gap-3' style={{ backgroundColor: colors.backgroundColor, color: colors.textColor, display: 'flex', alignItems: 'center', justifyContent: 'space-around', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.7)`, borderRadius: '10px', marginBottom: '10px', marginTop: '10px' }}>
                 {loading ? (
-                    <LoadingBar color="#ec1b90" height={3} />
+                    <div className="loading-dots">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                 ) : (
                     <div className='p-3 m-0 rounded-2'>
                         <Grid container alignItems="center" spacing={3}>
+
                             <Grid item>
-                                <Avatar
-                                    src={userPhotoUrl || defaultImageUrl}
-                                    alt="Profile Avatar"
-                                    style={{ width: '100px', height: '100px', cursor: 'pointer' }}
-                                    onClick={() => {
-                                        setIsAvatarModalOpen(true);
-                                        setAvtar(true);
-                                    }}
-                                />
+                                {userPhotoUrl ? (
+                                    <Avatar
+                                        src={userPhotoUrl}
+                                        alt={`${loginUserUsername || ''}`}
+                                        style={{ width: '100px', height: '100px', cursor: 'pointer', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}
+                                        onClick={() => {
+                                            setIsAvatarModalOpen(true);
+                                            setAvtar(true);
+                                        }}
+                                    />
+                                ) : (
+                                    <Avatar
+                                        alt={`@${loginUserUsername || ''}`}
+                                        style={{ width: '100px', height: '100px', cursor: 'pointer', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}
+                                        onClick={() => {
+                                            setIsAvatarModalOpen(true);
+                                            setAvtar(true);
+                                        }} />
+                                )}
                             </Grid>
 
                             {/* Avatar Modal */}
@@ -177,15 +209,25 @@ const ProfileSet = () => {
                                         boxShadow: colors.boxShadow,
                                     }}>
                                     {isAvtar && (
-                                        <Avatar
-                                            src={userPhotoUrl || defaultImageUrl}
-                                            alt="Profile Avatar"
-                                            style={{
-                                                width: '130px',
-                                                height: '130px',
-                                                margin: 'auto',
-                                            }}
-                                        />
+                                        userPhotoUrl ? (
+                                            <Avatar
+                                                src={userPhotoUrl}
+                                                alt={`${loginUserUsername || ''}`}
+                                                style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+                                                onClick={() => {
+                                                    setIsAvatarModalOpen(true);
+                                                    setAvtar(true);
+                                                }}
+                                            />
+                                        ) : (
+                                            <Avatar
+                                                style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+                                                onClick={() => {
+                                                    setIsAvatarModalOpen(true);
+                                                    setAvtar(true);
+                                                }}
+                                            />
+                                        )
                                     )}
                                 </DialogContent>
 
@@ -207,22 +249,23 @@ const ProfileSet = () => {
 
                             <Grid item>
                                 {userData && (
-                                    <Typography style={{ color: colors.textColor, fontSize: "18px" }}>
+                                    <Typography style={{ color: colors.textColor, fontSize: "16px" }}>
                                         {`${capitalizeFirstLetter(userData.firstName)} ${capitalizeFirstLetter(userData.lastName)}`}
                                     </Typography>
                                 )}
 
-                                <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                                    <Typography style={{ fontSize: "16px", color: colors.labelColor }}>
-                                        {`@${loginUserUsername || ''}`}
+                                <div style={{ display: 'flex', gap: '2px', alignItems: 'center', marginTop: '0px', marginBottom: '0px' }}>
+                                    <AlternateEmailOutlinedIcon style={{ color: colors.iconColor, fontSize: "12px", opacity: '0.7' }} />
+                                    <Typography style={{ fontSize: "14px", color: colors.labelColor }}>
+                                        {`${loginUserUsername || ''}`}
                                     </Typography>
                                 </div>
 
                                 {userData && (
                                     <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                                        <LocationOnIcon style={{ color: colors.iconColor, fontSize: "14px" }} />
+                                        <PlaceOutlinedIcon style={{ color: colors.iconColor, fontSize: "10px", opacity: '0.7' }} />
                                         <Typography style={{ fontSize: "12px", color: colors.labelColor }}>
-                                            {`${userData.location || ''}`}
+                                            {`${userData.location.country}, ${userData.location.state}, ${userData.location.city}` || ' '}
                                         </Typography>
                                     </div>
                                 )}

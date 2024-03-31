@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { TextField, IconButton, Container, Grid, LinearProgress } from '@mui/material';
+import { TextField, IconButton, Container, Grid, LinearProgress, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SendIcon from '@mui/icons-material/Send';
@@ -337,37 +337,36 @@ const PostForm = () => {
 
                     <Grid item container spacing={2} alignItems="center" xs={12}>
                         <Grid item xs={12}>
-                            <IconButton
+                            <Button
                                 type="submit"
                                 color="primary"
-                                style={{ color: colors.iconColor, borderRadius: 0 }}
+                                style={{ backgroundColor: colors.backgroundColor, gap: '10px', display: 'flex', justifyItems: 'center', alignContent: 'center', margin: '12px' }}
                             >
                                 <span
                                     style={{
-                                        color: colors.labelColor,
+                                        color: "#ec1b90",
                                         fontSize: '16px',
-                                        margin: '10px'
+                                        textDecoration: 'underline'
                                     }}
                                 >
                                     POST
                                 </span>
-                                <SendIcon />
-                            </IconButton>
+                                <SendIcon style={{ fontSize: '16px', color: '#ec1b90' }} />
+                            </Button>
                         </Grid>
                     </Grid>
-
                 </Grid>
 
                 {loading && (
-                    <div>
+                    <div className='m-2'>
                         <p style={{ color: colors.textColor }}>Uploading: {uploadProgress}%</p>
-                        <LinearProgress style={{ color: colors.textColor }} variant="determinate" value={uploadProgress} />
+                        <LinearProgress style={{ color: "#ec1b90" }} variant="determinate" value={uploadProgress} />
                     </div>
                 )}
 
             </form>
             <LoadingBar color={isDarkMode ? darkModeColors.spinnerColor : lightModeColors.spinnerColor} ref={ref} />
-        </Container>
+        </Container >
     );
 };
 

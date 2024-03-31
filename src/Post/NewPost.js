@@ -11,6 +11,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDarkMode } from '../theme/Darkmode';
 import { useDispatch } from 'react-redux';
 import { setBase64Data } from '../actions/authActions';
+import './otherpost.css';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -34,6 +35,14 @@ const darkModeColors = {
     spinnerColor: '#ffffff',
     labelColor: '#CCC',
     valueTextColor: '#ffffff'
+};
+
+const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
 };
 
 const NewPost = () => {
@@ -110,7 +119,7 @@ const NewPost = () => {
 
     return (
         <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '650px'
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 'auto'
         }}>
             {selectedImage ? (
                 <div>
@@ -181,16 +190,18 @@ const NewPost = () => {
 
                 </div>
             ) : (
-                <div>
-                    <label htmlFor="file-input">
-                        <CloudUploadIcon fontSize="large" style={{ color: colors.iconColor, cursor: 'pointer' }} />
+                <div className='p-4 rounded-1 file-upload-container' style={{ cursor: 'pointer', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
+                    <label htmlFor="file-input" className="upload-label">
+                        <div className="upload-icon-container">
+                            <CloudUploadIcon fontSize="large" style={{ color: colors.iconColor, }} className="upload-icon" />
+                        </div>
                     </label>
                     <input
                         id="file-input"
                         type="file"
                         onChange={handleImageChange}
                         accept="image/*"
-                        style={{ display: 'none', cursor: 'pointer' }}
+                        style={{ display: 'none' }}
                     />
                 </div>
             )}

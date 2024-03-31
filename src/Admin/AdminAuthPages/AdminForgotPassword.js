@@ -1,20 +1,16 @@
-// Login.js
-import { Form, Input, Button, Divider } from 'antd';
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-
-
+// AdminForgotPassword.js
+import { Form, Input, Button, Divider, message } from 'antd';
+import { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { noop } from "antd/es/_util/warning";
+import { MailOutlineOutlined } from '@material-ui/icons';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-// Redux
-import { connect } from 'react-redux';
-import { loginUser } from '../actions/loginAuth';
-import './Form.css';
 
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Person4OutlinedIcon from '@mui/icons-material/Person4Outlined';
+import config from '../../configuration';
 
-import logoImage from '../assets/vortex.png';
+import logoImage from '../../assets/vortex.png';
+
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -51,7 +47,7 @@ const hexToRgb = (hex) => {
 };
 
 
-const Login = ({ loginUser, loading, loggingIn, login, error }) => {
+const AdminForgotPassword = () => {
 
     const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -69,6 +65,8 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
     }, [isDarkMode]);
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;
+
+    const [loading, setLoading] = useState(false);
 
     const labelStyle = {
         color: colors.labelColor,
@@ -90,13 +88,38 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
         color: '#ffffff',
     };
 
-    const onFinish = async (values) => {
-        await loginUser(values);
+    const forgotPasswordbtn = (evt) => {
+
+        const mail = email.current.input.value;
+
+        if (!mail) {
+            message.warning("Please enter your email");
+            return;
+        }
+
+        setLoading(true);
+
+        fetch(`${config.apiUrl}/admins/admin/reset/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: mail }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    message.success("Check Your Email...");
+                    setTimeout(() => window.location.href = "/admin/login", 4500);
+                } else {
+                    setLoading(false);
+                    message.error("Email Can't be delivered...");
+                }
+            });
     };
+
+    let email = useRef();
 
     return (
         <>
-            <Form className="login-form justify-content-center align-items-center d-flex vh-100" onFinish={onFinish}
+            <Form className="login-form justify-content-center align-items-center d-flex vh-100"
                 style={{ backgroundColor: colors.backgroundColor, color: colors.textColor }}>
                 <div className="container">
                     <div className="row justify-content-center">
@@ -104,70 +127,42 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
 
                             <div>
                                 <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '250px' }} />
-                                <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '26px', letterSpacing: '1px' }}>
-                                    Log in to Vortex
+                                <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '16px' }}>
+                                    Admin Forgot Password Password ?
                                 </p>
                             </div>
 
-                            <div className='m-2 rounded-1' style={{ boxShadow: 'none', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
+                            <div className='m-2 ' style={{ boxShadow: 'none', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)` }}>
                                 <div className="card-body p-4" style={{ backgroundColor: colors.backgroundColor }}>
+
                                     <div>
                                         <div className="form-group">
-                                            <label htmlFor="username" className="p-1" style={labelStyle}>
-                                                Username or email address
-                                            </label>
-                                            <Form.Item
-                                                name="username"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: 'Please input your username!',
-                                                    },
-                                                ]}
-                                            >
+                                            <label htmlFor="email" className="p-1">Email</label>
+                                            <Form.Item name={'email'} rules={[
+                                                {
+                                                    required: true,
+                                                    message: noop,
+                                                },
+                                            ]}>
                                                 <Input
-                                                    type="text"
-                                                    id="username"
-                                                    placeholder="Enter your username or email"
-                                                    prefix={<Person4OutlinedIcon style={{ color: colors.iconColor, fontSize: '20px', margin: '3px' }} className="site-form-item-icon" />}
+                                                    type="email"
+                                                    id="email"
+                                                    placeholder="Enter your email"
+                                                    prefix={<MailOutlineOutlined style={{ color: colors.iconColor, fontSize: '20px', margin: '3px' }} className="site-form-item-icon" />}
                                                     style={inputStyle}
-                                                    className="placeholder-style"
-                                                    autoComplete="off"
-                                                />
-                                            </Form.Item>
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="password" className="p-1" style={labelStyle}>
-                                                Password
-                                            </label>
-                                            <Form.Item
-                                                name="password"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: 'Please input your password!',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input.Password
-                                                    type="password"
-                                                    id="password"
-                                                    placeholder="Enter your password"
-                                                    prefix={<LockOutlinedIcon style={{ color: colors.iconColor, fontSize: '20px', margin: '3px' }} className="site-form-item-icon" />}
-                                                    style={inputStyle}
-                                                    className="placeholder-style"
-                                                    autoComplete="off"
+                                                    ref={email}
                                                 />
                                             </Form.Item>
                                         </div>
 
                                         <Button
-                                            htmlType="submit"
+                                            type="submit"
+                                            onClick={forgotPasswordbtn}
                                             className="btn w-100 mt-2 btn-primary btn-block"
                                             disabled={loading}
                                             style={buttonStyle}
                                         >
-                                            {loading ? 'Loading...' : 'Log in'}
+                                            submit
                                         </Button>
 
                                     </div>
@@ -175,11 +170,11 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                                     <Divider className='p-0 m-1' />
 
                                     <div className="text-center">
-                                        <Link to="/forgotpassword" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Forgot password?
+                                        <Link to="/admin/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                            Log in for Vortex
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
-                                        <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                        <Link to="/admin/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
                                             Sign up for Vortex
                                         </Link>
                                     </div>
@@ -214,10 +209,4 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
     );
 };
 
-const mapStateToProps = (state) => ({
-    loggingIn: state.login.loggingIn,
-    error: state.login.error,
-    loading: state.login.loading,
-});
-
-export default connect(mapStateToProps, { loginUser })(Login);
+export default AdminForgotPassword;

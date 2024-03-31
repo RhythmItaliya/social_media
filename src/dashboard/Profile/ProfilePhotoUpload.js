@@ -1,228 +1,231 @@
-import React, { useState } from 'react';
-import { PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Modal, Upload, Button, message } from 'antd';
-import '../Tab/vertical.css';
-import { useSelector } from 'react-redux';
+// ProfileAvatarSelector.jsx
+import React, { useState, useRef } from 'react';
+import Avatar from '@mui/material/Avatar';
+import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import SaveIcon from '@mui/icons-material/Save';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Slider from '@mui/material/Slider';
+import AvatarEditor from 'react-avatar-editor';
+import Tooltip from '@mui/material/Tooltip';
 import config from '../../configuration';
-
-const getBase64 = (file) =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-    });
-
-const ProfilePhoto = () => {
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewImage, setPreviewImage] = useState('');
-    const [previewTitle, setPreviewTitle] = useState('');
-    const [fileList, setFileList] = useState([]);
-    const [uploading, setUploading] = useState(false);
-
-    const uuid = useSelector((state) => state.profileuuid.uuid);
-
-    const handleCancel = () => setPreviewOpen(false);
-
-    const handlePreview = async (file) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-        setPreviewImage(file.url || file.preview);
-        setPreviewOpen(true);
-        setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-    };
-
-    const handleChange = ({ fileList: newFileList }) => {
-        setFileList(newFileList);
-    };
+import { useSelector } from 'react-redux';
+import { message } from 'antd';
 
 
-    const customRequest = async ({ file, onError, onSuccess }) => {
-        try {
-            // Convert the file to base64 before sending it
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const base64Data = reader.result.split(',')[1];
+const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+};
 
 
-                // Check if a profile photo already exists for the user
-                const response = await fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log(data);
+const ProfilePhotoUpload = ({ colors }) => {
+    const [avatarUrl, setAvatarUrl] = useState('');
+    const [cropUrl, setCropUrl] = useState('');
+    const [zoom, setZoom] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const editorRef = useRef(null);
 
-                if (data.found) {
-                    // If a profile photo exists, update it
-                    try {
-                        const updateResponse = await fetch(`${config.apiUrl}/profilephotoes/update/${uuid}`, {
-                            method: 'PUT',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: file.name,
-                                data: base64Data,
-                            }),
-                        });
+    const profileUUID = useSelector(state => state.profileuuid.uuid);
 
-                        if (updateResponse.ok) {
-                            onSuccess();
-                            console.log('File updated successfully');
-                        } else {
-                            onError(new Error('Error updating file'));
-                            console.log('Error updating file');
-                        }
-                    } catch (error) {
-                        onError(error);
-                        console.log('Error updating file:', error);
-                    }
-                } else {
-                    // If no profile photo exists, add a new one
-                    try {
-                        const addResponse = await fetch(`${config.apiUrl}/profilephotoes/${uuid}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: file.name,
-                                data: base64Data,
-                            }),
-                        });
+    const handleAvatarChange = (event) => {
+        const file = event.target.files[0];
 
-                        if (addResponse.ok) {
-                            onSuccess();
-                            console.log('File uploaded successfully');
-                        } else {
-                            onError(new Error('Error uploading file'));
-                            console.log('Error uploading file');
-                        }
-                    } catch (error) {
-                        onError(error);
-                        console.error('Error uploading file:', error);
-                    }
-                }
+        if (file) {
+            setLoading(true);
+
+            const base64String = new FileReader();
+            base64String.onloadend = () => {
+                setAvatarUrl(base64String.result);
+                setCropUrl('');
+                setLoading(false);
             };
-        } catch (error) {
-            onError(error);
-            console.error('Error uploading file:', error);
+            base64String.readAsDataURL(file);
         }
     };
 
+    const handleZoomChange = (_, newZoom) => {
+        setZoom(newZoom);
+        updatePreview(newZoom);
+    };
 
-    const handleDeleteImage = async () => {
-        // Add logic to permanently delete the image
-        try {
-            await fetch(`${config.apiUrl}/profilephotoes/delete/${uuid}`, {
-                method: 'DELETE',
-                credentials: 'include',
+    const updatePreview = (newZoom) => {
+        if (editorRef.current) {
+            const canvas = editorRef.current.getImage();
+            const resizedCanvas = document.createElement('canvas');
+            resizedCanvas.width = 200;
+            resizedCanvas.height = 200;
+            const ctx = resizedCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, 0, 200, 200);
+
+            const resizedBase64 = resizedCanvas.toDataURL('image/png');
+            setCropUrl(resizedBase64);
+        }
+    };
+
+    const handleSaveAvatar = () => {
+        setLoading(true);
+
+        if (editorRef.current) {
+            const canvas = editorRef.current.getImage();
+            const resizedCanvas = document.createElement('canvas');
+            resizedCanvas.width = 200;
+            resizedCanvas.height = 200;
+            const ctx = resizedCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, 0, 200, 200);
+
+            const resizedBase64 = resizedCanvas.toDataURL('image/png');
+            setCropUrl(resizedBase64);
+            sendBase64ToAPI(resizedBase64);
+            setLoading(false);
+            setError(null);
+        }
+    };
+
+    const sendBase64ToAPI = (base64Data) => {
+        fetch(`${config.apiUrl}/settings/upload/profile/photo/${profileUUID}`, {
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: base64Data }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Failed to save avatar');
+                }
+                setLoading(false);
+                setError(null);
+                message.success({
+                    content: 'Successfully Updated Profile Avatar',
+                    duration: 5,
+                    onClose: handleReset
+                });
+            })
+            .catch((error) => {
+                setLoading(false);
+                setError(error);
             });
-
-            setFileList([]);
-            console.log('Image deleted successfully');
-        } catch (error) {
-            console.log('Error deleting image:', error);
-        }
     };
 
-    const handleSave = () => {
-        setFileList([]);
-        setUploading(true);
 
-        // Your customRequest logic goes here
-
-        // After the upload is complete, set uploading status to false
-        // This can be done in the onSuccess callback of your fetch request
-
-        // Example:
-        // .then(() => {
-        //     setUploading(false);
-        // })
-        // .catch((error) => {
-        //     console.log('Error:', error);
-        //     setUploading(false);
-        // });
+    const handleReset = () => {
+        setAvatarUrl('');
+        setCropUrl('');
+        setZoom(1);
+        setLoading(false);
+        setError(null);
     };
 
-    const handleClear = () => {
-        setFileList([]);
-    };
-
-    const uploadButton = (
-        <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-    );
 
     return (
-        <>
-            <Upload
-                customRequest={customRequest}
-                listType="picture-circle"
-                fileList={fileList}
-                onPreview={handlePreview}
-                onChange={({ fileList: newFileList }) => handleChange({ fileList: newFileList })}
-                name="profilePhoto"
-            >
-                {fileList.length >= 1 ? null : uploadButton}
-            </Upload>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '16px', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }} className='rounded-2'>
+            {loading && <p>
+                <div className="loading-dots">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </p>}
+            {error && <p style={{ color: 'red' }}>{error.message}</p>}
 
-            {fileList.length > 0 && (
+            <FormControl style={{ display: 'flex', justifyContent: 'center', width: '350px' }}>
+                <input
+                    type="file"
+                    id="avatar-file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    style={{ display: 'none' }}
+                />
+
+                {!avatarUrl && (
+                    <label htmlFor="avatar-file" style={{ cursor: 'pointer', textAlign: 'center', margin: '20px' }}>
+                        <Tooltip title="Select Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                component="span">
+                                <PhotoCameraIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </label>
+                )}
+
+            </FormControl>
+
+            {avatarUrl && (
+                <div>
+                    <AvatarEditor
+                        ref={editorRef}
+                        image={avatarUrl}
+                        width={200}
+                        height={200}
+                        border={50}
+                        color={[255, 255, 255, 0.6]} // RGBA
+                        scale={zoom}
+                        rotate={0}
+                    />
+                    <div style={{ marginTop: '16px' }}>
+                        <Slider
+                            value={zoom}
+                            min={1}
+                            max={2}
+                            step={0.1}
+                            onChange={handleZoomChange}
+                            style={{
+                                color: colors.iconColor
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {cropUrl && (
                 <>
-                    <Button
-                        type="primary"
-                        icon={<SaveOutlined />}
-                        onClick={handleSave}
-                        disabled={uploading}
-                        style={{ marginTop: 16, marginRight: 8 }}
-                    >
-                        Save
-                    </Button>
-
-                    <Button
-                        type="default"
-                        icon={<PlusOutlined />}
-                        onClick={handleClear}
-                        disabled={uploading}
-                        style={{ marginTop: 16, marginRight: 8 }}
-                    >
-                        Clear
-                    </Button>
+                    <p className='mb-2'>Preview</p>
+                    <Avatar
+                        alt="Avatar"
+                        src={cropUrl}
+                        style={{ width: 100, height: 100 }}
+                    />
                 </>
             )}
 
-            <Button
-                type="danger"
-                icon={<DeleteOutlined />}
-                onClick={handleDeleteImage}
-                style={{ marginTop: 16 }}
-            >
-                Remove Image
-            </Button>
-
-
-            <Modal visible={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
-                <img
-                    alt="Profile"
-                    style={{
-                        width: '100%',
-                        height: 'auto',
-                        maxWidth: '100px',
-                        maxHeight: '100px',
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                    }}
-                    src={previewImage}
-                />
-            </Modal>
-        </>
+            {avatarUrl && (
+                <div className='m-2' style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ margin: '0 8px' }}>
+                        <Tooltip title="Save Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                onClick={handleSaveAvatar}>
+                                <SaveIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <div style={{ margin: '0 8px' }}>
+                        <Tooltip title="Reset Avatar">
+                            <IconButton
+                                style={{
+                                    color: colors.iconColor
+                                }}
+                                onClick={handleReset}>
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
-export default ProfilePhoto;
+export default ProfilePhotoUpload;

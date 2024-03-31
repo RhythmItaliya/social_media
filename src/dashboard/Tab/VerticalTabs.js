@@ -21,7 +21,7 @@ import Searchmix from '../../mixComponet/Searchmix';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 
-import logoImage from '../../assets/orkut-logo.png';
+import logoImage from '../../assets/vortex.png';
 
 
 function TabPanel(props) {

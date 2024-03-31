@@ -219,7 +219,7 @@ const ChatWindow = ({ selectedUser }) => {
     <div className='chatWindow' style={{ padding: '25px', height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto', scrollBehavior: 'smooth' }}>
       {selectedUser ? (
         <div style={{ display: 'flex', alignItems: 'center', padding: '10px', borderRadius: '10px 10px 0 0', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
-          <Avatar src={selectedUser.photoURL} alt={`${selectedUser.firstName} ${selectedUser.lastName}`} style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px', cursor: 'pointer' }} />
+          <Avatar src={selectedUser.photoURL} alt={`${selectedUser.firstName} ${selectedUser.lastName}`} style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px', cursor: 'pointer', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`, }} />
           <div style={{ cursor: 'default' }}>
             <div style={{ fontWeight: 'bold', marginBottom: '5px', color: colors.textColor }}>
               {selectedUser.firstName.charAt(0).toUpperCase() + selectedUser.firstName.slice(1)} {selectedUser.lastName.charAt(0).toUpperCase() + selectedUser.lastName.slice(1)}

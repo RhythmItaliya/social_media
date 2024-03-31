@@ -5,6 +5,7 @@ import { CheckCircleOutlineOutlined, PersonAdd } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import config from '../configuration';
 import { useNavigate } from 'react-router-dom';
+import './abc.css';
 
 const hexToRgb = (hex) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -104,16 +105,14 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
             )}
 
             {!loading && !error && (
-                <div className='d-flex w-100 m-4 flex-column' style={{
-                }}>
+                <div className='d-flex w-100 m-4 flex-column'>
                     {searchResults.map((user) => (
                         <div
                             key={user.uuid}
-                            className='mb-2 p-1'
+                            className='mb-2 p-1 searchResultItem'
                             style={{
                                 borderBottom: `1px solid rgba(${hexToRgb(colors.border)},0.7)`,
-                            }}
-                        >
+                            }}>
 
                             <div className='d-flex p-2 justify-content-around'>
                                 <div
@@ -143,9 +142,7 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
                                         )}
                                     </div>
 
-                                    <div className="flex-column justify-content-start align-items-center ms-3 user-select-none" style={{
-                                        cursor: 'pointer',
-                                    }}>
+                                    <div className="flex-column justify-content-start align-items-center ms-3 user-select-none" style={{ cursor: 'pointer' }}>
                                         <Typography variant="body1" style={{ color: colors.textColor, fontWeight: '500' }}>
                                             {user.userProfile && user.userProfile.firstName && (
                                                 user.userProfile.firstName.charAt(0).toUpperCase() + user.userProfile.firstName.slice(1)
@@ -160,9 +157,7 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
                                     </div>
                                 </div>
 
-                                <div className="d-flex justify-content-center align-items-center" style={{
-                                    gap: '20px'
-                                }}>
+                                <div className="d-flex justify-content-center align-items-center" style={{ gap: '20px' }}>
                                     <IconButton
                                         style={{ color: colors.backgroundColor, backgroundColor: colors.backgroundColor }}
                                         onClick={() => sendFriendRequest(user.userProfile.uuid)}
@@ -179,12 +174,15 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
                         </div>
                     ))}
                 </div>
-            )}
+            )
+            }
 
-            {!loading && !error && searchResults.length === 0 && searchTerm && (
-                <p style={{ color: colors.textColor, backgroundColor: 'red', textAlign: 'center', padding: '20px' }}>No matching users found</p>
-            )}
-        </div>
+            {
+                !loading && !error && searchResults.length === 0 && searchTerm && (
+                    <p style={{ color: colors.textColor, backgroundColor: 'red', textAlign: 'center', padding: '20px' }}>No matching users found</p>
+                )
+            }
+        </div >
     );
 };
 

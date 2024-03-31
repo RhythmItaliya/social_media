@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
-import { Dialog, DialogContent, Typography, Link } from '@mui/material';
+import { Dialog, DialogContent, Typography } from '@mui/material';
 import { useDarkMode } from '../theme/Darkmode';
 import config from '../configuration';
-
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -42,16 +41,16 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-function PublicPost({ profileUUID }) {
 
+function PublicPost({ profileUUID }) {
     const [posts, setPosts] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [accessDenied, setAccessDenied] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
-
-    const [accessDenied, setAccessDenied] = useState(false);
 
     useEffect(() => {
         fetch(`${config.apiUrl}/api/user/posts/profile/public/${profileUUID}`)
@@ -59,20 +58,24 @@ function PublicPost({ profileUUID }) {
                 if (response.status === 403) {
                     console.error('Access denied. Users are not friends.');
                     setAccessDenied(true);
+                    setLoading(false);
                     return null;
                 }
                 return response.json();
             })
             .then(data => {
+                setLoading(false);
                 if (Array.isArray(data)) {
                     setPosts(data);
                 } else {
                     console.error('Invalid response format:', data);
                 }
             })
-            .catch(error => console.error('Error fetching user posts:', error));
+            .catch(error => {
+                setLoading(false);
+                console.error('Error fetching user posts:', error);
+            });
     }, [profileUUID]);
-
 
     const handleImageClick = (item) => {
         setSelectedImage(item);
@@ -84,23 +87,20 @@ function PublicPost({ profileUUID }) {
     };
 
     return (
-        <div>
-            {posts && !accessDenied && (
-                <Typography style={{
-                    fontSize: '14px',
-                    margin: '10px',
-                    display: 'flex',
-                    justifyContent: 'end',
-                    borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
-                }}>
-                    <Link style={{ color: colors.textColor, cursor: 'pointer' }} className='text-decoration-none user-select-none'>See All</Link>
-                </Typography>
-            )}
-
+        <div className='user-select-none'>
             <div style={{ height: '600px', overflowY: 'auto' }}>
-                {accessDenied ? (
-                    <Typography style={{
+                {loading ? (
+                    <Typography>
+                        <div className="loading-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </Typography>
+                ) : accessDenied ? (
+                    <div style={{
                         display: 'flex',
+                        flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
                         height: '400px',
@@ -108,65 +108,89 @@ function PublicPost({ profileUUID }) {
                         <div className='w-100 h-25 rounded-2 text-center'
                             style={{
                                 border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
                                 color: colors.textColor,
                                 fontSize: '16px',
                                 padding: '10px',
+                                marginBottom: '10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
                             }}>
-                            Access denied. To view posts, become friends.
+                            <Typography style={{ color: colors.textColor }}>
+                                Access denied. To view posts, become friends.
+                            </Typography>
                         </div>
-                    </Typography>
-                ) : (
-                    posts ? (
-                        /* ImageList */
-                        <ImageList
-                            sx={{
-                                width: '100%',
-                                height: '100%',
-                                transform: 'translateZ(0)',
-                                backgroundColor: colors.backgroundColor,
-                                padding: '10px'
-                            }}
-                            rowHeight={300}
-                            gap={15}
-                        >
-                            {posts.map((post) => (
-                                <ImageListItem key={post.id}>
-                                    <img
-                                        src={`http://static.post.local/${post.postUploadURLs}`}
-                                        alt={post.title}
-                                        loading="lazy"
-                                        onClick={() => handleImageClick(post)}
-                                        style={{
-                                            cursor: 'pointer', padding: '5px',
-                                            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                                        }}
-                                    />
-                                </ImageListItem>
-                            ))}
-                        </ImageList>
-                    ) : (
-                        <Typography style={{ color: 'red' }}>Error fetching user posts.</Typography>
-                    )
-                )}
-
-                {/* Modal */}
-                <Dialog open={modalOpen} onClose={handleCloseModal}>
-                    <DialogContent style={{
-                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                        backgroundColor: colors.backgroundColor
+                    </div>
+                ) : posts.length === 0 ? (
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '400px',
                     }}>
-                        <img
-                            src={`http://static.post.local/${selectedImage?.postUploadURLs}`}
-                            alt={selectedImage?.title}
-                            loading="lazy"
-                            style={{ width: '100%', height: '100%', backgroundColor: colors.backgroundColor }}
-                        />
-                    </DialogContent>
-                </Dialog>
+                        <div className='w-100 h-25 rounded-2 text-center'
+                            style={{
+                                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                color: colors.textColor,
+                                fontSize: '16px',
+                                padding: '10px',
+                                marginBottom: '10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                            <Typography style={{ color: colors.textColor }}>
+                                No posts found.
+                            </Typography>
+                        </div>
+                    </div>
+                ) : (
+                    <ImageList
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            transform: 'translateZ(0)',
+                            backgroundColor: colors.backgroundColor,
+                            padding: '10px'
+                        }}
+                        rowHeight={300}
+                        gap={15}
+                    >
+                        {posts.map((post) => (
+                            <ImageListItem key={post.id}>
+                                <img
+                                    src={`http://static.post.local/${post.postUploadURLs}`}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    onClick={() => handleImageClick(post)}
+                                    style={{
+                                        cursor: 'pointer',
+                                        padding: '5px',
+                                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                    }}
+                                />
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                )}
             </div>
+            {/* Modal */}
+            <Dialog open={modalOpen} onClose={handleCloseModal}>
+                <DialogContent style={{
+                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                    backgroundColor: colors.backgroundColor
+                }}>
+                    <img
+                        src={`http://static.post.local/${selectedImage?.postUploadURLs}`}
+                        alt={selectedImage?.title}
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', backgroundColor: colors.backgroundColor }}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

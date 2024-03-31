@@ -12,7 +12,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import './Form.css';
 import config from '../configuration';
 
-import logoImage from '../assets/orkut-logo.png';
+import logoImage from '../assets/vortex.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -128,7 +128,7 @@ const ForgotPassword = () => {
                         <div className="col-12 col-md-8 col-lg-6 col-xl-4">
 
                             <div>
-                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '150px' }} />
+                                <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '250px' }} />
                                 <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '16px' }}>
                                     ForgotPassword Password ?
                                 </p>
@@ -173,11 +173,11 @@ const ForgotPassword = () => {
 
                                     <div className="text-center">
                                         <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Log in for Orcut
+                                            Log in for Vortex
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
                                         <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Sign up for Orcut
+                                            Sign up for Vortex
                                         </Link>
                                     </div>
                                 </div>

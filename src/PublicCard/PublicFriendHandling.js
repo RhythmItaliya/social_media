@@ -339,7 +339,7 @@ const PublicFriendHandling = ({ profileUUID, userUUID, username }) => {
     return (
         <div>
             <div>
-                {loading && <p style={{ color: colors.textColor }}>
+                {loading && <p>
                     <div className="loading-dots">
                         <div></div>
                         <div></div>

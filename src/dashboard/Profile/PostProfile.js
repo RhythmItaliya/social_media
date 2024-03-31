@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
-import { Dialog, DialogContent, Typography, Link } from '@mui/material';
+import { Dialog, DialogContent, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useDarkMode } from '../../theme/Darkmode';
 import config from '../../configuration';
+import { Link } from 'react-router-dom';
 
 
 const lightModeColors = {
@@ -48,6 +49,7 @@ function PostProfile() {
     const [posts, setPosts] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const { isDarkMode } = useDarkMode();
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -62,7 +64,8 @@ function PostProfile() {
                     console.error('Invalid response format:', data);
                 }
             })
-            .catch(error => console.error('Error fetching user posts:', error));
+            .catch(error => console.error('Error fetching user posts:', error))
+            .finally(() => setLoading(false)); // Update loading state
     }, [profileUUID]);
 
 
@@ -77,45 +80,63 @@ function PostProfile() {
 
     return (
         <div className='user-select-none'>
-            {/* "See All" Link/Button */}
-            <Typography style={{
-                fontSize: '14px',
-                margin: '10px',
-                display: 'flex',
-                justifyContent: 'end',
-                borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
-            }}>
-                <Link style={{ color: colors.textColor, cursor: 'pointer' }} className='text-decoration-none user-select-none'>See All</Link>
-            </Typography>
-
-            <div style={{ height: '500px', overflowY: 'auto' }}>
-                {/* ImageList */}
-                <ImageList
-                    sx={{
-                        width: '100%',
-                        height: '100%',
-                        transform: 'translateZ(0)',
-                        backgroundColor: colors.backgroundColor,
-                        padding: '10px'
-                    }}
-                    rowHeight={300}
-                    gap={15}
-                >
-                    {posts.map((post) => (
-                        <ImageListItem key={post.id}>
-                            <img
-                                src={`http://static.post.local/${post.postUploadURLs}`}
-                                alt={post.title}
-                                loading="lazy"
-                                onClick={() => handleImageClick(post)}
-                                style={{
-                                    cursor: 'pointer', padding: '5px',
-                                    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-                                }}
-                            />
-                        </ImageListItem>
-                    ))}
-                </ImageList>
+            <div style={{ height: '580px', overflowY: 'auto' }}>
+                {loading ? (
+                    <Typography>Loading...</Typography>
+                ) : posts.length === 0 ? (
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '400px',
+                    }}>
+                        <div className='w-100 h-25 rounded-2 text-center'
+                            style={{
+                                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                color: colors.textColor,
+                                fontSize: '16px',
+                                padding: '10px',
+                                marginBottom: '10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                            <Typography style={{ color: colors.textColor }}>
+                                No posts found. Share your moments with friends!
+                            </Typography>
+                        </div>
+                        <Link to='/add' style={{ color: colors.labelColor, textDecoration: 'none', textAlign: 'center' }}>Go to Upload</Link>
+                    </div>
+                ) : (
+                    <ImageList
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            transform: 'translateZ(0)',
+                            backgroundColor: colors.backgroundColor,
+                            padding: '10px'
+                        }}
+                        rowHeight={300}
+                        gap={15}
+                    >
+                        {posts.map((post) => (
+                            <ImageListItem key={post.id}>
+                                <img
+                                    src={`http://static.post.local/${post.postUploadURLs}`}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    onClick={() => handleImageClick(post)}
+                                    style={{
+                                        cursor: 'pointer', padding: '5px',
+                                        border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                                    }}
+                                />
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                )}
 
                 {/* Modal */}
                 <Dialog open={modalOpen} onClose={handleCloseModal}>
@@ -132,7 +153,7 @@ function PostProfile() {
                     </DialogContent>
                 </Dialog>
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -7,7 +7,6 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
 import TextField from '@mui/material/TextField';
@@ -15,7 +14,6 @@ import Collapse from '@mui/material/Collapse';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
-import Box from '@mui/material/Box';
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,6 +28,8 @@ import config from '../configuration';
 
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import FavoriteBorderTwoToneIcon from '@mui/icons-material/FavoriteBorderTwoTone';
+import { Box, List, ListItem, ListItemText, Modal, TextareaAutosize } from '@mui/material';
+import { message } from 'antd';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -277,10 +277,6 @@ export default function FriendPost() {
       console.error('Error in handleLikeClick:', error);
     }
   };
-
-
-
-
 
 
 
@@ -662,6 +658,10 @@ export default function FriendPost() {
 
   // ------------------------------------
 
+  const [openReportModal, setOpenReportModal] = React.useState(false);
+  const [reportText, setReportText] = React.useState('');
+  const [reportedPostId, setReportedPostId] = React.useState(null);
+
   const handleMoreVertClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -672,6 +672,54 @@ export default function FriendPost() {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+
+  // Report ===========================================================
+
+  const handleOpenReportDialog = (postId) => {
+    console.log(postId);
+    setReportedPostId(postId); // Set the reported postId
+    setOpenReportModal(true); // Open the report dialog
+  };
+
+
+  const handleReportSubmit = async () => {
+    try {
+      if (!reportText.trim()) {
+        message.error('Report text is empty');
+        return;
+      }
+
+      const response = await fetch(`${config.apiUrl}/reports/post/report`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfileUuid: profileUUID,
+          postId: reportedPostId,
+          reportText: reportText,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to report post');
+      }
+
+      message.success('Post reported successfully');
+      setReportText('');
+      handleCloseReportDialog();
+    } catch (error) {
+      console.error('Error reporting post:', error);
+    }
+  };
+
+  const handleCloseReportDialog = () => {
+    setOpenReportModal(false);
+  };
+
+
 
   {/* ------------------------------------------------------------------------------------------------- */ }
 
@@ -945,6 +993,7 @@ export default function FriendPost() {
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleMoreVertClose}
+                onExited={handleMoreVertClose}
                 anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'right',
@@ -952,16 +1001,52 @@ export default function FriendPost() {
                 transformOrigin={{
                   vertical: 'top',
                   horizontal: 'right',
+                  top: 0,
+                }}
+                style={{
+                  cursor: 'pointer'
                 }}
               >
-                <Box sx={{ p: 2 }}>
-                  <Typography>Settings about post</Typography>
+                <Box style={{ background: colors.backgroundColor, color: colors.textColor, border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
+                  <List>
+                    <ListItem button onClick={() => handleOpenReportDialog(post.id)}>
+                      <ListItemText primary="Report Post" />
+                    </ListItem>
+                  </List>
                 </Box>
-              </Popover >
+
+                <Modal
+                  open={openReportModal}
+                  onClose={handleCloseReportDialog}
+                  aria-labelledby="report-modal-title"
+                  aria-describedby="report-modal-description"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div style={{ backgroundColor: colors.backgroundColor, borderRadius: '8px', padding: '16px', outline: 'none' }}>
+                    <TextareaAutosize
+                      aria-label="Report Reason"
+                      placeholder="Report Reason"
+                      minRows={3}
+                      maxRows={5}
+                      value={reportText}
+                      onChange={(e) => setReportText(e.target.value)}
+                      style={{ width: '100%', marginBottom: '16px', padding: '12px', backgroundColor: colors.backgroundColor, color: colors.textColor }}
+                    />
+                    <IconButton onClick={handleReportSubmit} variant="contained" style={{ color: colors.iconColor }}>
+                      <SendIcon />
+                    </IconButton>
+                  </div>
+                </Modal>
+
+              </Popover>
             </Card>
           ))}
         </div>
       )}
-    </div>
+    </div >
   );
 }

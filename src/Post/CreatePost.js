@@ -2,7 +2,6 @@ import React from 'react';
 import NewPost from './NewPost';
 import { useDarkMode } from '../theme/Darkmode';
 import PostFrom from './PostFrom';
-import { Grid } from '@mui/material';
 
 
 const lightModeColors = {
@@ -37,40 +36,28 @@ const hexToRgb = (hex) => {
   return `${r}, ${g}, ${b}`;
 };
 
+// border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)
+
 const CreatePost = () => {
   const { isDarkMode } = useDarkMode();
   const colors = isDarkMode ? darkModeColors : lightModeColors;
 
-  const containerStyle = {
-    width: '100%',
-    maxWidth: '1200px',
-    margin: 'auto',
-    padding: '10px',
-  };
-
-  const postContainerStyle = {
-    width: '100%',
-    maxWidth: '550px',
-    height: 'auto',
-    margin: 'auto',
-    border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
-    borderRadius: '10px',
-  };
-
   return (
-    <Grid container spacing={2} justifyContent="center" alignItems="center" style={containerStyle}>
-      <Grid item xs={12} lg={6}>
-        <div style={postContainerStyle}>
-          <NewPost />
+    <div class='container'>
+      <div class='row justify-content-center align-items-center' style={{ border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
+        <h3 className='p-3' style={{ color: '#ec1b90', textAlign: 'center', borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>Create Post</h3>
+        <div class='col-md-6'>
+          <div class="d-flex justify-content-center align-items-center h-100">
+            <NewPost />
+          </div>
         </div>
-      </Grid>
-
-      <Grid item xs={12} lg={6}>
-        <div style={postContainerStyle}>
-          <PostFrom />
+        <div class='col-md-6'>
+          <div class="d-flex justify-content-center align-items-center h-100">
+            <PostFrom />
+          </div>
         </div>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

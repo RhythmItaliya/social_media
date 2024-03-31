@@ -46,3 +46,10 @@
     align-items: center;
     justify-content: center;
 }
+
+
+.searchResultItem:hover {
+    background-color: #ec1b9166;
+    cursor: pointer;
+    border-radius: 20px;
+}

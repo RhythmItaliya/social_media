@@ -15,9 +15,14 @@ export const loginUser = (userData) => (dispatch) => {
     })
         .then((response) => {
             if (response.status === 401) {
-                message.error('Username and Password are incorrect...');
+                message.error('Username and Password are incorrect.');
+                return;
+            } else if (response.status === 403) {
+                message.error('User is terminated.');
+                return;
             } else if (!response.ok) {
                 message.error('Login failed due to a server error.');
+                return;
             } else {
                 return response.json();
             }

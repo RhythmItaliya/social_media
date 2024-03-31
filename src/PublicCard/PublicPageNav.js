@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
-import logoImage from '../assets/orkut-logo.png';
+import logoImage from '../assets/vortex.png';
 import { Avatar, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -31,7 +31,7 @@ const PublicPageNav = ({ colors, photoURL }) => {
 
                 <div className='d-flex justify-content-center align-content-center'>
                     <Link to={'/home'}>
-                        <img src={logoImage} alt="Logo" style={{ width: '120px', height: 'auto', borderRadius: '5px' }} />
+                        <img src={logoImage} alt="Logo" style={{ width: '150px', height: 'auto', borderRadius: '5px' }} />
                     </Link>
                 </div>
 

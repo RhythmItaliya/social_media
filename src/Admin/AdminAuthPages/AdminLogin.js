@@ -1,20 +1,15 @@
-// Login.js
-import { Form, Input, Button, Divider } from 'antd';
+// AdminLoginPage.js
+import { useState } from 'react';
+import { Form, Input, Button, Divider, message } from 'antd';
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-
-
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-// Redux
-import { connect } from 'react-redux';
-import { loginUser } from '../actions/loginAuth';
-import './Form.css';
-
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Person4OutlinedIcon from '@mui/icons-material/Person4Outlined';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import logoImage from '../../assets/vortex.png';
+import config from '../../configuration';
+import CryptoJS from 'crypto-js';
 
-import logoImage from '../assets/vortex.png';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -50,23 +45,12 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-
-const Login = ({ loginUser, loading, loggingIn, login, error }) => {
-
+const AdminLoginPage = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleDarkMode = () => {
         setIsDarkMode(!isDarkMode);
     };
-
-    useEffect(() => {
-        const savedMode = localStorage.getItem('mode');
-        setIsDarkMode(savedMode === 'dark');
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('mode', isDarkMode ? 'dark' : 'light');
-    }, [isDarkMode]);
 
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
@@ -90,9 +74,57 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
         color: '#ffffff',
     };
 
+
     const onFinish = async (values) => {
-        await loginUser(values);
+        try {
+            const response = await fetch(`${config.apiUrl}/admins/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            });
+
+            if (response.status === 401) {
+
+                message.error('Username and Password are incorrect...');
+                return;
+            } else if (!response.ok) {
+
+                message.error('Login failed due to a server error.');
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data && data['X-Access-Token'] && data['uuid'] && data['username']) {
+                const token = data['X-Access-Token'];
+                const uuid = data['uuid'];
+                const username = data['username'];
+
+                const encryptedUuid = CryptoJS.AES.encrypt(uuid, 'ASDCFVBNLKMNBSDFVBNJNBCV').toString();
+
+                document.cookie = `AdminAuth=${token}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
+                document.cookie = `AdminUsername=${username}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
+                document.cookie = `AdminToken=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
+
+                localStorage.clear();
+
+                message.success('Successfully Logged In...');
+
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 4500);
+            } else {
+                throw new Error('Incomplete data received from server.');
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            message.error(error.message || 'Login failed.');
+        }
     };
+
 
     return (
         <>
@@ -105,7 +137,7 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                             <div>
                                 <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '250px' }} />
                                 <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '26px', letterSpacing: '1px' }}>
-                                    Log in to Vortex
+                                    Admin Log in
                                 </p>
                             </div>
 
@@ -164,10 +196,9 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                                         <Button
                                             htmlType="submit"
                                             className="btn w-100 mt-2 btn-primary btn-block"
-                                            disabled={loading}
                                             style={buttonStyle}
                                         >
-                                            {loading ? 'Loading...' : 'Log in'}
+                                            Log in as a Admin
                                         </Button>
 
                                     </div>
@@ -175,12 +206,12 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                                     <Divider className='p-0 m-1' />
 
                                     <div className="text-center">
-                                        <Link to="/forgotpassword" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                        <Link to="/admin/forgotPassword" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
                                             Forgot password?
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
-                                        <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Sign up for Vortex
+                                        <Link to="/admin/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                            Sign up as a Admin
                                         </Link>
                                     </div>
                                 </div>
@@ -193,7 +224,10 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                                     </span>
                                 </div>
                                 <div>
-                                    <span style={{ color: colors.textColor, fontSize: '12px', marginRight: '20px' }}>
+                                    <span style={{
+                                        color: colors.textColor, fontSize:
+                                            '12px', marginRight: '20px'
+                                    }}>
                                         <Link to="/terms-and-conditions">Terms and Conditions</Link>
                                     </span>
                                     <span style={{ color: colors.textColor, fontSize: '12px', marginRight: '20px' }}>
@@ -209,15 +243,8 @@ const Login = ({ loginUser, loading, loggingIn, login, error }) => {
                     </div>
                 </div>
             </Form >
-
         </>
     );
 };
 
-const mapStateToProps = (state) => ({
-    loggingIn: state.login.loggingIn,
-    error: state.login.error,
-    loading: state.login.loading,
-});
-
-export default connect(mapStateToProps, { loginUser })(Login);
+export default AdminLoginPage;

@@ -1,13 +1,15 @@
+// AdminResetPassword.js
+
 import { Form, Input, Button, Divider, message } from 'antd';
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MailOutlineOutlined } from '@material-ui/icons';
-import LoadingSpinner from '../others/LoadingSpinner';
-import { useDarkMode } from '../theme/Darkmode';
-import './Form.css';
-import config from '../configuration';
+import LoadingSpinner from '../../others/LoadingSpinner';
+import { useDarkMode } from '../../theme/Darkmode';
+import config from '../../configuration';
 
-import logoImage from '../assets/vortex.png';
+import logoImage from '../../assets/vortex.png';
+
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -43,7 +45,7 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-const ResetPassword = () => {
+const AdminResetPassword = () => {
     const [isValid, setIsValid] = useState(null);
     const [loading, setLoading] = useState(true);
     const { token } = useParams();
@@ -74,7 +76,7 @@ const ResetPassword = () => {
     useEffect(() => {
         const checkLinkExpire = async () => {
             try {
-                const res = await fetch(`${config.apiUrl}/auth/resetlink/verify/${token}`, {
+                const res = await fetch(`${config.apiUrl}/admins/admin/resetlink/verify/${token}`, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
                 });
@@ -112,7 +114,7 @@ const ResetPassword = () => {
                 return message.warning("Password Can't be matched");
             }
 
-            const res = await fetch(`${config.apiUrl}/auth/reset/password/${token}`, {
+            const res = await fetch(`${config.apiUrl}/admins/admin/reset/password/${token}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -121,10 +123,10 @@ const ResetPassword = () => {
 
             if (res.ok) {
                 message.success("Password Reset Successfully. Redirecting...");
-                setTimeout(() => (window.location.href = '/login'), 3000);
+                setTimeout(() => (window.location.href = '/admin/login'), 4500);
             } else {
                 message.error("The link has expired. Please try again. Redirecting...");
-                setTimeout(() => (window.location.href = '/forgotpassword'), 3000);
+                setTimeout(() => (window.location.href = '/admin/forgotpassword'), 4500);
             }
         } catch (e) {
             evt.target.disabled = false;
@@ -147,7 +149,7 @@ const ResetPassword = () => {
                     Link is invalid...
                 </h2>
                 <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                    Log in for Vortex
+                    Log in as a Admin
                 </Link>
             </div>
         );
@@ -162,7 +164,7 @@ const ResetPassword = () => {
                             <div>
                                 <img src={logoImage} alt="Logo" className="mb-5 mx-auto d-block user-select-none" style={{ width: '250px' }} />
                                 <p className="mb-3 mt-3 text-center" style={{ color: colors.textColor, fontSize: '16px' }}>
-                                    Reset your password
+                                    Admin Reset password
                                 </p>
                             </div>
 
@@ -225,12 +227,12 @@ const ResetPassword = () => {
                                     <Divider className='p-0 m-1' />
 
                                     <div className="text-center">
-                                        <Link to="/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Log in for Vortex
+                                        <Link to="/admin/login" className="d-block d-sm-inline user-select-none " style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                            Log in as a Admin
                                         </Link>
                                         <span className="mx-2 d-none d-sm-inline user-select-none" style={{ color: colors.textColor }}>|</span>
-                                        <Link to="/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
-                                            Sign up for Vortex
+                                        <Link to="/admin/register" className="d-block d-sm-inline" style={{ color: colors.hashtagColor, fontSize: '14px' }}>
+                                            Sign up as a Admin
                                         </Link>
                                     </div>
                                 </div>
@@ -249,4 +251,4 @@ const ResetPassword = () => {
 
 
 
-export default ResetPassword;
+export default AdminResetPassword;

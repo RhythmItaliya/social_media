@@ -3,3 +3,33 @@
         padding: 0 !important;
     }
 }
+
+
+
+.file-upload-container {
+    border: 1px solid transparent;
+    /* Initial border */
+    transition: border-color 0.3s ease;
+    /* Smooth transition for border color change */
+}
+
+.upload-icon {
+    transition: transform 0.3s ease;
+    /* Smooth transition for icon transform */
+    cursor: pointer;
+}
+
+.upload-label:hover+#file-input {
+    cursor: pointer;
+    /* Change cursor on hover */
+}
+
+.upload-label:hover .upload-icon {
+    transform: scale(1.1);
+    /* Zoom effect on hover */
+}
+
+.upload-label:hover+#file-input {
+    border-color: rgba(0, 0, 0, 0.9);
+    /* Change border color on hover */
+}

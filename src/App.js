@@ -22,6 +22,14 @@ import ContactUs from './pages/ContactUs';
 
 import '../src/loading.css';
 
+// ADMIN
+import AdminLoginPage from './Admin/AdminAuthPages/AdminLogin';
+import AdminRegister from './Admin/AdminAuthPages/AdminRegister';
+import AdminForgotPassword from './Admin/AdminAuthPages/AdminForgotPassword';
+import AdminVerifylogin from './Admin/AdminAuthPages/AdminVerifylogin';
+import AdminResetPassword from './Admin/AdminAuthPages/AdminResetPassword';
+import AdminDash from './Admin/AdminDash';
+
 const App = () => {
   const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
   // const isAuthenticated = !!cookies.auth;
@@ -44,7 +52,6 @@ const App = () => {
 
           <Route path="/register" element={<Register />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
-
           <Route path="/verify/login/:token" element={<VerifyLogin />} />
           <Route path="/reset/password/:token" element={<ResetPassword />} />
 
@@ -68,6 +75,14 @@ const App = () => {
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
 
+
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          <Route path="/admin/forgotPassword" element={<AdminForgotPassword />} />
+          <Route path="/admin/verify/login/:token" element={<AdminVerifylogin />} />
+          <Route path="/admin/reset/password/:token" element={<AdminResetPassword />} />
+          <Route path="/admin" element={<AdminDash />} />
+          
         </Routes>
       </DarkModeProvider>
     </BrowserRouter>
