@@ -730,18 +730,18 @@ export default function FriendPost() {
         event.preventDefault();
         scrollToPreviousPost();
       } else if (event.key === 'ArrowDown') {
-        event.preventDefault(); 
+        event.preventDefault();
         scrollToNextPost();
       }
     };
-  
+
     document.addEventListener('keydown', handleKeyPress);
-  
+
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [mergedData]);
-  
+
   const scrollToPreviousPost = () => {
     if (containerRef.current) {
       const currentPosition = containerRef.current.scrollTop;
@@ -752,7 +752,7 @@ export default function FriendPost() {
       });
     }
   };
-  
+
   const scrollToNextPost = () => {
     if (containerRef.current) {
       const currentPosition = containerRef.current.scrollTop;
@@ -763,7 +763,14 @@ export default function FriendPost() {
       });
     }
   };
-  
+
+  // ==============================================================================================
+
+  const [isLargeView, setIsLargeView] = React.useState(false);
+
+  const handleDoubleClickLargePost = () => {
+    setIsLargeView(!isLargeView);
+  };
 
   {/* ------------------------------------------------------------------------------------------------- */ }
 
@@ -793,18 +800,27 @@ export default function FriendPost() {
             }}>
 
               <CardHeader
+
                 avatar={
-                  <Avatar
-                    src={`http://static.profile.local/${post.photoURL}`}
-                    alt="User Avatar"
-                    loading='lazy'
-                    sx={{
-                      ...instagramStyles.roundedAvatar,
-                      width: 40,
-                      height: 40,
-                      backgroundColor: colors.backgroundColor,
-                    }}
-                  />
+                  post.photoURL ? (
+                    <Avatar
+                      src={`http://static.profile.local/${post.photoURL}`}
+                      alt="User Avatar"
+                      loading='lazy'
+                      sx={{
+                        ...instagramStyles.roundedAvatar,
+                        backgroundColor: colors.backgroundColor,
+                        cursor: 'pointer',
+                      }}
+                    />
+                  ) : (
+                    <Avatar
+                      alt={post.username}
+                      style={{
+                        cursor: 'pointer'
+                      }}
+                    />
+                  )
                 }
 
                 // POST ACTION
@@ -841,7 +857,7 @@ export default function FriendPost() {
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* POST */}
-              <CardMedia
+              {/* <CardMedia
                 component="img"
                 height="400"
                 image={`http://static.post.local/${post.postUploadURLs}`}
@@ -850,8 +866,41 @@ export default function FriendPost() {
                 sx={{
                   background: '#fffff',
                   borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                  cursor: 'pointer'
                 }}
-              />
+              /> */}
+
+              <div onDoubleClick={handleDoubleClickLargePost}>
+                {isLargeView ? (
+                  <div>
+                    <CardMedia
+                      component="img"
+                      height="500"
+                      image={`http://static.post.local/${post.postUploadURLs}`}
+                      loading='lazy'
+                      alt="Post Image"
+                      sx={{
+                        background: '#fffff',
+                        borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                        cursor: 'pointer'
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <CardMedia
+                    component="img"
+                    height="400"
+                    image={`http://static.post.local/${post.postUploadURLs}`}
+                    loading='lazy'
+                    alt="Post Image"
+                    sx={{
+                      background: '#fffff',
+                      borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                      cursor: 'pointer'
+                    }}
+                  />
+                )}
+              </div>
 
               {/* ------------------------------------------------------------------------------------------------- */}
 

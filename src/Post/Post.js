@@ -948,14 +948,14 @@ export default function InstagramCard() {
         scrollToNextPost();
       }
     };
-  
+
     document.addEventListener('keydown', handleKeyPress);
-  
+
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [newUserProfile]);
-  
+
   const scrollToPreviousPost = () => {
     if (containerRef.current) {
       const currentPosition = containerRef.current.scrollTop;
@@ -966,7 +966,7 @@ export default function InstagramCard() {
       });
     }
   };
-  
+
   const scrollToNextPost = () => {
     if (containerRef.current) {
       const currentPosition = containerRef.current.scrollTop;
@@ -976,6 +976,15 @@ export default function InstagramCard() {
         behavior: 'smooth',
       });
     }
+  };
+
+  // ==============================================================================================
+
+
+  const [isLargeView, setIsLargeView] = React.useState(false);
+
+  const handleDoubleClickLargePost = () => {
+    setIsLargeView(!isLargeView);
   };
 
   {/* ------------------------------------------------------------------------------------------------- */ }
@@ -1010,18 +1019,25 @@ export default function InstagramCard() {
 
                 // AVTAR
                 avatar={
-                  <Avatar
-                    src={`http://static.profile.local/${newUserProfile.photoURL}`}
-                    alt="User Avatar"
-                    loading='lazy'
-                    sx={{
-                      ...instagramStyles.roundedAvatar,
-                      width: 40,
-                      height: 40,
-                      backgroundColor: colors.backgroundColor,
-
-                    }}
-                  />
+                  newUserProfile.photoURL ? (
+                    <Avatar
+                      src={`http://static.profile.local/${newUserProfile.photoURL}`}
+                      alt="User Avatar"
+                      loading='lazy'
+                      sx={{
+                        ...instagramStyles.roundedAvatar,
+                        backgroundColor: colors.backgroundColor,
+                        cursor: 'pointer'
+                      }}
+                    />
+                  ) : (
+                    <Avatar
+                      alt={newUserProfile.username}
+                      style={{
+                        cursor: 'pointer'
+                      }}
+                    />
+                  )
                 }
 
                 // POST ACTION
@@ -1067,7 +1083,7 @@ export default function InstagramCard() {
               {/* ------------------------------------------------------------------------------------------------- */}
 
               {/* POST */}
-              <CardMedia
+              {/* <CardMedia
                 component="img"
                 height="400"
                 image={`http://static.post.local/${post.postUploadURLs}`}
@@ -1076,8 +1092,41 @@ export default function InstagramCard() {
                 sx={{
                   background: '#fffff',
                   borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                  cursor: 'pointer'
                 }}
-              />
+              /> */}
+
+              <div onDoubleClick={handleDoubleClickLargePost}>
+                {isLargeView ? (
+                  <div>
+                    <CardMedia
+                      component="img"
+                      height="500"
+                      image={`http://static.post.local/${post.postUploadURLs}`}
+                      loading='lazy'
+                      alt="Post Image"
+                      sx={{
+                        background: '#fffff',
+                        borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                        cursor: 'pointer'
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <CardMedia
+                    component="img"
+                    height="400"
+                    image={`http://static.post.local/${post.postUploadURLs}`}
+                    loading='lazy'
+                    alt="Post Image"
+                    sx={{
+                      background: '#fffff',
+                      borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                      cursor: 'pointer'
+                    }}
+                  />
+                )}
+              </div>
 
               {/* ------------------------------------------------------------------------------------------------- */}
 
