@@ -288,7 +288,7 @@ const CustomButton = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('friendCount')}>
               <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>
-                {friendCount.toString().padStart(2, '0')}
+                {friendCount === 0 ? '0' : friendCount.toString().padStart(2, '0')}
               </Typography>
             </IconButton>
             <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
@@ -299,7 +299,7 @@ const CustomButton = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('crush')}>
               <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>
-                {crushCount.toString().padStart(2, '0')}
+                {crushCount === 0 ? '0' : crushCount.toString().padStart(2, '0')}
               </Typography>
             </IconButton>
             <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
@@ -310,7 +310,7 @@ const CustomButton = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <IconButton sx={{ color: colors.iconColor }} onClick={() => handleDrawerOpen('ignore')}>
               <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>
-                {ignoreCount.toString().padStart(2, '0')}
+                {ignoreCount === 0 ? '0' : ignoreCount.toString().padStart(2, '0')}
               </Typography>
             </IconButton>
             <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
@@ -319,7 +319,6 @@ const CustomButton = () => {
           </div>
         </Grid>
       </div>
-
 
       <Drawer anchor="right" open={friendDrawerOpen} onClose={() => handleDrawerClose('friendCount')}>
         <Container maxWidth="sm " className="custom-drawer-container" style={{ backgroundColor: colors.backgroundColor, borderLeft: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, boxShadow: colors.boxShadow }}>

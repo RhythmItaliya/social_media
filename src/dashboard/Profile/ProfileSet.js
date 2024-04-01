@@ -273,7 +273,9 @@ const ProfileSet = () => {
 
                             <Grid item>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>{postCount.toString().padStart(2, '0')}</Typography>
+                                    <Typography style={{ fontSize: '30px', color: colors.textColor, textTransform: 'uppercase' }}>
+                                        {postCount === 0 ? '0' : postCount.toString().padStart(2, '0')}
+                                    </Typography>
                                     <Typography style={{ fontSize: "10px", color: colors.labelColor, textTransform: 'uppercase' }}>
                                         Post
                                     </Typography>
