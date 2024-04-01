@@ -143,7 +143,20 @@ const StoryList = ({ colors }) => {
                     {loadingAvatar[profile.photoURL] ? (
                       <CircularProgress size={30} style={{ color: colors.iconColor }} />
                     ) : (
-                      <Avatar style={{ cursor: 'pointer' }} alt={profile.username} src={profile.photoURL || `https://via.placeholder.com/200`} onLoad={() => handleAvatarLoad(profile.photoURL)} />
+                      profile.photoURL ? (
+                        <Avatar
+                          style={{ cursor: 'pointer' }}
+                          alt={profile.username}
+                          src={profile.photoURL}
+                          onLoad={() => handleAvatarLoad(profile.photoURL)}
+                        />
+                      ) : (
+                        <Avatar
+                          style={{ cursor: 'pointer' }}
+                          alt={profile.username}
+                          onLoad={() => handleAvatarLoad(profile.photoURL)}
+                        />
+                      )
                     )}
                   </IconButton>
                 </div>

@@ -98,7 +98,7 @@ const SuggestedFriends = ({ colors }) => {
 
             <div className='py-3 d-flex justify-content-between align-items-center' style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, }}>
                 <div className='d-flex align-items-center justify-content-center'>
-                    <p className='m-2' style={{ color: colors.textColor }}>Suggested Friends</p>
+                    <p className='m-2' style={{color: "#ec1b90" }}>Suggested Friends</p>
                 </div>
                 <div>
                     <IconButton style={{ color: colors.iconColor }} onClick={fetchUserProfiles}>
@@ -134,15 +134,26 @@ const SuggestedFriends = ({ colors }) => {
                         }}>
                         <Grid item xs={4}>
                             <div className='avatar-container' style={{ cursor: 'pointer' }}>
-                                <Avatar
-                                    className="avatar-wrapper"
-                                    alt="User Avatar"
-                                    src={`http://static.profile.local/${data.photoURL}`}
-                                    style={{
-                                        width: '35px',
-                                        height: '35px'
-                                    }}
-                                />
+                                {data.photoURL ? (
+                                    <Avatar
+                                        className="avatar-wrapper"
+                                        alt={`${data.username}`}
+                                        src={`http://static.profile.local/${data.photoURL}`}
+                                        style={{
+                                            width: '35px',
+                                            height: '35px'
+                                        }}
+                                    />
+                                ) : (
+                                    <Avatar
+                                        className="avatar-wrapper"
+                                        alt={`${data.username}`}
+                                        style={{
+                                            width: '35px',
+                                            height: '35px'
+                                        }}
+                                    />
+                                )}
                             </div>
                         </Grid>
                         <div style={{

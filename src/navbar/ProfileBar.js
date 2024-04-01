@@ -159,7 +159,7 @@ export default function Profilebar({ toggleStoryVisibility }) {
                         <Logout />
                         <Layout />
 
-                        <Typography variant="subtitle1" sx={{ color: colors.textColor }}>
+                        <Typography variant="subtitle1" sx={{ color: '#ec1b90', textDecoration: 'underline' }}>
                             {user.username}
                         </Typography>
 
@@ -199,7 +199,8 @@ export default function Profilebar({ toggleStoryVisibility }) {
                     }}>
 
                         <DialogTitle style={{
-                            color: colors.textColor,
+                            // color: colors.textColor,
+                            color: '#ec1b90',
                             backgroundColor: colors.backgroundColor,
                             textAlign: 'center',
                             border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5`,

@@ -219,7 +219,7 @@ const MarkasRead = ({ colors }) => {
 
             <div className='py-3 d-flex justify-content-between align-items-center' style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, }}>
                 <div className='d-flex align-items-center justify-content-center'>
-                    <p className='m-2' style={{ color: colors.textColor }}>Friend Request</p>
+                    <p className='m-2' style={{ color: '#ec1b90', fontSize: '16px' }}>Friend Request</p>
                 </div>
                 <div>
                     <IconButton style={{ color: colors.iconColor }} onClick={handleRefresh}>

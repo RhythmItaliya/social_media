@@ -128,11 +128,23 @@ const FriendStory = ({ open, onClose, selectedUser, colors }) => {
 
                                 <div style={{ position: 'absolute', top: '0', textAlign: 'center', width: '100%', color: storyDetails.textColor }}>
                                     <div className='d-flex justify-content-center align-content-center gap-2 mt-2'>
-                                        <Avatar
-                                            src={selectedUser.photoURL || 'https://via.placeholder.com/200'}
-                                            alt={selectedUser.username}
-                                            style={{ width: '30px', height: '30px' }}
-                                        />
+
+                                        {selectedUser.photoURL ? (
+                                            <div>
+                                                <Avatar
+                                                    src={selectedUser.photoURL}
+                                                    alt={selectedUser.username}
+                                                    style={{ width: '30px', height: '30px' }}
+
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Avatar
+                                                alt={selectedUser.username}
+                                                style={{ width: '30px', height: '30px' }}
+                                            />
+                                        )}
+
                                         <p className='mt-1' style={{ color: colors.textColor, fontSize: '14px' }}>@{selectedUser.username}</p>
                                     </div>
                                 </div>

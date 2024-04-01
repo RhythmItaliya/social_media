@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { useSelector } from 'react-redux';
 import { joinRoom, leaveRoom, sendMessage } from './chatInfo';
-import { Avatar } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import './chat.css';
 import config from '../configuration';
@@ -183,6 +183,23 @@ const UserChatList = ({ onSelectUser }) => {
           </div>
         </div>
       </div>
+
+      {filteredFriendsList.length === 0 && (
+        <div className='w-100 p-2 mt-3 rounded-2 text-center'
+          style={{
+            border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+            color: colors.textColor,
+            fontSize: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Typography style={{ color: colors.textColor }}>
+            {searchInput.trim() === '' ? "Make some friends and start chatting!" : "No results found"}
+          </Typography>
+        </div>
+      )}
 
       <ul className="p-1"
         style={{

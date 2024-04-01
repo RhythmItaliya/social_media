@@ -24,8 +24,6 @@ const ReceiverComponent = ({ colors }) => {
     const [friendRequestVisibility, setFriendRequestVisibility] = useState({});
     const [renderIndex, setRenderIndex] = useState(0);
 
-    const defaultImageUrl = 'https://placekitten.com/200/300';
-
     useEffect(() => {
         fetchReceiverData();
     }, [receiverUUID]);
@@ -70,7 +68,7 @@ const ReceiverComponent = ({ colors }) => {
                     receiverUuid,
                     firstName,
                     lastName,
-                    selectedImageUrl: imageUrl !== null ? imageUrl : defaultImageUrl,
+                    imageUrl,
                     username
                 };
             });
@@ -125,7 +123,7 @@ const ReceiverComponent = ({ colors }) => {
                     receiverUuid,
                     firstName,
                     lastName,
-                    selectedImageUrl: imageUrl !== null ? imageUrl : defaultImageUrl,
+                    imageUrl,
                     username
                 };
 
@@ -221,7 +219,7 @@ const ReceiverComponent = ({ colors }) => {
 
             <div className='py-3 d-flex justify-content-between align-items-center' style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, }}>
                 <div className='d-flex align-items-center justify-content-center'>
-                    <p className='m-2' style={{ color: colors.textColor }}>Friend Request</p>
+                    <p className='m-2' style={{ color: "#ec1b90" }}>Friend Request</p>
                 </div>
                 <div>
                     <IconButton style={{ color: colors.iconColor }} onClick={handleRefresh}>
@@ -262,21 +260,26 @@ const ReceiverComponent = ({ colors }) => {
 
                             {/* avatar */}
                             <Grid item xs={4}>
-                                {data.selectedImageUrl &&
-
-                                    <div
-                                        className='avatar-container'
-                                        style={{
-                                            cursor: 'pointer',
-                                        }}
-                                    >
+                                <div className='avatar-container' style={{ cursor: 'pointer' }}>
+                                    {data.imageUrl ? (
                                         <Avatar
                                             className="avatar-wrapper"
-                                            alt="Receiver Photo"
-                                            src={data.selectedImageUrl}
+                                            src={`${data.imageUrl}`}
+                                            style={{
+                                                width: '35px',
+                                                height: '35px'
+                                            }}
                                         />
-                                    </div>
-                                }
+                                    ) : (
+                                        <Avatar
+                                            className="avatar-wrapper"
+                                            style={{
+                                                width: '35px',
+                                                height: '35px'
+                                            }}
+                                        />
+                                    )}
+                                </div>
                             </Grid>
 
                             {/* info */}
@@ -292,7 +295,7 @@ const ReceiverComponent = ({ colors }) => {
                                     </span>
                                     <br />
                                     <span style={{ margin: '0', color: colors.labelColor, fontSize: '12px' }}>
-                                        {data.username}
+                                        {/* {data.username} */}
                                     </span>
                                 </p>
                             </div>

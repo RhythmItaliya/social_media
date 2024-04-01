@@ -163,11 +163,15 @@ const SenderComponent = () => {
                                     cursor: 'pointer',
                                 }}
                             >
-                                <Avatar
-                                    className="avatar-wrapper"
-                                    alt="User Avatar"
-                                    src={`http://static.profile.local/${profile.photoURL}`}
-                                />
+                                {profile.photoURL ? (
+                                    <Avatar
+                                        className="avatar-wrapper"
+                                        alt="User Avatar"
+                                        src={`http://static.profile.local/${profile.photoURL}`}
+                                    />
+                                ) : (
+                                    <Avatar />
+                                )}
                             </div>
                         </Grid>
                     ))
@@ -185,17 +189,26 @@ const SenderComponent = () => {
                     // border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`
                 }}>
                     <div className="close-icon justify-content-end d-flex m-1" onClick={() => setSelectedProfile(null)}>
-                        <CloseIcon style={{ cursor: 'pointer', color: colors.iconColor,fontSize:'16px' }} />
+                        <CloseIcon style={{ cursor: 'pointer', color: colors.iconColor, fontSize: '16px' }} />
                     </div>
-                    <Avatar
-                        className="selected-avatar"
-                        alt="Selected User Avatar"
-                        src={`http://static.profile.local/${selectedProfile.photoURL}`}
-                        onClick={(e) => handleAvatarClick(selectedProfile, e)}
-                        style={{
-                            cursor: 'pointer',
-                        }}
-                    />
+
+                    {selectedProfile.photoURL ? (
+                        <Avatar
+                            src={`http://static.profile.local/${selectedProfile.photoURL}`}
+                            alt={selectedProfile.username}
+                            className="selected-avatar"
+                            onClick={(e) => handleAvatarClick(selectedProfile, e)}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    ) : (
+                        <Avatar
+                            alt={selectedProfile.username}
+                            style={{ cursor: 'pointer' }}
+                            onLoad={() => handleAvatarLoad(profile.photoURL)}
+                        />
+                    )}
+
+
                     <div className='details'>
                         <p style={{ color: colors.labelColor, marginTop: '12px' }}>{selectedProfile.username}</p>
                         <StyledIconButton

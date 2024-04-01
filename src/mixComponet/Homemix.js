@@ -151,13 +151,13 @@ const Homemix = () => {
                                             <Tab
                                                 label="Show Friend Post"
                                                 style={{
-                                                    fontSize: '12px',
+                                                    fontSize: '10px',
                                                 }}
                                             />
                                             <Tab
                                                 label="Show Your Post"
                                                 style={{
-                                                    fontSize: '12px',
+                                                    fontSize: '10px',
                                                 }}
                                             />
                                         </Tabs>
