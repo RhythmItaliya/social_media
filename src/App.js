@@ -29,6 +29,7 @@ import AdminForgotPassword from './Admin/AdminAuthPages/AdminForgotPassword';
 import AdminVerifylogin from './Admin/AdminAuthPages/AdminVerifylogin';
 import AdminResetPassword from './Admin/AdminAuthPages/AdminResetPassword';
 import AdminDash from './Admin/AdminDash';
+import HashtagComponent from './Post/HashTag/HashtagComponent';
 
 const App = () => {
   const [cookies] = useCookies(['auth', 'X-Access-Token', 'token']);
@@ -69,6 +70,8 @@ const App = () => {
 
           <Route path="/:username" element={<ProfileRoute />} />
 
+          <Route path="/hashtags/:hashtag" element={<ProtectedRoute condition={isAuthenticated}><HashtagComponent /></ProtectedRoute>} />
+
           <Route path="*" element={<NotFound />} />
 
           <Route path="/terms-and-conditions" element={<Terms />} />
@@ -82,7 +85,7 @@ const App = () => {
           <Route path="/admin/verify/login/:token" element={<AdminVerifylogin />} />
           <Route path="/admin/reset/password/:token" element={<AdminResetPassword />} />
           <Route path="/admin" element={<AdminDash />} />
-          
+
         </Routes>
       </DarkModeProvider>
     </BrowserRouter>

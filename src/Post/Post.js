@@ -1145,7 +1145,7 @@ export default function InstagramCard() {
                         <React.Fragment key={index}>
                           {index > 0 && ' '}
                           <Link to={`/hashtags/${encodeURIComponent(hashtag)}`} style={{
-                            color: colors.hashtagColor, textDecoration: 'none'
+                            color: colors.hashtagColor,
                           }}>
                             {`#${hashtag.replace(/^#/, '')}`}
                           </Link>
