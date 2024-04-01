@@ -144,7 +144,7 @@ const PostForm = () => {
                 setUploadProgress(interval);
             }
 
-            const response = await fetch(`${config.apiUrl}/api/create/posts/${profileUUID}`, {
+            const response = await fetch(`${config.apiUrl}/posts/api/create/posts/${profileUUID}`, {
                 credentials: 'include',
                 method: 'POST',
                 headers: {

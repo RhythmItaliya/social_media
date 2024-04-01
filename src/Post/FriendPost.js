@@ -130,13 +130,14 @@ export default function FriendPost() {
 
         setLoading(true);
 
-        const response = await fetch(`${config.apiUrl}/find/api/posts/friend/${profileUUID}`);
+        const response = await fetch(`${config.apiUrl}/posts/find/api/posts/friend/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
 
+        
         const updatedUserProfile = {
           posts: data.friendsPosts.map((post) => ({
             id: post.id,
@@ -226,7 +227,7 @@ export default function FriendPost() {
   const handleLikeClick = async (postId) => {
     try {
       // Make a POST request to like/unlike the post
-      const response = await fetch(`${config.apiUrl}/post/like`, {
+      const response = await fetch(`${config.apiUrl}/comments/post/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -300,7 +301,7 @@ export default function FriendPost() {
   // Comment Count....................................................................................
   const fetchUserData = async (postId) => {
     try {
-      const commentCountResponse = await fetch(`${config.apiUrl}/api/post/comments/count/${postId}`, {
+      const commentCountResponse = await fetch(`${config.apiUrl}/comments/api/post/comments/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -312,7 +313,7 @@ export default function FriendPost() {
         throw new Error('Failed to fetch comment count');
       }
 
-      const likeCountResponse = await fetch(`${config.apiUrl}/api/post/likes/count/${postId}`, {
+      const likeCountResponse = await fetch(`${config.apiUrl}/posts/api/post/likes/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -349,7 +350,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Fetch comments for the post
-      const response = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -387,7 +388,7 @@ export default function FriendPost() {
 
 
       // Like comment 
-      const likedCommentsResponse = await fetch(`${config.apiUrl}/find/api/user/liked-comments/${profileUUID}`, {
+      const likedCommentsResponse = await fetch(`${config.apiUrl}/comments/find/api/user/liked/comments/${profileUUID}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -426,7 +427,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Make a POST request to the server to save the comment
-      const response = await fetch(`${config.apiUrl}/api/post/comment`, {
+      const response = await fetch(`${config.apiUrl}/comments/api/post/comment`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -446,7 +447,7 @@ export default function FriendPost() {
       }
 
       // After successfully posting the comment, fetch the updated comments for the post
-      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -498,7 +499,7 @@ export default function FriendPost() {
     try {
 
       // Make a POST request to the server to update the comment likes
-      const likeResponse = await fetch(`${config.apiUrl}/api/post/comment/like`, {
+      const likeResponse = await fetch(`${config.apiUrl}/comments/api/post/comment/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -515,7 +516,7 @@ export default function FriendPost() {
       }
 
       // After successfully updating the comment likes, fetch the updated comments for the post
-      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -559,7 +560,7 @@ export default function FriendPost() {
       setCommentLoading(true);
 
       // Make a DELETE request to the server to delete the comment
-      const response = await fetch(`${config.apiUrl}/api/delete/comment/${commentId}`, {
+      const response = await fetch(`${config.apiUrl}/comments/api/delete/comment/${commentId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

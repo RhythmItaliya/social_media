@@ -29,7 +29,7 @@ import { TextareaAutosize } from '@mui/material';
 import CountrySelector from '../dashboard/LoginProfile/CountrySelector';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import DeleteAllPosts from './deleteAllPosts';
+import DeleteAllPosts from './DeleteAllPosts';
 
 
 const hexToRgb = (hex) => {
@@ -409,12 +409,12 @@ const SubOptionsComponent = ({ subOptions, colors, onBackButtonClick }) => {
         );
       }
 
-      if (selectedSubOptionLabel.toLowerCase() !== 'avatar') {
+      if (selectedSubOptionLabel.toLowerCase() !== 'avatar' && selectedSubOptionLabel.toLowerCase() !== 'delete post') {
         return (
           <div className='p-2 w-100 mx-auto d-flex justify-content-center align-content-center'>
             <TextField
               variant="standard"
-              label={`Set Your ${selectedSubOptionLabel} `}
+              label={`Set Your ${selectedSubOptionLabel}`}
               value={defaultValue}
               onChange={(e) => handleInputChange(selectedSubOptionLabel.toLowerCase(), e.target.value)}
               InputProps={{
@@ -471,6 +471,20 @@ const SubOptionsComponent = ({ subOptions, colors, onBackButtonClick }) => {
     return null;
   };
 
+  const renderDeleteRow = () => {
+    const subOptionLabel = selectedSubOption !== null ? subOptions[selectedSubOption].option.toLowerCase() : '';
+
+    if (subOptionLabel === 'delete post') {
+      return (
+        <div className='p-2 w-100 mx-auto d-flex justify-content-center align-content-center'>
+          <DeleteAllPosts colors={colors} />
+        </div>
+      );
+    }
+    return null;
+  };
+
+
   return (
     <>
       {selectedSubOption !== null ? (
@@ -478,7 +492,9 @@ const SubOptionsComponent = ({ subOptions, colors, onBackButtonClick }) => {
           <SubSubOptionsComponent backbutton={handleBackButtonClick} subSubOptions={subOptions[selectedSubOption].subOptions} colors={colors} />
           {renderInputRow()}
           {renderAvatar()}
+          {renderDeleteRow()}
           {renderValidationMessage()}
+
         </>
       ) : (
         <TableContainer>

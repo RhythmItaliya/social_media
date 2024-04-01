@@ -10,6 +10,7 @@ import profileuuidReducer from './profileuuidReducer';
 import imageReducer from './imageReducer';
 import profileReducer from './profileReducer';
 import usernameReducer from './usernameReducer';
+import darkModeReducer from './darkModeReducer';
 
 const rootReducer = combineReducers({
     login: authReducerLogin,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
     post: imageReducer,
     postData: profileReducer,
     name: usernameReducer,
+    darkMode: darkModeReducer,
 });
 
 export default rootReducer;

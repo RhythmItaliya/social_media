@@ -55,7 +55,7 @@ function PostProfile() {
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
-        fetch(`${config.apiUrl}/api/user/posts/profile/${profileUUID}`)
+        fetch(`${config.apiUrl}/posts/api/user/posts/profile/${profileUUID}`)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {

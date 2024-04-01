@@ -1,4 +1,4 @@
-// deleteAllPosts.js
+// DeleteAllPosts.js
 
 import React, { useState } from 'react';
 import { Button, Typography } from '@mui/material';

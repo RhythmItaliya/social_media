@@ -119,7 +119,7 @@ const ProfileSet = () => {
             try {
                 setLoading(true);
 
-                const postCountResponse = await fetch(`${config.apiUrl}/api/userPostsCount/${profileUUID}`, {
+                const postCountResponse = await fetch(`${config.apiUrl}/posts/api/userPostsCount/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

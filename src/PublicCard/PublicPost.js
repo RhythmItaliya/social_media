@@ -53,7 +53,7 @@ function PublicPost({ profileUUID }) {
     const colors = isDarkMode ? darkModeColors : lightModeColors;
 
     useEffect(() => {
-        fetch(`${config.apiUrl}/api/user/posts/profile/public/${profileUUID}`)
+        fetch(`${config.apiUrl}/posts/api/user/posts/profile/public/${profileUUID}`)
             .then(response => {
                 if (response.status === 403) {
                     console.error('Access denied. Users are not friends.');

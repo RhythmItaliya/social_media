@@ -1,12 +1,12 @@
-// DarkModeContext.js
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleDarkMode } from '../actions/authActions';
 
 const DarkModeContext = createContext();
 
 export const DarkModeProvider = ({ children }) => {
-  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-
-  const [isDarkMode, setIsDarkMode] = useState(savedDarkMode);
+  const dispatch = useDispatch();
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
 
   useEffect(() => {
     const body = document.body;
@@ -15,17 +15,15 @@ export const DarkModeProvider = ({ children }) => {
     } else {
       body.classList.remove('dark-mode');
     }
-
-    localStorage.setItem('darkMode', isDarkMode ? 'true' : 'false');
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
+  const toggleDarkModeContext = () => {
+    dispatch(toggleDarkMode(!isDarkMode));
   };
 
   const theme = {
     isDarkMode,
-    toggleDarkMode,
+    toggleDarkMode: toggleDarkModeContext,
   };
 
   return (

@@ -2,6 +2,7 @@
 
 
 // authActions.js
+import config from '../configuration';
 import * as types from './types';
 
 export const setGlobalLoading = (loading) => ({ type: types.SET_GLOBAL_LOADING, payload: loading });
@@ -56,3 +57,28 @@ export const setUsername = (username) => ({
 export const removePostBase64 = () => ({
     type: types.REMOVE_POST_BASE64,
 });
+
+
+export const toggleDarkMode = (isDarkMode) => async (dispatch, getState) => {
+    try {
+        const response = await fetch(`${config.apiUrl}/api/user/profiles/${getState().useruuid.uuid}/mode`, {
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ darkMode: isDarkMode }),
+        });
+
+        if (response.ok) {
+            dispatch({
+                type: types.TOGGLE_DARK_MODE,
+                payload: isDarkMode,
+            });
+        } else {
+            console.error('Error updating dark mode:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error updating dark mode:', error);
+    }
+};

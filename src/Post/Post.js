@@ -128,7 +128,7 @@ export default function InstagramCard() {
 
         setLoading(true);
 
-        const response = await fetch(`${config.apiUrl}/find/api/posts/user/${profileUUID}`);
+        const response = await fetch(`${config.apiUrl}/posts/find/api/posts/user/${profileUUID}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -195,7 +195,7 @@ export default function InstagramCard() {
 
   const handleLikeClick = async (postId) => {
     try {
-      const response = await fetch(`${config.apiUrl}/post/like`, {
+      const response = await fetch(`${config.apiUrl}/comments/post/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -257,7 +257,7 @@ export default function InstagramCard() {
 
   // const handleLikeClick = async (postId) => {
   //   try {
-  //     const response = await fetch(`${config.apiUrl}/post/like`, {
+  //     const response = await fetch(`${config.apiUrl}/comments/post/like`, {
   //       method: 'POST',
   //       credentials: 'include',
   //       headers: {
@@ -326,7 +326,7 @@ export default function InstagramCard() {
   // COMMENT LIKE COUNT
   const fetchUserData = async (postId) => {
     try {
-      const commentCountResponse = await fetch(`${config.apiUrl}/api/post/comments/count/${postId}`, {
+      const commentCountResponse = await fetch(`${config.apiUrl}/comments/api/post/comments/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -338,7 +338,7 @@ export default function InstagramCard() {
         throw new Error('Failed to fetch comment count');
       }
 
-      const likeCountResponse = await fetch(`${config.apiUrl}/api/post/likes/count/${postId}`, {
+      const likeCountResponse = await fetch(`${config.apiUrl}/posts/api/post/likes/count/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -376,7 +376,7 @@ export default function InstagramCard() {
       setCommentLoading(true);
 
       // Fetch comments for the post
-      const response = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -414,7 +414,7 @@ export default function InstagramCard() {
 
 
       // Like comment 
-      const likedCommentsResponse = await fetch(`${config.apiUrl}/find/api/user/liked-comments/${profileUUID}`, {
+      const likedCommentsResponse = await fetch(`${config.apiUrl}/comments/find/api/user/liked/comments/${profileUUID}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -453,7 +453,7 @@ export default function InstagramCard() {
       setCommentLoading(true);
 
       // Make a POST request to the server to save the comment
-      const response = await fetch(`${config.apiUrl}/api/post/comment`, {
+      const response = await fetch(`${config.apiUrl}/comments/api/post/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -472,7 +472,7 @@ export default function InstagramCard() {
       }
 
       // After successfully posting the comment, fetch the updated comments for the post
-      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -524,7 +524,7 @@ export default function InstagramCard() {
     try {
 
       // Make a POST request to the server to update the comment likes
-      const likeResponse = await fetch(`${config.apiUrl}/api/post/comment/like`, {
+      const likeResponse = await fetch(`${config.apiUrl}/comments/api/post/comment/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -540,7 +540,7 @@ export default function InstagramCard() {
       }
 
       // After successfully updating the comment likes, fetch the updated comments for the post
-      const commentsResponse = await fetch(`${config.apiUrl}/find/api/post/comments/${postId}`, {
+      const commentsResponse = await fetch(`${config.apiUrl}/comments/find/api/post/comments/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -582,7 +582,7 @@ export default function InstagramCard() {
 
       setCommentLoading(true);
 
-      const response = await fetch(`${config.apiUrl}/api/delete/comment/${commentId}`, {
+      const response = await fetch(`${config.apiUrl}/comments/api/delete/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -700,7 +700,7 @@ export default function InstagramCard() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${config.apiUrl}/api/posts/get/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/posts/api/posts/get/${postId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -787,7 +787,7 @@ export default function InstagramCard() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${config.apiUrl}/api/posts/update/${editedPostId}`, {
+      const response = await fetch(`${config.apiUrl}/posts/api/posts/update/${editedPostId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -851,7 +851,7 @@ export default function InstagramCard() {
   const handleDeletePost = async (postId) => {
     try {
       setLoading(true);
-      const response = await fetch(`${config.apiUrl}/api/posts/delete/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/posts/api/posts/delete/${postId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -898,7 +898,7 @@ export default function InstagramCard() {
   const handleHidePost = async (postId) => {
     try {
       setLoading(true);
-      const response = await fetch(`${config.apiUrl}/api/posts/visibility/${postId}`, {
+      const response = await fetch(`${config.apiUrl}/posts/api/posts/visibility/${postId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {

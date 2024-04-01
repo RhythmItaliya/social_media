@@ -59,8 +59,7 @@ const dataMapping = {
     { option: 'Birthdate', subOptions: 'birthDate' },
   ],
   'Post Info': [
-    { option: 'Delete All Posts', subOptions: 'deletePosts' },
-    { option: 'Private All Posts', subOptions: 'privatePosts' },
+    { option: 'Delete Post', subOptions: 'delete post' },
   ],
 };
 

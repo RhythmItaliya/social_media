@@ -51,7 +51,7 @@ const hexToRgb = (hex) => {
 
 const ForgotPassword = () => {
 
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleDarkMode = () => {
         setIsDarkMode(!isDarkMode);
