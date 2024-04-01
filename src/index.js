@@ -36,12 +36,12 @@ import { AuthProvider } from './auth/AuthContext';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store/store';
-import { DarkModeProvider } from './theme/Darkmode';
 
 import './index.css';
 import './App.css';
 import './loading.css';
-import './dashboard/Tab/vertical.css'
+import './dashboard/Tab/vertical.css';
+import './mixComponet/mix.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

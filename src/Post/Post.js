@@ -5,7 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
 import TextField from '@mui/material/TextField';
@@ -81,7 +80,7 @@ const instagramStyles = {
 };
 
 export default function InstagramCard() {
-
+  const containerRef = React.useRef(null);
   const [newUserProfile, setNewUserProfile] = React.useState({});
 
   const [expandedPosts, setExpandedPosts] = React.useState({});
@@ -931,19 +930,59 @@ export default function InstagramCard() {
     }
   };
 
-  // ==============================================================================================
 
   const handleVisitProfile = () => {
     console.log('Visiting profile');
     handleMoreVertClose();
   };
 
+  // ==============================================================================================
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        scrollToPreviousPost();
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        scrollToNextPost();
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyPress);
+  
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [newUserProfile]);
+  
+  const scrollToPreviousPost = () => {
+    if (containerRef.current) {
+      const currentPosition = containerRef.current.scrollTop;
+      const postHeight = 400;
+      containerRef.current.scrollTo({
+        top: currentPosition - postHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+  
+  const scrollToNextPost = () => {
+    if (containerRef.current) {
+      const currentPosition = containerRef.current.scrollTop;
+      const postHeight = 400;
+      containerRef.current.scrollTo({
+        top: currentPosition + postHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   {/* ------------------------------------------------------------------------------------------------- */ }
 
   return (
 
-    <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+    <div ref={containerRef} className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       {loading ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>
           <div className="loading-dots">

@@ -83,6 +83,7 @@ const instagramStyles = {
 };
 
 export default function FriendPost() {
+  const containerRef = React.useRef(null);
 
   const [mergedData, setMergedData] = React.useState([]);
 
@@ -137,7 +138,7 @@ export default function FriendPost() {
 
         const data = await response.json();
 
-        
+
         const updatedUserProfile = {
           posts: data.friendsPosts.map((post) => ({
             id: post.id,
@@ -720,12 +721,54 @@ export default function FriendPost() {
     setOpenReportModal(false);
   };
 
+  // ==============================================================================================
 
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        scrollToPreviousPost();
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault(); 
+        scrollToNextPost();
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyPress);
+  
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [mergedData]);
+  
+  const scrollToPreviousPost = () => {
+    if (containerRef.current) {
+      const currentPosition = containerRef.current.scrollTop;
+      const postHeight = 400;
+      containerRef.current.scrollTo({
+        top: currentPosition - postHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+  
+  const scrollToNextPost = () => {
+    if (containerRef.current) {
+      const currentPosition = containerRef.current.scrollTop;
+      const postHeight = 400;
+      containerRef.current.scrollTo({
+        top: currentPosition + postHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+  
 
   {/* ------------------------------------------------------------------------------------------------- */ }
 
   return (
-    <div className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+    <div ref={containerRef} className={`vh-100 overflow-scroll ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       {loading ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>
           <div className="loading-dots">

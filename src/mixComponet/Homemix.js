@@ -12,6 +12,7 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 
 import UserChatList from '../Chat/UserChatList';
 import DrawerWindow from '../Chat/DrawerWindow';
+import SuggestedFriendMain from './SuggestedFriendMain';
 
 
 const lightModeColors = {
@@ -120,43 +121,64 @@ const Homemix = () => {
                     </div>
                 )}
 
-                <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-12 col-lg-6 mx-auto justify-content-center d-flex">
-                            <div>
-                                {/* Messeges */}
-                                <IconButton onClick={toggleDrawer(true)} style={{ position: 'fixed', top: '50%', right: '0', transform: 'translateY(-50%)', zIndex: '1000', color: colors.iconColor }}>
-                                    <ArrowBackIosNewOutlinedIcon />
-                                </IconButton>
 
-                                {/* Main Post */}
-                                <div className="justify-content-center align-content-center d-flex">
-                                    <Tabs
-                                        value={value2}
-                                        onChange={handleChange2}
-                                    >
-                                        <Tab
-                                            label="Show Friend Post"
-                                            style={{
-                                                fontSize: '12px',
-                                            }}
-                                        />
-                                        <Tab
-                                            label="Show Your Post"
-                                            style={{
-                                                fontSize: '12px',
-                                            }}
-                                        />
-                                    </Tabs>
+                <div className="container">
+                    <div className="row">
+                        {/* Suggested Friend */}
+                        <div className="col-lg-3 notificationMain">
+                            <div className=''>
+                                <>
+                                    {/* <SuggestedFriendMain /> */}
+                                </>
+                            </div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="col-lg-6">
+                            <div className="justify-content-center align-content-between d-flex">
+                                <div>
+                                    {/* Messages */}
+                                    <IconButton className='messagesMiniWindow' onClick={toggleDrawer(true)} style={{ position: 'fixed', top: '50%', right: '0', transform: 'translateY(-50%)', zIndex: '1000', color: colors.iconColor }}>
+                                        <ArrowBackIosNewOutlinedIcon />
+                                    </IconButton>
+
+                                    {/* Main Post */}
+                                    <div className="justify-content-center align-content-center d-flex">
+                                        <Tabs
+                                            value={value2}
+                                            onChange={handleChange2}
+                                        >
+                                            <Tab
+                                                label="Show Friend Post"
+                                                style={{
+                                                    fontSize: '12px',
+                                                }}
+                                            />
+                                            <Tab
+                                                label="Show Your Post"
+                                                style={{
+                                                    fontSize: '12px',
+                                                }}
+                                            />
+                                        </Tabs>
+                                    </div>
+                                    <div className="tab-content">
+                                        {value2 === 0 && <FriendPost />}
+                                        {value2 === 1 && <Post />}
+                                    </div>
                                 </div>
-                                <div className="tab-content">
-                                    {value2 === 0 && <FriendPost />}
-                                    {value2 === 1 && <Post />}
-                                </div>
+                            </div>
+                        </div>
+
+                        {/* Another Div */}
+                        <div className="col-lg-3 suggestedFriendMain">
+                            <div className='d-flex justify-content-center align-content-center'>
+                                <SuggestedFriendMain colors={colors} />
                             </div>
                         </div>
                     </div>
                 </div>
+
 
             </div>
         </>
