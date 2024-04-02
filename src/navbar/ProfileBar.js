@@ -256,8 +256,6 @@ export default function Profilebar({ toggleStoryVisibility }) {
                             </IconButton>
                         </DialogActions>
                     </Dialog>
-
-
                 </Toolbar>
             </AppBar>
         </Box>

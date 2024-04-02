@@ -134,7 +134,7 @@ const Homemix = () => {
                         </div>
 
                         {/* Main Content */}
-                        <div className="col-lg-6">
+                        <div className="col-lg-5">
                             <div className="justify-content-center align-content-between d-flex">
                                 <div>
                                     {/* Messages */}
@@ -171,7 +171,7 @@ const Homemix = () => {
                         </div>
 
                         {/* Another Div */}
-                        <div className="col-lg-3 suggestedFriendMain">
+                        <div className="col-lg-4 suggestedFriendMain">
                             <div className='d-flex justify-content-center align-content-center'>
                                 <SuggestedFriendMain colors={colors} />
                             </div>

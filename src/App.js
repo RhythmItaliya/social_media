@@ -20,7 +20,11 @@ import Terms from './pages/Terms';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 
-import '../src/loading.css';
+import './index.css';
+import './App.css';
+import './loading.css';
+import './dashboard/Tab/vertical.css';
+import './mixComponet/mix.css';
 
 // ADMIN
 import AdminLoginPage from './Admin/AdminAuthPages/AdminLogin';

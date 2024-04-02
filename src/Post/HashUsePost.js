@@ -14,8 +14,6 @@ import Collapse from '@mui/material/Collapse';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Popover from '@mui/material/Popover';
-
-
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserProfilePosts } from '../actions/authActions';
 import { useEffect } from 'react';
@@ -82,7 +80,7 @@ const instagramStyles = {
   },
 };
 
-export default function FriendPost() {
+export default function FriendPost({ hashtag }) {
   const containerRef = React.useRef(null);
 
   const [mergedData, setMergedData] = React.useState([]);
@@ -128,16 +126,14 @@ export default function FriendPost() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-
         setLoading(true);
 
-        const response = await fetch(`${config.apiUrl}/posts/find/api/posts/friend/${profileUUID}`);
+        const response = await fetch(`${config.apiUrl}/hashtags/hashtags/${profileUUID}?hashtag=${hashtag}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-
 
         const updatedUserProfile = {
           posts: data.friendsPosts.map((post) => ({
@@ -161,7 +157,9 @@ export default function FriendPost() {
               day: 'numeric',
             }),
           })),
-          likedPosts: data.likedPosts
+          likedPosts: data.likedPosts,
+          friendPostIds: data.friendPostIds,
+          otherPostIds: data.otherPostIds
         };
 
         const updatedUserinfo = {
@@ -172,26 +170,30 @@ export default function FriendPost() {
           })),
         };
 
-        setMergedData(updatedUserProfile.posts.map(post => {
+        const updatedMergedData = updatedUserProfile.posts.map(post => {
           const userInfo = updatedUserinfo.friends.find(friend => friend.id === post.userProfileId);
+          if (userInfo) {
+            return {
+              id: post.id,
+              userProfileId: post.userProfileId,
+              postText: post.postText,
+              isPhoto: post.isPhoto,
+              caption: post.caption,
+              location: post.location,
+              isVisibility: post.isVisibility,
+              postUploadURLs: post.postUploadURLs,
+              hashtags: post.hashtags,
+              uuid: post.uuid,
+              createdAt: post.createdAt,
+              username: userInfo.username,
+              photoURL: userInfo.photoURL,
+            };
+          }
 
-          return {
-            id: post.id,
-            userProfileId: post.userProfileId,
-            postText: post.postText,
-            isPhoto: post.isPhoto,
-            caption: post.caption,
-            location: post.location,
-            isVisibility: post.isVisibility,
-            postUploadURLs: post.postUploadURLs,
-            hashtags: post.hashtags,
-            uuid: post.uuid,
-            createdAt: post.createdAt,
-            username: userInfo.username,
-            photoURL: userInfo.photoURL,
-          };
-        }));
+          return null;
+        }).filter(post => post !== null);
 
+        setMergedData(updatedMergedData);
         setLoading(false);
 
         await Promise.all(updatedUserProfile.posts.map(async (post) => {
@@ -206,7 +208,10 @@ export default function FriendPost() {
     };
 
     fetchPosts();
-  }, [profileUUID]);
+  }, [profileUUID, hashtag]);
+
+
+
 
   useEffect(() => {
     dispatch(setUserProfilePosts(mergedData));
@@ -215,7 +220,6 @@ export default function FriendPost() {
 
   // Like click ------------------------------------
   const [likeSuccess, setLikeSuccess] = React.useState(false);
-
 
   const getIcon = (postId) => {
     // Check if the post is liked
@@ -787,7 +791,7 @@ export default function FriendPost() {
       ) : error ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
       ) : mergedData.length === 0 ? (
-        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px', marginTop: '50px', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '50px', lineHeight: 2 }}>Post not found.<br /> <span style={{ color: '#ec1b90', fontSize: '16px' }}>Connect With Friends & Explore Posts</span></p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '16px', marginTop: '50px', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '50px' }}>Post <span style={{ color: '#ec1b90', textDecoration: 'underline' }}>{`#${hashtag}`}</span> not found.</p>
       ) : (
         <div>
           {mergedData.map((post) => (
@@ -1000,8 +1004,6 @@ export default function FriendPost() {
                   </IconButton>
                   {/* Other icons for comment and share */}
                 </CardActions>
-
-
 
 
                 <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="comment" onClick={() => handleExpandClick(post.id)} sx={instagramStyles.instagramIcons}>

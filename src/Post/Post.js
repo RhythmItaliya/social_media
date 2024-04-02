@@ -1003,7 +1003,7 @@ export default function InstagramCard() {
       ) : error ? (
         <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>Error: {error}</p>
       ) : newUserProfile.posts.length === 0 ? (
-        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px' }}>No posts found</p>
+        <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px', marginTop: '50px', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '50px', lineHeight: 2 }}>Post not found.<br /> <span style={{ color: '#ec1b90', fontSize: '16px' }}>Share your first post</span></p>
       ) : (
         <div>
           {newUserProfile.posts && newUserProfile.posts.map((post) => (
