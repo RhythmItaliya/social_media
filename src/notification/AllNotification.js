@@ -1,3 +1,4 @@
+// AllNotification,js
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import config from '../configuration';
@@ -13,7 +14,7 @@ const hexToRgb = (hex) => {
     return `${r}, ${g}, ${b}`;
 };
 
-function Notification({ colors }) {
+function AllNotification({ colors }) {
     const [loading, setLoading] = useState(true);
     const [notifications, setNotifications] = useState([]);
     const [notificationsUUID, setNotificationsUUID] = useState([]);
@@ -26,7 +27,7 @@ function Notification({ colors }) {
     async function fetchNotifications() {
         setLoading(true);
         try {
-            const response = await fetch(`${config.apiUrl}/notifications/post/notifications/${profileUUID}`);
+            const response = await fetch(`${config.apiUrl}/notifications/all/post/notifications/${profileUUID}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch notifications');
             }
@@ -142,7 +143,7 @@ function Notification({ colors }) {
         >
             <div className='p-2 d-flex justify-content-between align-items-center' style={{ borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, }}>
                 <div className='d-flex align-items-center user-select-none'>
-                    <p className='m-2' style={{ color: "#ec1b90", fontSize: '16px', margin: 0 }}>Recent Notification</p>
+                    <p className='m-2' style={{ color: "#ec1b90", fontSize: '16px', margin: 0 }}>Show All Notification</p>
                 </div>
                 <div className='d-flex align-items-center gap-2 user-select-none'>
                     <IconButton style={{ color: colors.iconColor }} onClick={fetchNotifications}>
@@ -166,7 +167,7 @@ function Notification({ colors }) {
                 <div>
                     {notifications.length === 0 ? (
                         <div>
-                            <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px', marginTop: '50px', borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '50px', lineHeight: 2 }}>No <span style={{ color: '#ec1b90', fontSize: '16px' }}>Activity</span> Found.</p>
+                            <p style={{ color: colors.textColor, textAlign: 'center', fontSize: '14px', marginTop: '50px', borderTop: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`, padding: '50px', lineHeight: 2 }}>No Recent<span style={{ color: '#ec1b90', fontSize: '16px' }}>Activity</span> Found.</p>
                         </div>
                     ) : (
                         notifications.map(notification => (
@@ -199,4 +200,4 @@ function Notification({ colors }) {
     );
 }
 
-export default Notification;
+export default AllNotification;

@@ -25,3 +25,30 @@
     overflow-y: auto !important;
     max-height: calc(100vh - 64px) !important;
 }
+
+
+
+/* Responsive styles */
+@media (max-width: 991.98px) {
+    .notificationMain {
+        display: none !important;
+    }
+
+    .suggestedFriendMain {
+        display: none !important;
+    }
+
+    .messagesMiniWindow {
+        display: none !important;
+    }
+}
+
+@media screen and (min-width: 991.99px) and (max-width: 1024px) {
+    .notificationMain {
+        display: none !important;
+    }
+
+    .suggestedFriendMain {
+        display: none !important;
+    }
+}

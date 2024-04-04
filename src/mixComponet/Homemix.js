@@ -13,7 +13,7 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import UserChatList from '../Chat/UserChatList';
 import DrawerWindow from '../Chat/DrawerWindow';
 import SuggestedFriendMain from './SuggestedFriendMain';
-import Notification from './Notification';
+import RecentNotification from '../notification/RecentNotification';
 
 
 const lightModeColors = {
@@ -121,17 +121,17 @@ const Homemix = () => {
                     </div>
                 )}
 
-                <div className="container">
-                    <div className="row">
+                <div className="container-fluid">
+                    <div className="row justify-content-center">
                         {/* Suggested Friend */}
                         <div className="col-lg-3 notificationMain">
                             <div className='d-flex justify-content-center align-content-center'>
-                                < Notification colors={colors} />
+                                < RecentNotification colors={colors} />
                             </div>
                         </div>
 
                         {/* Main Content */}
-                        <div className="col-lg-6">
+                        <div className="col-lg-5">
                             <div className="justify-content-center align-content-between d-flex">
                                 <div>
                                     {/* Messages */}
