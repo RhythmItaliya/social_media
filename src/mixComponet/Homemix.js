@@ -13,6 +13,7 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import UserChatList from '../Chat/UserChatList';
 import DrawerWindow from '../Chat/DrawerWindow';
 import SuggestedFriendMain from './SuggestedFriendMain';
+import Notification from './Notification';
 
 
 const lightModeColors = {
@@ -93,7 +94,6 @@ const Homemix = () => {
     return (
         <>
             <div className="overflow-hidden" style={{ height: '100vh' }}>
-
                 <Drawer
                     anchor="right"
                     open={isDrawerOpen}
@@ -121,20 +121,17 @@ const Homemix = () => {
                     </div>
                 )}
 
-
                 <div className="container">
                     <div className="row">
                         {/* Suggested Friend */}
                         <div className="col-lg-3 notificationMain">
-                            <div className=''>
-                                <>
-                                    {/* <SuggestedFriendMain /> */}
-                                </>
+                            <div className='d-flex justify-content-center align-content-center'>
+                                < Notification colors={colors} />
                             </div>
                         </div>
 
                         {/* Main Content */}
-                        <div className="col-lg-5">
+                        <div className="col-lg-6">
                             <div className="justify-content-center align-content-between d-flex">
                                 <div>
                                     {/* Messages */}
@@ -171,15 +168,13 @@ const Homemix = () => {
                         </div>
 
                         {/* Another Div */}
-                        <div className="col-lg-4 suggestedFriendMain">
+                        <div className="col-lg-3 suggestedFriendMain">
                             <div className='d-flex justify-content-center align-content-center'>
                                 <SuggestedFriendMain colors={colors} />
                             </div>
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </>
     );
