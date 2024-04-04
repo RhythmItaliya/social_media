@@ -247,7 +247,7 @@ const UserChatList = ({ onSelectUser }) => {
                 )}
                 {!friend.lastMessage && (
                   <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
-                    Start an awesome chat with @{friend.user.username} now!
+                    Start an awesome chat with <span style={{ color: '#ec1b90' }}>{friend.user.username}</span> now!
                   </span>
                 )}
               </div>
