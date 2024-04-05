@@ -507,7 +507,7 @@ const SubOptionsComponent = ({ subOptions, colors, onBackButtonClick }) => {
                     }, 0.5)`
                 }}>
                   <div style={{ color: colors.textColor }}>
-                    <IconButton onClick={handleBackButtonClickMain}>
+                    <IconButton style={{ color: colors.iconColor }} onClick={handleBackButtonClickMain}>
                       <ArrowBackIos />
                     </IconButton>
                     Set Your Account

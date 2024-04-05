@@ -187,7 +187,22 @@ function AllNotification({ colors }) {
                                             <Avatar style={{ width: '25px', height: '25px' }} />
                                         )}
                                         <Typography style={{ color: colors.textColor, marginLeft: '8px', fontSize: '12px', textAlign: 'center' }}>
-                                            New Post by&nbsp;&nbsp;<span className='username' style={{ color: '#ec1b90', fontSize: '14px', cursor: 'pointer' }} onClick={() => navigate(`/${notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}`)}>{notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}</span>&nbsp;&nbsp;<span style={{ fontSize: '10px', color: colors.labelColor }}>{getTimeDifference(notification.createdAt)}</span>
+                                            {notification.isPost ? (
+                                                <>
+                                                    New Post by&nbsp;&nbsp;
+                                                    <span className='username' style={{ color: '#ec1b90', fontSize: '14px', cursor: 'pointer' }} onClick={() => navigate(`/${notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}`)}>
+                                                        {notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Your Post Liked by&nbsp;&nbsp;
+                                                    <span className='username' style={{ color: '#ec1b90', fontSize: '14px', cursor: 'pointer' }} onClick={() => navigate(`/${notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}`)}>
+                                                        {notificationsUsername && notificationsUsername[notification.notificationMessage] && notificationsUsername[notification.notificationMessage].username}
+                                                    </span>
+                                                </>
+                                            )}
+                                            &nbsp;&nbsp;<span style={{ fontSize: '10px', color: colors.labelColor }}>{getTimeDifference(notification.createdAt)}</span>
                                         </Typography>
                                     </li>
                                 </ul>
