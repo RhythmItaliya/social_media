@@ -205,55 +205,65 @@ const UserChatList = ({ onSelectUser }) => {
         style={{
           listStyleType: 'none',
         }}>
-        {filteredFriendsList.map((friend) => (
-          <li
-            key={friend.uuid}
-            style={{
-              marginBottom: '10px',
-              cursor: 'pointer',
-              backgroundColor: selectedUser && selectedUser.uuid === friend.uuid ? colors.activeTransparentColor : colors.backgroundColor,
-              color: selectedUser && selectedUser.uuid === friend.uuid ? colors.textColor : colors.textColor,
-              padding: '2px',
-              borderRadius: '5px'
-            }}
-            onClick={() => handleUserSelect(friend)}
-          >
-            <div className='d-flex gap-3 m-1 p-1 rounded-2'>
-              <div className="d-flex justify-content-center align-content-center" style={{ flex: '20%' }}>
-                <Avatar
-                  src={friend.photoURL}
-                  alt={`${friend.firstName}'s Avatar`}
-                  style={{
-                    width: '42px',
-                    height: '42px'
-                  }}
-                />
-              </div>
-              <div style={{ flex: '80%' }}>
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="user-select-none" style={{ fontSize: "14px", color: colors.textColor, fontWeight: '500' }}>
-                    {friend.firstName.charAt(0).toUpperCase() + friend.firstName.slice(1)}{' '}
-                    {friend.lastName.charAt(0).toUpperCase() + friend.lastName.slice(1)}
-                  </span>
-                  <span className="user-select-none" style={{ fontSize: '10px', opacity: '0.8' }}>
-                    {friend.lastMessage ? formatTimestamp(friend.lastMessage.timestamp) : ''}
-                  </span>
+        {/* {filteredFriendsList.map((friend) => ( */}
+        {filteredFriendsList
+          .slice()
+          .sort((a, b) => {
+            if (!a.lastMessage && !b.lastMessage) return 0;
+            if (!a.lastMessage) return -1;
+            if (!b.lastMessage) return 1;
+            return new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp);
+          })
+          .map((friend) => (
+            <li
+              key={friend.uuid}
+              style={{
+                marginBottom: '10px',
+                cursor: 'pointer',
+                backgroundColor: selectedUser && selectedUser.uuid === friend.uuid ? colors.activeTransparentColor : colors.backgroundColor,
+                color: selectedUser && selectedUser.uuid === friend.uuid ? colors.textColor : colors.textColor,
+                border: `1px solid rgba(${hexToRgb(colors.border)}, 0.5)`,
+                padding: '2px',
+                borderRadius: '5px'
+              }}
+              onClick={() => handleUserSelect(friend)}
+            >
+              <div className='d-flex gap-3 m-1 p-1 rounded-2'>
+                <div className="d-flex justify-content-center align-content-center" style={{ flex: '20%', }}>
+                  <Avatar
+                    src={friend.photoURL}
+                    alt={`${friend.firstName}'s Avatar`}
+                    style={{
+                      width: '42px',
+                      height: '42px'
+                    }}
+                  />
                 </div>
-                {friend.lastMessage && (
-                  <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
-                    {''}
-                    {friend.lastMessage.message}
-                  </span>
-                )}
-                {!friend.lastMessage && (
-                  <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
-                    Start an awesome chat with <span style={{ color: '#ec1b90' }}>{friend.user.username}</span> now!
-                  </span>
-                )}
+                <div style={{ flex: '80%' }}>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <span className="user-select-none" style={{ fontSize: "14px", color: colors.textColor, fontWeight: '500' }}>
+                      {friend.firstName.charAt(0).toUpperCase() + friend.firstName.slice(1)}{' '}
+                      {friend.lastName.charAt(0).toUpperCase() + friend.lastName.slice(1)}
+                    </span>
+                    <span className="user-select-none" style={{ fontSize: '10px', opacity: '0.8' }}>
+                      {friend.lastMessage ? formatTimestamp(friend.lastMessage.timestamp) : ''}
+                    </span>
+                  </div>
+                  {friend.lastMessage && (
+                    <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
+                      {''}
+                      {friend.lastMessage.message}
+                    </span>
+                  )}
+                  {!friend.lastMessage && (
+                    <span className="user-select-none" style={{ fontSize: '12px', opacity: '0.9', color: colors.labelColor }}>
+                      Start an awesome chat with <span style={{ color: '#ec1b90' }}>{friend.user.username}</span> now!
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          ))}
       </ul>
     </div >
   );

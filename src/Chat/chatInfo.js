@@ -48,7 +48,14 @@ export const joinRoom = (senderUuid, receiverUuid, updateMessages) => {
     // updateMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
+  const handleDeletedMessage = (deletedMessageId) => {
+    console.log(`Message with ID ${deletedMessageId} has been deleted`);
+    fetchMessages()
+    // updateMessages(prevMessages => prevMessages.filter(message => message.id !== deletedMessageId));
+  };
+
   socket.on('new-message', handleNewMessage);
+  socket.on('message-deleted', handleDeletedMessage);
 
   return { room, handleNewMessage };
 };

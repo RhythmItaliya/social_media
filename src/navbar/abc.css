@@ -48,8 +48,18 @@
 }
 
 
-.searchResultItem:hover {
-    background-color: #ec1b9166;
+/* .searchResultItem:hover {
+    background-color: rgba(255, 114, 186, 0.3);
     cursor: pointer;
-    border-radius: 20px;
+    border-radius: 5px;
+} */
+
+.searchResultItem {
+    border-radius: 5px;
+    transition: background-color 0.1s ease;
+}
+
+.searchResultItem:hover {
+    background-color: rgba(255, 114, 186, 0.3);
+    cursor: pointer;
 }

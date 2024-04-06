@@ -6,6 +6,7 @@ import { joinRoom, leaveRoom, sendMessage } from './chatInfo';
 import Avatar from '@mui/material/Avatar';
 import { IconButton } from '@mui/material';
 import { EmojiEmotions, SendAndArchiveOutlined } from '@mui/icons-material';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -224,20 +225,48 @@ const ChatWindow = ({ selectedUser }) => {
 
     // console.log("all messeges123", allMessages)
 
+    // console.log("all messeges123", allMessages)
+    const handleRemoveMessage = async (messageId) => {
+        try {
+            await fetch(`${config.apiUrl}/chat/delete-chat/${messageId}`, {
+                credentials: 'include',
+                method: 'DELETE',
+            });
+
+            // Update state to remove the message locally
+            setAllMessages((prevMessages) => prevMessages.filter((message) => message.id !== messageId));
+        } catch (error) {
+            console.error('Error removing message:', error);
+        }
+    };
+
     return (
         <div className='chatWindow' style={{ padding: '12px', height: '500px', display: 'flex', flexDirection: 'column', overflowY: 'auto', scrollBehavior: 'smooth' }}>
             {selectedUser ? (
-                <div style={{ display: 'flex', alignItems: 'center', padding: '10px', borderRadius: '10px 10px 0 0', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)` }}>
-                    <Avatar src={selectedUser.photoURL} alt={`${selectedUser.firstName} ${selectedUser.lastName}`} style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px', cursor: 'pointer' }} />
+                <div className='d-flex align-items-center justify-content-start p-2 gap-3' style={{ borderRadius: '10px 10px 0 0', border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, }}>
+                    <div>
+                        <Avatar src={selectedUser.photoURL}
+                            alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                            style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                cursor: 'pointer',
+                            }}
+                        />
+                    </div>
                     <div style={{ cursor: 'pointer' }}>
                         <Link to={`/${selectedUser.user.username}`} style={{ textDecoration: 'none', color: colors.textColor }}>
-                            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                                {selectedUser.firstName.charAt(0).toUpperCase() + selectedUser.firstName.slice(1)} {selectedUser.lastName.charAt(0).toUpperCase() + selectedUser.lastName.slice(1)}
+                            <div className='d-flex flex-column align-content-center justify-content-start'>
+                                <h6>{selectedUser.firstName.charAt(0).toUpperCase() + selectedUser.firstName.slice(1)} {selectedUser.lastName.charAt(0).toUpperCase() + selectedUser.lastName.slice(1)}</h6>
+                                {/* <p style={{ color: colors.textColor, fontSize: '10px', margin: 0, padding: 0 }}>Last seen <span style={{ color: '#ec1b90' }}>{selectedUser.lastMessage ? (selectedUser.lastMessage.timestamp ? formatTimestamp(selectedUser.lastMessage.timestamp) : '') : ''}</span></p> */}
+                                {selectedUser.lastMessage && selectedUser.lastMessage.timestamp ? (
+                                    <p style={{ color: colors.textColor, fontSize: '10px', margin: 0, padding: 0 }}>
+                                        Last seen <span style={{ color: '#ec1b90' }}>{formatTimestamp(selectedUser.lastMessage.timestamp)}</span>
+                                    </p>
+                                ) : null}
                             </div>
                         </Link>
-                        <div style={{ fontSize: '10px', color: colors.textColor }}>
-                            Last seen {selectedUser.lastMessage ? (selectedUser.lastMessage.timestamp ? formatTimestamp(selectedUser.lastMessage.timestamp) : '') : ''}
-                        </div>
                     </div>
                 </div>
             ) : (
@@ -255,10 +284,25 @@ const ChatWindow = ({ selectedUser }) => {
                                 {message.sender !== senderUuid && (
                                     <Avatar src={selectedUser?.photoURL || ''} alt={`${selectedUser?.firstName} ${selectedUser?.lastName}`} style={{ width: '30px', height: '30px', marginRight: '5px' }} />
                                 )}
+                                {/* <div><p className={`small p-2 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ fontSize: '16px', backgroundColor: colors.backgroundColor, color: colors.textColor }}>{message.content}<span style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor, opacity: '0.4' }} className="mb-1 justify-content-end d-flex">{formatTimestamp(message.createdAt)}</span></p></div> */}
                                 <div>
-                                    <p className={`small p-2 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ fontSize: '16px', backgroundColor: colors.backgroundColor, color: colors.textColor }}>
-                                        {message.content}
-                                        <p style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor, opacity: '0.4' }} className="mb-1 justify-content-end d-flex">{formatTimestamp(message.createdAt)}</p>
+                                    <p className={`small p-1 ${message.sender === senderUuid ? 'me-3' : 'ms-3'} mb-1 rounded-3`} style={{ fontSize: '16px', backgroundColor: colors.backgroundColor, color: colors.textColor }}>
+                                        {message.sender === senderUuid ? (
+                                            <>
+                                                {message.content}
+                                                {message.sender === senderUuid && (
+                                                    <IconButton onClick={() => handleRemoveMessage(message.id)}>
+                                                        <RemoveCircleOutlineIcon style={{ fontSize: '12px', color: '#ec1b90' }} />
+                                                    </IconButton>
+                                                )}
+                                                <span style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor, opacity: '0.4' }} className="mb-1 justify-content-end d-flex">{formatTimestamp(message.createdAt)}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {message.content}
+                                                <span style={{ fontSize: '10px', backgroundColor: colors.backgroundColor, color: colors.textColor, opacity: '0.4' }} className="mb-1 justify-content-start d-flex">{formatTimestamp(message.createdAt)}</span>
+                                            </>
+                                        )}
                                     </p>
                                 </div>
                                 {message.sender === senderUuid && (
