@@ -7,7 +7,9 @@ import { useSelector } from 'react-redux';
 import UserStory from './UserStory';
 import FriendStory from './FriendStory';
 import config from '../configuration';
-
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import './story.css';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -106,6 +108,35 @@ const StoryList = ({ colors }) => {
     vertical: false,
   });
 
+  const CustomPrevArrow = (props) => {
+    const { onClick } = props;
+    return (
+      <div className="custom-arrow prev-arrow" onClick={onClick}>
+        <IconButton style={{ cursor: 'pointer' }}>
+          <NavigateBeforeIcon style={{ color: '#ec1b90' }} />
+        </IconButton>
+      </div>
+    );
+  };
+
+  const CustomNextArrow = (props) => {
+    const { onClick } = props;
+    return (
+      <div className="custom-arrow next-arrow" onClick={onClick}>
+        <IconButton style={{ cursor: 'pointer' }}>
+          <NavigateNextIcon style={{ color: '#ec1b90' }} />
+        </IconButton>
+      </div>
+    );
+  };
+
+  const customSliderSettings = {
+    ...sliderSettings,
+    prevArrow: <CustomPrevArrow />,
+    nextArrow: <CustomNextArrow />
+  };
+
+
   return (
     <div>
       {loadingProfiles ? (
@@ -135,7 +166,7 @@ const StoryList = ({ colors }) => {
           </div>
 
           {/* Friend Stories */}
-          <Slider {...sliderSettings} className='w-50 mx-auto' style={{ flexDirection: 'row' }}>
+          <Slider {...customSliderSettings} {...sliderSettings} className='w-50 mx-auto' style={{ flexDirection: 'row' }}>
             {dynamicProfiles.map((profile) => (
               <div key={profile.uuid} style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>

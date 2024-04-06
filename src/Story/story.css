@@ -1,0 +1,13 @@
+.custom-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.prev-arrow {
+    left: 10px !important;
+}
+
+.next-arrow {
+    right: 10px !important;
+}

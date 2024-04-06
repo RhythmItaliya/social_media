@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Backdrop, Fade, IconButton, Avatar } from '@mui/material';
+import { Modal, Backdrop, Fade, IconButton, Avatar, CardMedia } from '@mui/material';
 import { Close, ArrowBack, ArrowForward } from '@mui/icons-material';
 import config from '../configuration';
+import { useNavigate } from 'react-router-dom';
+
+const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+};
 
 const FriendStory = ({ open, onClose, selectedUser, colors }) => {
     const [storyDetails, setStoryDetails] = useState(null);
     const [stories, setStories] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/${selectedUser.username}`);
+    };
 
     useEffect(() => {
         const fetchStoryDetails = async () => {
@@ -88,6 +103,7 @@ const FriendStory = ({ open, onClose, selectedUser, colors }) => {
         };
     }, [handleNextStory, handlePreviousStory]);
 
+
     return (
         <Modal
             aria-labelledby='transition-modal-title'
@@ -116,60 +132,74 @@ const FriendStory = ({ open, onClose, selectedUser, colors }) => {
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '8px',
                 }}>
-                    <div style={{ position: 'relative' }}>
+                    <div>
                         {storyDetails && (
                             <>
-                                <Avatar
-                                    src={`http://static.stories.local/${storyDetails.image}` || 'https://via.placeholder.com/200'}
-                                    alt="Story Preview"
-                                    style={{ width: '350px', height: '550px', objectFit: 'cover', borderRadius: '8px' }}
-                                />
+                                <div className='d-flex justify-content-around align-items-center p-1' style={{ zIndex: 9999, backgroundColor: colors.backgroundColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
+                                    {stories && (
+                                        <div>
+                                            <span style={{ color: colors.textColor }}>{currentIndex + 1}/{stories.length}</span>
+                                        </div>
+                                    )}
 
-
-                                <div style={{ position: 'absolute', top: '0', textAlign: 'center', width: '100%', color: storyDetails.textColor }}>
-                                    <div className='d-flex justify-content-center align-content-center gap-2 mt-2'>
-
+                                    <div className='d-flex justify-content-center align-items-center gap-2' style={{ cursor: 'pointer' }} onClick={handleClick}>
                                         {selectedUser.photoURL ? (
                                             <div>
                                                 <Avatar
                                                     src={selectedUser.photoURL}
                                                     alt={selectedUser.username}
-                                                    style={{ width: '30px', height: '30px' }}
-
+                                                    style={{ width: '32px', height: '32px' }}
                                                 />
                                             </div>
                                         ) : (
                                             <Avatar
                                                 alt={selectedUser.username}
-                                                style={{ width: '30px', height: '30px' }}
+                                                style={{ width: '32px', height: '32px', cursor: 'pointer' }}
                                             />
                                         )}
+                                        <p style={{ color: colors.textColor, fontSize: '14px', margin: 0 }}>@{selectedUser.username}</p>
+                                    </div>
 
-                                        <p className='mt-1' style={{ color: colors.textColor, fontSize: '14px' }}>@{selectedUser.username}</p>
+                                    <div>
+                                        <IconButton style={{ color: '#ec1b90' }} onClick={handleCloseStoryModal}>
+                                            <Close />
+                                        </IconButton>
                                     </div>
                                 </div>
 
-                                <div style={{ position: 'absolute', bottom: '0', textAlign: 'center', width: '100%', color: storyDetails.textColor }}>
-                                    {storyDetails.text && <p className='mt-2' style={{ color: storyDetails.textColor }}>{storyDetails.text}</p>}
+                                <div style={{ width: '350px', overflow: 'hidden', backgroundColor: colors.backgroundColor, borderBottomLeftRadius: storyDetails.text ? '0px' : '10px', borderBottomRightRadius: storyDetails.text ? '0px' : '10px', }} onClick={handleNextStory}>
+                                    <CardMedia
+                                        image={`http://static.stories.local/${storyDetails.image}`}
+                                        alt="Story Preview"
+                                        component="img"
+                                        height="550"
+                                        loading='lazy'
+                                        sx={{
+                                            background: '#fffff',
+                                            objectFit: 'cover',
+                                        }}
+                                    />
                                 </div>
 
-                                <IconButton style={{ position: 'absolute', top: 0, right: 0, color: 'white' }} onClick={handleCloseStoryModal}>
-                                    <Close style={{ color: colors.textColor }} />
-                                </IconButton>
+                                <div className='d-flex align-items-center justify-content-center' style={{ display: storyDetails.text ? 'flex' : 'none', color: storyDetails.textColor, backgroundColor: colors.backgroundColor }}>
+                                    {storyDetails.text && <p style={{ color: storyDetails.textColor, margin: '10px' }}>{storyDetails.text}</p>}
+                                </div>
 
-                                <IconButton style={{ position: 'absolute', top: '45%', left: 0 }} onClick={handlePreviousStory}>
-                                    <ArrowBack style={{ color: colors.textColor }} />
-                                </IconButton>
+                                <div className='d-flex align-item-center justify-content-around p-1' style={{ backgroundColor: colors.backgroundColor, borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px' }}>
+                                    <IconButton style={{ color: '#ec1b90' }} onClick={handlePreviousStory}>
+                                        <ArrowBack />
+                                    </IconButton>
 
-                                <IconButton style={{ position: 'absolute', top: '45%', right: 0 }} onClick={handleNextStory}>
-                                    <ArrowForward style={{ color: colors.textColor }} />
-                                </IconButton>
+                                    <IconButton style={{ color: '#ec1b90' }} onClick={handleNextStory}>
+                                        <ArrowForward />
+                                    </IconButton>
+                                </div>
                             </>
                         )}
                     </div>
                 </div>
             </Fade>
-        </Modal>
+        </Modal >
     );
 };
 

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Backdrop, Fade, IconButton, Avatar, TextareaAutosize, Slider, Tooltip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogContentText, Button } from '@mui/material';
+import { Modal, Backdrop, Fade, IconButton, Avatar, TextareaAutosize, Slider, Tooltip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CardMedia } from '@mui/material';
 import { Close, Visibility, Add, Upload, ArrowBack, ArrowForward } from '@mui/icons-material';
 import AvatarEditor from 'react-avatar-editor';
 import { ChromePicker } from 'react-color';
 import { message } from 'antd';
 import { DeleteForever } from '@material-ui/icons';
 import config from '../configuration';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const hexToRgb = (hex) => {
   const bigint = parseInt(hex.slice(1), 16);
@@ -40,6 +42,15 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stories, setStories] = useState(null);
 
+  const photoURL = useSelector((state) => state.userPhoto.photoUrl);
+
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/${username}`);
+  };
+
   const handleColorChange = (color) => {
     setTextColor(color.hex);
   };
@@ -53,6 +64,7 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
   };
 
   const handleImageChange = (e) => {
+    setShowColorPicker(false);
     const file = e.target.files[0];
 
     if (file) {
@@ -469,20 +481,51 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                 transform: 'translate(-50%, -50%)',
                 borderRadius: '8px',
               }}>
-                <div style={{ position: 'relative' }}>
-                  {/* Display the uploaded story details in the preview modal */}
+                <div>
                   {previewDetails && (
                     <>
-                      <Avatar
-                        src={previewDetails.image}
-                        alt="Preview"
-                        style={{ width: '350px', height: '550px', objectFit: 'cover', borderRadius: '8px' }}
-                      />
-                      <IconButton style={{ position: 'absolute', top: 0, right: 0, color: colors.iconColor }} onClick={handleClosePreview}>
-                        <Close style={{ color: colors.iconColor }} />
-                      </IconButton>
-                      <div style={{ position: 'absolute', bottom: '0', textAlign: 'center', width: '100%', color: textColor }}>
-                        {previewDetails.text && <p className='mt-2' style={{ color: textColor }}>{previewDetails.text}</p>}
+                      <div className='d-flex justify-content-around align-items-center p-1' style={{ zIndex: 9999, backgroundColor: colors.backgroundColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
+                        <div className='d-flex justify-content-center align-items-center gap-2' style={{ cursor: 'pointer' }} onClick={handleClick}>
+                          {photoURL ? (
+                            <div>
+                              <Avatar
+                                src={photoURL}
+                                alt={username}
+                                style={{ width: '32px', height: '32px' }}
+                              />
+                            </div>
+                          ) : (
+                            <Avatar
+                              alt={username}
+                              style={{ width: '32px', height: '32px', cursor: 'pointer' }}
+                            />
+                          )}
+                          <p style={{ color: colors.textColor, fontSize: '14px', margin: 0 }}>@{username}</p>
+                        </div>
+
+                        <div>
+                          <IconButton style={{ color: '#ec1b90' }} onClick={handleClosePreview}>
+                            <Close />
+                          </IconButton>
+                        </div>
+                      </div>
+
+                      <div style={{ width: '350px', overflow: 'hidden', backgroundColor: colors.backgroundColor, borderBottomLeftRadius: previewDetails.text ? '0px' : '10px', borderBottomRightRadius: previewDetails.text ? '0px' : '10px', }} onClick={handleNextStory}>
+                        <CardMedia
+                          image={`${previewDetails.image}`}
+                          alt="Story Preview"
+                          component="img"
+                          height="550"
+                          loading='lazy'
+                          sx={{
+                            background: '#fffff',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </div>
+
+                      <div className='d-flex align-items-center justify-content-center' style={{ color: previewDetails.textColor, backgroundColor: colors.backgroundColor, }}>
+                        {previewDetails.text && <p style={{ color: previewDetails.textColor, margin: '10px' }}>{previewDetails.text}</p>}
                       </div>
                     </>
                   )}
@@ -514,56 +557,81 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                 transform: 'translate(-50%, -50%)',
                 borderRadius: '8px',
               }}>
-                <div style={{ position: 'relative' }}>
+
+                <div>
                   {storyDetails && (
                     <>
-                      <Avatar
-                        src={`http://static.stories.local/${storyDetails.image}`}
-                        alt="Story Preview"
-                        style={{ width: '350px', height: '550px', objectFit: 'cover', borderRadius: '8px' }}
-                      />
+                      <div className='d-flex justify-content-around align-items-center p-1' style={{ zIndex: 9999, backgroundColor: colors.backgroundColor, borderBottom: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`, borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
+                        <div className='d-flex justify-content-center align-items-center gap-3' style={{ cursor: 'pointer' }} onClick={handleClick}>
+                          {stories && (
+                            <div>
+                              <span style={{ color: colors.textColor }}>{currentIndex + 1}/{stories.length}</span>
+                            </div>
+                          )}
 
-                      <div style={{ position: 'absolute', top: '0', textAlign: 'center', width: '100%', color: storyDetails.textColor }}>
-                        <p className='mt-2' style={{ color: colors.textColor, fontSize: '14px' }}>@{username}</p>
-                      </div>
-
-                      <div style={{ position: 'absolute', bottom: '0', textAlign: 'center', width: '100%', color: storyDetails.textColor }}>
-                        {storyDetails.text && <p className='mt-2' style={{ color: storyDetails.textColor }}>{storyDetails.text}</p>}
-                      </div>
-
-                      <IconButton style={{ position: 'absolute', top: 0, right: 0, color: 'white' }} onClick={handleCloseStoryModal}>
-                        <Close style={{ color: colors.iconColor }} />
-                      </IconButton>
-
-                      {stories && (
-                        <div style={{ position: 'absolute', top: 0, left: 0, color: 'white', padding: '8px' }}>
-                          <span style={{ color: colors.textColor }}>{stories.length}/{currentIndex + 1}</span>
+                          {photoURL ? (
+                            <div>
+                              <Avatar
+                                src={photoURL}
+                                alt={username}
+                                style={{ width: '32px', height: '32px' }}
+                              />
+                            </div>
+                          ) : (
+                            <Avatar
+                              alt={username}
+                              style={{ width: '32px', height: '32px', cursor: 'pointer' }}
+                            />
+                          )}
+                          <p style={{ color: colors.textColor, fontSize: '14px', margin: 0 }}>@{username}</p>
                         </div>
-                      )}
 
-                      <IconButton style={{ position: 'absolute', top: '45%', left: 0 }} onClick={handlePreviousStory}>
-                        <ArrowBack style={{ color: colors.textColor }} />
-                      </IconButton>
+                        <div>
+                          <IconButton style={{ color: '#ec1b90' }} onClick={handleCloseStoryModal}>
+                            <Close />
+                          </IconButton>
+                        </div>
+                      </div>
 
-                      <IconButton style={{ position: 'absolute', top: '45%', right: 0 }} onClick={handleNextStory}>
-                        <ArrowForward style={{ color: colors.textColor }} />
-                      </IconButton>
+                      <div style={{ width: '350px', overflow: 'hidden', backgroundColor: colors.backgroundColor, borderBottomLeftRadius: storyDetails.text ? '0px' : '10px', borderBottomRightRadius: storyDetails.text ? '0px' : '10px', }} onClick={handleNextStory}>
+                        <CardMedia
+                          src={`http://static.stories.local/${storyDetails.image}`}
+                          alt="Story Preview"
+                          component="img"
+                          height="550"
+                          loading='lazy'
+                          sx={{
+                            background: '#fffff',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </div>
 
-                      <Tooltip title="Action" placement="top">
-                        <IconButton style={{ position: 'absolute', bottom: '0', right: 0 }} onClick={() => handleDeleteConfirmation(storyDetails.uuid)}>
-                          <DeleteForever style={{ color: colors.textColor }} />
+                      <div className='d-flex align-items-center justify-content-center' style={{ display: storyDetails.text ? 'flex' : 'none', color: storyDetails.textColor, backgroundColor: colors.backgroundColor }}>
+                        {storyDetails.text && <p style={{ color: storyDetails.textColor, margin: '10px' }}>{storyDetails.text}</p>}
+                      </div>
+
+                      <div className='d-flex align-item-center justify-content-around p-1' style={{ backgroundColor: colors.backgroundColor, borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px' }}>
+                        <IconButton style={{ color: '#ec1b90' }} onClick={handlePreviousStory}>
+                          <ArrowBack />
                         </IconButton>
-                      </Tooltip>
+
+                        <IconButton style={{ color: '#ec1b90' }} onClick={handleNextStory}>
+                          <ArrowForward />
+                        </IconButton>
+
+                        <Tooltip title="Action" placement="top">
+                          <IconButton style={{ color: '#ec1b90' }} onClick={() => handleDeleteConfirmation(storyDetails.uuid)}>
+                            <DeleteForever />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
 
                       <Dialog
                         open={deleteConfirmationOpen}
                         onClose={handleCloseDeleteConfirmation}
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description"
-                        style={{
-                          border: `1px solid rgba(${hexToRgb(colors.border)}, 0.9)`,
-                          boxShadow: colors.boxShadow
-                        }}
                       >
                         <DialogTitle style={{ color: colors.textColor, backgroundColor: colors.backgroundColor }} id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
                         <DialogContent sx={{ backgroundColor: colors.backgroundColor }}>
@@ -580,7 +648,6 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
                           </Button>
                         </DialogContent>
                       </Dialog>
-
                     </>
                   )}
                 </div>
@@ -589,31 +656,30 @@ const UserStory = ({ open, onClose, username, colors, uuid }) => {
           </Modal>
 
           {uploadingStory ? null : (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} className='gap-5'>
-              <IconButton style={{ position: 'absolute', top: 0, right: 0, color: colors.iconColor }} onClick={handleClose}>
-                <Close style={{ color: colors.iconColor }} />
-              </IconButton>
-
+            <div className='d-flex justify-content-center align-items-center w-100 h-100 rounded-2 gap-3' style={{ backgroundColor: colors.backgroundColor }}>
               <Tooltip title="View Your Story" placement="bottom">
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                  <IconButton style={{ color: colors.iconColor, marginBottom: '5px' }} onClick={handleViewStory}>
+                <div className='text-center'>
+                  <IconButton style={{ color: '#ec1b90' }} onClick={handleViewStory}>
                     <Visibility />
                   </IconButton>
                   <p style={{ color: colors.textColor, margin: '0', fontSize: '12px' }}>View Your Story</p>
                 </div>
               </Tooltip>
 
-
               <Tooltip title="Upload Your Story" placement="bottom">
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                  <IconButton style={{ color: colors.iconColor, marginBottom: '5px' }} onClick={handleUploadStory}>
+                <div className='text-center'>
+                  <IconButton style={{ color: '#ec1b90' }} onClick={handleUploadStory}>
                     <Add />
                   </IconButton>
                   <p style={{ color: colors.textColor, margin: '0', fontSize: '12px' }}>Upload Your Story</p>
                 </div>
               </Tooltip>
 
-
+              <div className="position-absolute top-0 end-0">
+                <IconButton style={{ color: '#ec1b90' }} onClick={handleClose}>
+                  <Close />
+                </IconButton>
+              </div>
             </div>
           )}
         </div>
