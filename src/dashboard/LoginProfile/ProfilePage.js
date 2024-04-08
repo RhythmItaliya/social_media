@@ -207,7 +207,7 @@ const ProfilePage = () => {
         await new Promise(resolve => setTimeout(resolve, 10));
       }
 
-      const response = await fetch(`${config.apiUrl}/api/profilepage/create/${isdecryptedUuid}`, {
+      const response = await fetch(`${config.apiUrl}/create/api/profilepage/create/${isdecryptedUuid}`, {
         method: 'POST',
         credentials: 'include',
         headers: {

@@ -42,7 +42,7 @@ const EditProfile = () => {
 
     const onFinish = async (values) => {
         try {
-            const response = await fetch(`${config.apiUrl}/userProfile/create/${useruuid}`, {
+            const response = await fetch(`${config.apiUrl}/create/userProfile/create/${useruuid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

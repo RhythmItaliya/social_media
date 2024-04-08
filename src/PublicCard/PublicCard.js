@@ -46,7 +46,7 @@ const PublicCard = ({ uuid, profileUUID, username, photoURL, colors, userUUID })
         const fetchUserData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/users/users/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

@@ -35,7 +35,7 @@ const ReceiverComponent = ({ colors }) => {
     const handleRefresh = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${config.apiUrl}/friendRequests/${receiverUUID}`, {
+            const response = await fetch(`${config.apiUrl}/friends/friendRequests/${receiverUUID}`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -91,7 +91,7 @@ const ReceiverComponent = ({ colors }) => {
     const fetchReceiverData = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${config.apiUrl}/friendRequests/${receiverUUID}`, {
+            const response = await fetch(`${config.apiUrl}/friends/friendRequests/${receiverUUID}`, {
                 method: 'GET',
                 credentials: 'include',
             });

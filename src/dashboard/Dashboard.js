@@ -102,7 +102,7 @@ const Dashboard = () => {
 
         const fetchProfileCreatedStatus = async (uuid) => {
             try {
-                const response = await fetch(`${config.apiUrl}/api/users/profileCreated/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/create/api/users/profileCreated/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -143,7 +143,7 @@ const Dashboard = () => {
 
     const fetchUserData = async (uuid) => {
         try {
-            const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
+            const response = await fetch(`${config.apiUrl}/users/users/${uuid}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -170,7 +170,7 @@ const Dashboard = () => {
 
     const fetchUserPhoto = async (profileUuid) => {
         try {
-            const response = await fetch(`${config.apiUrl}/profile/profilePhoto/${profileUuid}`, {
+            const response = await fetch(`${config.apiUrl}/photos/profile/profilePhoto/${profileUuid}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

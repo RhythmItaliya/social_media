@@ -58,7 +58,7 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
     useEffect(() => {
         const fetchFriendCount = async () => {
             try {
-                const friendCountResponse = await fetch(`${config.apiUrl}/api/friendships-crushes-ignores/count/${profileUUID}`, {
+                const friendCountResponse = await fetch(`${config.apiUrl}/create/api/friendships-crushes-ignores/count/${profileUUID}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -203,7 +203,7 @@ const PublicCustomButton = ({ colors, profileUUID }) => {
                 setFriendDrawerOpen(true);
                 if (friend.length === 0) {
                     try {
-                        const friendsListResponse = await fetch(`${config.apiUrl}/api/friendships/users/${profileUUID}`, {
+                        const friendsListResponse = await fetch(`${config.apiUrl}/friends/api/friendships/users/${profileUUID}`, {
                             method: 'GET',
                             credentials: 'include',
                             headers: {

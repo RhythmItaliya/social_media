@@ -18,7 +18,7 @@ function Layout({ children }) {
     const fetchInitialDarkModeStatus = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${config.apiUrl}/api/user/profiles/${userUUID}/mode`, {
+        const response = await fetch(`${config.apiUrl}/darkmode/api/user/profiles/${userUUID}/mode`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -54,7 +54,7 @@ function Layout({ children }) {
       const newDarkMode = !isDarkMode;
       dispatch(toggleDarkMode(newDarkMode));
 
-      const response = await fetch(`${config.apiUrl}/api/user/profiles/${userUUID}/mode`, {
+      const response = await fetch(`${config.apiUrl}/darkmode/api/user/profiles/${userUUID}/mode`, {
         credentials: 'include',
         method: 'POST',
         headers: {

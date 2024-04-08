@@ -61,7 +61,7 @@ export const removePostBase64 = () => ({
 
 export const toggleDarkMode = (isDarkMode) => async (dispatch, getState) => {
     try {
-        const response = await fetch(`${config.apiUrl}/api/user/profiles/${getState().useruuid.uuid}/mode`, {
+        const response = await fetch(`${config.apiUrl}/darkmode/api/user/profiles/${getState().useruuid.uuid}/mode`, {
             credentials: 'include',
             method: 'POST',
             headers: {

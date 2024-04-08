@@ -56,7 +56,7 @@ const PublicFriendHandling = ({ profileUUID, userUUID, username }) => {
         const fetchData = () => {
             setLoading(true);
 
-            const friendRequestPromise = fetch(`${config.apiUrl}/get/public/friendRequests/${profileUUID}`)
+            const friendRequestPromise = fetch(`${config.apiUrl}/friends/get/public/friendRequests/${profileUUID}`)
                 .then((friendRequestResponse) => {
                     if (!friendRequestResponse.ok) {
                         throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);
@@ -113,7 +113,7 @@ const PublicFriendHandling = ({ profileUUID, userUUID, username }) => {
     const handleAddToFriend = () => {
         setLoading(true);
 
-        fetch(`${config.apiUrl}/public/friendRequests`, {
+        fetch(`${config.apiUrl}/friends/public/friendRequests`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -137,7 +137,7 @@ const PublicFriendHandling = ({ profileUUID, userUUID, username }) => {
                 if (responseData.success) {
                     setFriendRequestStatus((prevStatus) => responseData.status);
 
-                    fetch(`${config.apiUrl}/get/public/friendRequests/${profileUUID}`)
+                    fetch(`${config.apiUrl}/friends/get/public/friendRequests/${profileUUID}`)
                         .then((friendRequestResponse) => {
                             if (!friendRequestResponse.ok) {
                                 throw new Error(`Friend request status request failed: ${friendRequestResponse.status}`);

@@ -35,7 +35,7 @@ const SearchOverlay = ({ searchTerm, searchResults, loading, error, colors, onCl
 
     const sendFriendRequest = async (receiverId) => {
         try {
-            const response = await fetch(`${config.apiUrl}/friendRequests`, {
+            const response = await fetch(`${config.apiUrl}/friends/friendRequests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

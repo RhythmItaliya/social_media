@@ -41,7 +41,7 @@ export const loginUser = (userData) => (dispatch) => {
 
                 document.cookie = `token=${encryptedUuid}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
 
-                fetch(`${config.apiUrl}/api/users/profileCreated/${uuid}`, {
+                fetch(`${config.apiUrl}/create/api/users/profileCreated/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

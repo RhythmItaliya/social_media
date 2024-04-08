@@ -30,7 +30,7 @@ const SuggestedFriendMain = ({ colors }) => {
     const fetchUserProfiles = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${config.apiUrl}/api/userProfiles/${profileUUID}`, {
+            const response = await fetch(`${config.apiUrl}/friends/api/userProfiles/${profileUUID}`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -58,7 +58,7 @@ const SuggestedFriendMain = ({ colors }) => {
 
     const sendFriendRequest = async (receiverId) => {
         try {
-            const response = await fetch(`${config.apiUrl}/friendRequests`, {
+            const response = await fetch(`${config.apiUrl}/friends/friendRequests`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

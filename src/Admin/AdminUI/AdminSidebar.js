@@ -61,11 +61,11 @@ const AdminSidebar = () => {
                 <Menu theme="dark" className='mt-3 user-select-none' selectedKeys={[selectedTab]} mode="inline" onClick={handleMenuClick}>
                     <Menu.Item key="1">Vortex Analytics</Menu.Item>
                     <Menu.Item key="2">User Details</Menu.Item>
-                    <Menu.Item key="3">Default Avatar</Menu.Item>
-                    <Menu.Item key="4">Post Report</Menu.Item>
-                    <Menu.Item key="5">Account Terminate</Menu.Item>
-                    <Menu.Item key="6">Contact Us</Menu.Item>
-                    <Menu.Item key="7">Blogs</Menu.Item>
+                    <Menu.Item key="3">Post Report</Menu.Item>
+                    <Menu.Item key="4">Account Terminate</Menu.Item>
+                    <Menu.Item key="5">Contact Us Details</Menu.Item>
+                    <Menu.Item key="6">Blogs Uplaod</Menu.Item>
+                    <Menu.Item key="7">Default Avatar</Menu.Item>
                 </Menu>
             </Sider>
             <Layout>
@@ -83,27 +83,27 @@ const AdminSidebar = () => {
                         </h1>}
                         {selectedTab === '3' && <h1>
                             <>
-                                <AdminAvatar colors={colors} />
+                                <AdminPostReportData colors={colors} />
                             </>
                         </h1>}
                         {selectedTab === '4' && <h1>
                             <>
-                                <AdminPostReportData colors={colors} />
+                                <AdminUserTerminate colors={colors} />
                             </>
                         </h1>}
                         {selectedTab === '5' && <h1>
                             <>
-                                <AdminUserTerminate colors={colors} />
+                                <AdminContactUs colors={colors} />
                             </>
                         </h1>}
                         {selectedTab === '6' && <h1>
                             <>
-                                <AdminContactUs colors={colors} />
+                                <AdminBlog colors={colors} />
                             </>
                         </h1>}
                         {selectedTab === '7' && <h1>
                             <>
-                                <AdminBlog colors={colors} />
+                                <AdminAvatar colors={colors} />
                             </>
                         </h1>}
                     </div>

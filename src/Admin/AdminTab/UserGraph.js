@@ -124,8 +124,24 @@ const UserGraph = () => {
 
     return (
         <>
-            <div className="container">
+            <div className="container-fluid">
                 <h2 className='card p-2 w-25 text-center mx-auto'>Users Recodes</h2>
+
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <div className="box mx-2 p-3">
+                        <h3>Box 1</h3>
+                        <p>This is the content of the first box.</p>
+                    </div>
+                    <div className="box mx-2 p-3">
+                        <h3>Box 2</h3>
+                        <p>This is the content of the second box.</p>
+                    </div>
+                    <div className="box mx-2 p-3">
+                        <h3>Box 3</h3>
+                        <p>This is the content of the third box.</p>
+                    </div>
+                </div>
+
                 <div className='d-flex flex-wrap justify-content-center align-content-center mb-5'>
                     <div className="chart-container mt-3">
                         <canvas id="chartCanvas"></canvas>
@@ -162,7 +178,7 @@ const UserGraph = () => {
                     <div>Total Accounts: {totalAccounts}</div>
                     <Button onClick={toggleChartType}>{chartType === 'bar' ? 'Switch to Pie Chart' : 'Switch to Bar Chart'}</Button>
                 </div>
-            </div>
+            </div >
         </>
     );
 };

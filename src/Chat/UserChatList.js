@@ -71,7 +71,7 @@ const UserChatList = ({ onSelectUser }) => {
   useEffect(() => {
     async function fetchFriendsList() {
       try {
-        const response = await fetch(`${config.apiUrl}/api/friendships/users/${profileUuid}`);
+        const response = await fetch(`${config.apiUrl}/friends/api/friendships/users/${profileUuid}`);
         const data = await response.json();
 
         if (response.ok) {

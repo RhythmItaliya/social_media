@@ -48,7 +48,7 @@ const SenderComponent = () => {
     useEffect(() => {
         const fetchUserProfiles = async () => {
             try {
-                const response = await fetch(`${config.apiUrl}/api/userProfiles/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/friends/api/userProfiles/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -77,7 +77,7 @@ const SenderComponent = () => {
 
     const sendFriendRequest = async (receiverId) => {
         try {
-            const response = await fetch(`${config.apiUrl}/friendRequests`, {
+            const response = await fetch(`${config.apiUrl}/friends/friendRequests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

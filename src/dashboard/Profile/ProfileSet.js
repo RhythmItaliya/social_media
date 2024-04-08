@@ -78,7 +78,7 @@ const ProfileSet = () => {
             try {
                 setLoading(true);
 
-                const response = await fetch(`${config.apiUrl}/users/${uuid}`, {
+                const response = await fetch(`${config.apiUrl}/users/users/${uuid}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
