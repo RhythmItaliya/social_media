@@ -14,12 +14,21 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Button,
 } from '@mui/material';
 
+import {
+    FacebookShareButton,
+    FacebookIcon,
+    TwitterShareButton,
+    TwitterIcon,
+    WhatsappShareButton,
+    WhatsappIcon,
+} from 'react-share';
 
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
-import { CloseOutlined } from '@material-ui/icons';
+import { CloseOutlined, ShareTwoTone } from '@material-ui/icons';
 
 import config from '../../configuration';
 import AllNotification from '../../notification/AllNotification';
@@ -72,6 +81,9 @@ const ProfileSet = () => {
 
     const [isAvtar, setAvtar] = useState(null);
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+
+    const [sharLink, setSharLink] = useState(true);
+    const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -150,6 +162,42 @@ const ProfileSet = () => {
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
+
+
+    const handleShareIconClick = async () => {
+        setShareDialogOpen(true);
+        try {
+            setLoading(true);
+
+            const response = await fetch(`${config.apiUrl}/share/share/profiles/${profileUUID}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Failed to fetch sharable link');
+                throw new Error('Failed to fetch sharable link');
+            }
+
+            const data = await response.json();
+            setSharLink(data.sharLink);
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCloseShareDialog = () => {
+        setShareDialogOpen(false);
+    };
+
+    const fullSharLink = "http://localhost:3000/" + loginUserUsername + "/" + sharLink;
+    const shortSharLink = "http://localhost:3000/" + loginUserUsername;
 
     return (
         <div className='container-fluid'>
@@ -254,7 +302,6 @@ const ProfileSet = () => {
                                             </DialogActions>
                                         </Dialog>
 
-
                                         <Grid item>
                                             {userData && (
                                                 <Typography style={{ color: colors.textColor, fontSize: "16px" }}>
@@ -289,6 +336,50 @@ const ProfileSet = () => {
                                                 </Typography>
                                             </div>
                                         </Grid>
+
+
+
+                                        <Grid item>
+                                            <IconButton style={{ color: colors.iconColor }} onClick={handleShareIconClick}>
+                                                <ShareTwoTone />
+                                            </IconButton>
+                                            <Dialog open={shareDialogOpen} onClose={handleCloseShareDialog}>
+                                                <DialogTitle style={{ position: 'relative', color: colors.textColor, backgroundColor: colors.backgroundColor }}>
+                                                    Share Profile
+                                                    <IconButton
+                                                        style={{ position: 'absolute', top: '5px', right: '5px', color: colors.iconColor }}
+                                                        onClick={handleCloseShareDialog}
+                                                    >
+                                                        <CloseOutlined />
+                                                    </IconButton>
+                                                </DialogTitle>
+
+                                                <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                                                    <Typography className='me-2'>
+                                                        <a href={fullSharLink} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+                                                            {shortSharLink}
+                                                        </a>
+                                                    </Typography>
+                                                    <Button variant="contained" onClick={() => navigator.clipboard.writeText(fullSharLink)}>Copy Link</Button>
+                                                </DialogContent>
+
+                                                <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                                                    <FacebookShareButton url={fullSharLink}>
+                                                        <FacebookIcon size={32} round />
+                                                    </FacebookShareButton>
+
+                                                    <TwitterShareButton url={fullSharLink}>
+                                                        <TwitterIcon size={32} round />
+                                                    </TwitterShareButton>
+
+                                                    <WhatsappShareButton url={fullSharLink}>
+                                                        <WhatsappIcon size={32} round />
+                                                    </WhatsappShareButton>
+
+                                                </DialogContent>
+                                            </Dialog>
+                                        </Grid>
+
                                     </Grid>
                                 </div>
                             )}

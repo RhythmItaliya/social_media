@@ -73,6 +73,7 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
     "react-settings-pane": "^0.1.5",
+    "react-share": "^5.1.0",
     "react-slick": "^0.30.2",
     "react-spinners": "^0.13.8",
     "react-spring": "^9.7.3",
