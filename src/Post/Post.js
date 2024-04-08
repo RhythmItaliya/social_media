@@ -3,15 +3,13 @@ import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
 import ShareIcon from '@mui/icons-material/Share';
 import CommentIcon from '@mui/icons-material/Comment';
 import TextField from '@mui/material/TextField';
 import Collapse from '@mui/material/Collapse';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Popover, Box, Typography, List, ListItem, ListItemText, Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Chip, Grid } from '@mui/material';
+import { Popover, Avatar, Box, IconButton, Typography, List, ListItem, ListItemText, Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Chip, Grid } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserProfilePosts } from '../actions/authActions';
@@ -19,15 +17,24 @@ import { useEffect } from 'react';
 import { useDarkMode } from '../theme/Darkmode';
 import { Link } from 'react-router-dom';
 
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+} from 'react-share';
 
 import Comment from './Comment';
 import LocationPicker from './LocationPicker';
-import { AddCircleOutline } from '@material-ui/icons';
+import { AddCircleOutline, CloseOutlined } from '@material-ui/icons';
 import config from '../configuration';
 
 
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import FavoriteBorderTwoToneIcon from '@mui/icons-material/FavoriteBorderTwoTone';
+import { CopyAll } from '@mui/icons-material';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -306,10 +313,43 @@ export default function InstagramCard() {
 
 
   // Share click ------------------------------------
-  const handleShareClick = (postId) => {
-    const updatedShareCounts = { ...shareCounts, [postId]: (shareCounts[postId] || 0) + 1 };
-    setShareCounts(updatedShareCounts);
+
+  const [sharLink, setSharLink] = React.useState(true);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
+
+  const handleShareIconClick = async (postId) => {
+    setShareDialogOpen(true);
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiUrl}/share/share/post/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to fetch sharable link');
+        throw new Error('Failed to fetch sharable link');
+      }
+
+      const data = await response.json();
+      setSharLink(data.sharLink);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleCloseShareDialog = () => {
+    setShareDialogOpen(false);
+  };
+
+  const shortSharLink = "http://localhost:3000/post/" + sharLink;
 
   // Show More click ------------------------------------
   const handleShowMoreClick = (postId) => {
@@ -1241,12 +1281,49 @@ export default function InstagramCard() {
                   </Typography>
                 </IconButton>
 
-                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareIconClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <ShareIcon sx={{ color: colors.iconColor }} />
-                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                  {/* <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {shareCounts[post.id] || 0}
-                  </Typography>
+                  </Typography> */}
                 </IconButton>
+
+                <Dialog open={shareDialogOpen} onClose={handleCloseShareDialog}>
+                  <DialogTitle style={{ position: 'relative', color: colors.textColor, backgroundColor: colors.backgroundColor }}>
+                    Share Post
+                    <IconButton
+                      style={{ position: 'absolute', top: '5px', right: '5px', color: colors.iconColor }}
+                      onClick={handleCloseShareDialog}
+                    >
+                      <CloseOutlined />
+                    </IconButton>
+                  </DialogTitle>
+
+                  <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                    <Typography className='me-2' style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <a href={sharLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {shortSharLink}
+                      </a>
+                    </Typography>
+                    <IconButton variant="contained" onClick={() => navigator.clipboard.writeText(shortSharLink)}><CopyAll /></IconButton>
+                  </DialogContent>
+
+                  <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                    <FacebookShareButton url={sharLink}>
+                      <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+
+                    <TwitterShareButton url={sharLink}>
+                      <TwitterIcon size={32} round />
+                    </TwitterShareButton>
+
+                    <WhatsappShareButton url={sharLink}>
+                      <WhatsappIcon size={32} round />
+                    </WhatsappShareButton>
+
+                  </DialogContent>
+                </Dialog>
+
               </CardActions>
 
               {/* ------------------------------------------------------------------------------------------------- */}

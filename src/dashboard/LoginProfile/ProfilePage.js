@@ -346,10 +346,11 @@ const ProfilePage = () => {
                 {currentStep === 1 && (
                   <>
                     <TextField
-                      label="First Name"
+                      // label="First Name"
+                      placeholder='Frist Name'
                       variant="outlined"
                       fullWidth
-                      margin="normal"
+                      margin="dense"
                       value={firstName}
                       onChange={handleFirstNameChange}
                       style={{
@@ -358,10 +359,11 @@ const ProfilePage = () => {
                       }}
                     />
                     <TextField
-                      label="Last Name"
+                      // label="Last Name"
+                      placeholder='Last Name'
                       variant="outlined"
                       fullWidth
-                      margin="normal"
+                      margin="dense"
                       value={lastName}
                       onChange={handleLastNameChange}
                       style={{

@@ -26,10 +26,21 @@ import Comment from './Comment';
 import config from '../configuration';
 
 
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+} from 'react-share';
+
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import FavoriteBorderTwoToneIcon from '@mui/icons-material/FavoriteBorderTwoTone';
-import { Box, List, ListItem, ListItemText, Modal, TextareaAutosize } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, Modal, TextareaAutosize } from '@mui/material';
 import { message } from 'antd';
+import { CopyAll } from '@mui/icons-material';
+import { CloseOutlined } from '@material-ui/icons';
 
 const lightModeColors = {
   backgroundColor: '#ffffff',
@@ -284,10 +295,44 @@ export default function FriendPost() {
 
 
   // Share click ------------------------------------
-  const handleShareClick = (postId) => {
-    const updatedShareCounts = { ...shareCounts, [postId]: (shareCounts[postId] || 0) + 1 };
-    setShareCounts(updatedShareCounts);
+
+  const [sharLink, setSharLink] = React.useState(true);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
+
+  const handleShareIconClick = async (postId) => {
+    setShareDialogOpen(true);
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiUrl}/share/share/post/${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to fetch sharable link');
+        throw new Error('Failed to fetch sharable link');
+      }
+
+      const data = await response.json();
+      setSharLink(data.sharLink);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleCloseShareDialog = () => {
+    setShareDialogOpen(false);
+  };
+
+  const shortSharLink = "http://localhost:3000/post/" + sharLink;
+
 
   // Show More click ------------------------------------
   const handleShowMoreClick = (postId) => {
@@ -1011,12 +1056,48 @@ export default function FriendPost() {
                   </Typography>
                 </IconButton>
 
-                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareClick(post.id)} sx={instagramStyles.instagramIcons}>
+                <IconButton style={{ color: colors.iconColor }} className='gap-1' aria-label="share" onClick={() => handleShareIconClick(post.id)} sx={instagramStyles.instagramIcons}>
                   <ShareIcon sx={{ color: colors.iconColor }} />
-                  <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
+                  {/* <Typography sx={{ color: colors.labelColor, fontSize: '12px' }}>
                     {shareCounts[post.id] || 0}
-                  </Typography>
+                  </Typography> */}
                 </IconButton>
+
+                <Dialog open={shareDialogOpen} onClose={handleCloseShareDialog}>
+                  <DialogTitle style={{ position: 'relative', color: colors.textColor, backgroundColor: colors.backgroundColor }}>
+                    Share Post
+                    <IconButton
+                      style={{ position: 'absolute', top: '5px', right: '5px', color: colors.iconColor }}
+                      onClick={handleCloseShareDialog}
+                    >
+                      <CloseOutlined />
+                    </IconButton>
+                  </DialogTitle>
+
+                  <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                    <Typography className='me-2' style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <a href={sharLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {shortSharLink}
+                      </a>
+                    </Typography>
+                    <IconButton variant="contained" onClick={() => navigator.clipboard.writeText(shortSharLink)}><CopyAll /></IconButton>
+                  </DialogContent>
+
+                  <DialogContent style={{ color: colors.textColor, backgroundColor: colors.backgroundColor, justifyContent: 'space-around', display: 'flex', alignItems: 'center' }}>
+                    <FacebookShareButton url={sharLink}>
+                      <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+
+                    <TwitterShareButton url={sharLink}>
+                      <TwitterIcon size={32} round />
+                    </TwitterShareButton>
+
+                    <WhatsappShareButton url={sharLink}>
+                      <WhatsappIcon size={32} round />
+                    </WhatsappShareButton>
+
+                  </DialogContent>
+                </Dialog>
               </CardActions>
 
 
