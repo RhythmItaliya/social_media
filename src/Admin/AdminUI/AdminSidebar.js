@@ -7,6 +7,8 @@ import AdminAvatar from '../AdminTab/AdminAvatar';
 import { useDarkMode } from '../../theme/Darkmode';
 import AdminUserTerminate from '../AdminTab/AdminUserTerminate';
 import './admin.css';
+import AdminContactUs from '../AdminTab/AdminContactUs';
+import AdminBlog from '../AdminTab/AdminBlog';
 
 const lightModeColors = {
     backgroundColor: '#ffffff',
@@ -56,12 +58,14 @@ const AdminSidebar = () => {
     return (
         <Layout className='admin-sidebar'>
             <Sider>
-                <Menu theme="dark" className='mt-5 user-select-none' selectedKeys={[selectedTab]} mode="inline" onClick={handleMenuClick}>
+                <Menu theme="dark" className='mt-3 user-select-none' selectedKeys={[selectedTab]} mode="inline" onClick={handleMenuClick}>
                     <Menu.Item key="1">Vortex Analytics</Menu.Item>
                     <Menu.Item key="2">User Details</Menu.Item>
                     <Menu.Item key="3">Default Avatar</Menu.Item>
                     <Menu.Item key="4">Post Report</Menu.Item>
                     <Menu.Item key="5">Account Terminate</Menu.Item>
+                    <Menu.Item key="6">Contact Us</Menu.Item>
+                    <Menu.Item key="7">Blogs</Menu.Item>
                 </Menu>
             </Sider>
             <Layout>
@@ -90,6 +94,16 @@ const AdminSidebar = () => {
                         {selectedTab === '5' && <h1>
                             <>
                                 <AdminUserTerminate colors={colors} />
+                            </>
+                        </h1>}
+                        {selectedTab === '6' && <h1>
+                            <>
+                                <AdminContactUs colors={colors} />
+                            </>
+                        </h1>}
+                        {selectedTab === '7' && <h1>
+                            <>
+                                <AdminBlog colors={colors} />
                             </>
                         </h1>}
                     </div>

@@ -16,9 +16,9 @@ import { DarkModeProvider } from './theme/Darkmode';
 import ProfilePage from './dashboard/LoginProfile/ProfilePage';
 
 import VerticalTabs from './dashboard/Tab/VerticalTabs';
-import Terms from './pages/Terms';
-import AboutUs from './pages/AboutUs';
-import ContactUs from './pages/ContactUs';
+import Terms from './vortexPages/Terms';
+import AboutUs from './vortexPages/Blog';
+import ContactUs from './vortexPages/ContactUs';
 
 import './index.css';
 import './App.css';

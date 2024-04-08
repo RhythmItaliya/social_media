@@ -11,9 +11,9 @@ const AdminNav = () => {
         <Header className='admin-nav p-0'>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px' }}>
                 <Link to="/home">
-                    <img src={logoImage} alt="Logo" style={{ width: '150px', height: 'auto', borderRadius: '5px', margin: '15px 0' }} />
+                    <img src={logoImage} alt="Logo" style={{ width: '150px', height: 'auto', borderRadius: '5px', margin: '0' }} />
                 </Link>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Avatar icon={<UserOutlined />} />
                     <span className="username">Username</span>
                 </div>
