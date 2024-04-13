@@ -88,6 +88,10 @@ const App = () => {
           <Route path="/admin/forgotPassword" element={<AdminForgotPassword />} />
           <Route path="/admin/verify/login/:token" element={<AdminVerifylogin />} />
           <Route path="/admin/reset/password/:token" element={<AdminResetPassword />} />
+          {/* <Route
+            path="/admin"
+            element={<ProtectedRoute condition={isAuthenticated}><AdminDash /></ProtectedRoute>}
+          /> */}
           <Route path="/admin" element={<AdminDash />} />
 
         </Routes>
